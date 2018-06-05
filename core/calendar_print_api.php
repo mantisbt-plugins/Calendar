@@ -17,11 +17,24 @@
 
 function print_time_select_option( $p_selected_time = NULL ) {
 
+    if( $p_selected_time != NULL ) {
+        $fdf                         = date( "H", $p_selected_time );
+        $fdf1                        = date( "i", $p_selected_time );
+        $t_time_format_selected_time = gmmktime( $fdf, $fdf1, 0, 1, 1, 1970 );
+    } else {
+        $t_time_format_selected_time = NULL;
+    }
+
     $t_time_day_start  = plugin_config_get( 'timeDayStart' );
     $t_time_day_finish = plugin_config_get( 'timeDayFinish' );
 
     $t_time_day_start_timestamp  = ($t_time_day_start * 60) * 60;
     $t_time_day_finish_timestamp = ($t_time_day_finish * 60) * 60;
+
+    if( $t_time_format_selected_time < $t_time_day_start_timestamp || $t_time_format_selected_time > $t_time_day_finish_timestamp ) {
+        $t_time_day_start_timestamp  = 0;
+        $t_time_day_finish_timestamp = (24 * 60) * 60;
+    }
 
     $stepDaySeconds        = (60 / plugin_config_get( 'stepDayMinutesCount' )) * 60;
     $t_select_time_options = array();
@@ -32,13 +45,6 @@ function print_time_select_option( $p_selected_time = NULL ) {
 
     echo '<option value="--:--">--:--</option>';
     foreach( $t_select_time_options as $key => $t_current_time ) {
-        if( $p_selected_time != NULL ) {
-            $fdf                         = date( "H", $p_selected_time );
-            $fdf1                        = date( "i", $p_selected_time );
-            $t_time_format_selected_time = gmmktime( $fdf, $fdf1, 0, 1, 1, 1970 );
-        } else {
-            $t_time_format_selected_time = NULL;
-        }
 
         if( $t_time_format_selected_time !== $t_current_time ) {
             echo '<option value="' . $t_current_time . '">' . gmdate( "H:i", $t_current_time ) . '</option>';
