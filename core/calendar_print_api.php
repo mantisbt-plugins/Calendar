@@ -31,7 +31,7 @@ function print_time_select_option( $p_selected_time = NULL ) {
     $t_time_day_start_timestamp  = ($t_time_day_start * 60) * 60;
     $t_time_day_finish_timestamp = ($t_time_day_finish * 60) * 60;
 
-    if( $t_time_format_selected_time < $t_time_day_start_timestamp || $t_time_format_selected_time > $t_time_day_finish_timestamp ) {
+    if( $t_time_format_selected_time < $t_time_day_start_timestamp && $p_selected_time != NULL || $t_time_format_selected_time > $t_time_day_finish_timestamp && $p_selected_time != NULL ) {
         $t_time_day_start_timestamp  = 0;
         $t_time_day_finish_timestamp = (24 * 60) * 60;
     }
