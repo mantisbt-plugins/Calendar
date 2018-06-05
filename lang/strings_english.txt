@@ -1,0 +1,80 @@
+<?php
+# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar for MantisBT is free software: 
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, 
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for for MantisBT is distributed in the hope 
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Customer management plugin for MantisBT.  
+# If not, see <http://www.gnu.org/licenses/>.
+
+$s_plugin_Calendar_name_plugin_description_page = 'Calendar of Events';
+$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the event calendar';
+
+$s_plugin_Calendar_Mon = 'Mon';
+$s_plugin_Calendar_Tue = 'Tue';
+$s_plugin_Calendar_Wed = 'Wed';
+$s_plugin_Calendar_Thu = 'Thu';
+$s_plugin_Calendar_Fri = 'Fri';
+$s_plugin_Calendar_Sat = 'Sat';
+$s_plugin_Calendar_Sun = 'Sun';
+
+$s_plugin_Calendar_config_title = 'Settings';
+$s_plugin_Calendar_config_days_week_display = 'Days of the week for display';
+
+$s_plugin_Calendar_menu_main_front = 'Calendar';
+$s_plugin_Calendar_name_event = 'Event Name';
+$s_plugin_Calendar_date_event = 'Date of the event';
+$s_plugin_Calendar_event = 'Calendar Event';
+$s_plugin_Calendar_event_hystory_create = 'Added to the event';
+$s_plugin_Calendar_add_new_event = 'Add new event';
+$s_plugin_Calendar_enter_report_details_title = 'Enter Event Data';
+$s_plugin_Calendar_insert_event = 'Add to an existing event';
+$s_plugin_Calendar_delete_event_sure_msg = 'Are you sure you want to delete this event?';
+$s_plugin_Calendar_delete_event_button = 'Delete';
+$s_plugin_Calendar_not_update = 'Not updated';
+$s_plugin_Calendar_last_update = 'Updated';
+$s_plugin_Calendar_author = 'Author';
+$s_plugin_Calendar_updater = 'Updated';
+$s_plugin_Calendar_in = 'in';
+$s_plugin_Calendar_from_time = 'from';
+$s_plugin_Calendar_to_time = 'to';
+$s_plugin_Calendar_time_event = 'Time';
+$s_plugin_Calendar_pointer_to_calendar_key = 'Use the button to select the date';
+$s_plugin_Calendar_quantity = 'pcs';
+$s_plugin_Calendar_selected = 'Selected';
+$s_plugin_Calendar_add_button = 'Add';
+$s_plugin_Calendar_cancel_button = 'Cancel';
+$s_plugin_Calendar_event_edit_title = 'Edit Event';
+$s_plugin_Calendar_updating_event_advanced_title = 'Changing event details';
+$s_plugin_Calendar_back_to_event_link = 'back to event';
+$s_plugin_Calendar_update_information_button = 'Edit Data';
+$s_plugin_Calendar_update_successful_button = 'Event changed';
+$s_plugin_Calendar_save_button = 'Save';
+$s_plugin_Calendar_close_button = 'Close';
+
+$s_plugin_Calendar_week = 'Current week';
+$s_plugin_Calendar_day = 'Day';
+$s_plugin_Calendar_next_period = 'Next';
+$s_plugin_Calendar_current_period = 'Current period';
+$s_plugin_Calendar_previous_period = 'Back';
+
+$s_plugin_Calendar_assigned_event = 'Assigned Events';
+$s_plugin_Calendar_not_assigned_event = 'No events assigned';
+$s_plugin_Calendar_event_view_title = 'Event Viewer';
+$s_plugin_Calendar_id = 'Number';
+$s_plugin_Calendar_last_update = 'Date edited';
+$s_plugin_Calendar_not_last_update = 'No';
+$s_plugin_Calendar_event_relationships_bugs = 'Related tasks';
+$s_plugin_Calendar_out_of_range = 'events out of range';
+
+$s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
+
+$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Event %1$d was not found.';

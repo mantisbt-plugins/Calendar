@@ -1,0 +1,82 @@
+<?php
+# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar for MantisBT is free software: 
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, 
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for for MantisBT is distributed in the hope 
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Customer management plugin for MantisBT.  
+# If not, see <http://www.gnu.org/licenses/>.
+
+$s_plugin_Calendar_name_plugin_description_page = 'Календарь событий';
+$s_plugin_Calendar_description = 'Добавляет в MantisBT фунцию планирования выполнения задач на основе календаря событий';
+
+$s_plugin_Calendar_Mon = 'Пн';
+$s_plugin_Calendar_Tue = 'Вт';
+$s_plugin_Calendar_Wed = 'Ср';
+$s_plugin_Calendar_Thu = 'Чт';
+$s_plugin_Calendar_Fri = 'Пт';
+$s_plugin_Calendar_Sat = 'Сб';
+$s_plugin_Calendar_Sun = 'Вс';
+
+$s_plugin_Calendar_config_title = 'Настройка';
+$s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в календаре';
+
+$s_plugin_Calendar_menu_main_front = 'Календарь событий';
+$s_plugin_Calendar_name_event = 'Имя события';
+$s_plugin_Calendar_date_event = 'Дата события';
+$s_plugin_Calendar_event = 'Событие календаря';
+$s_plugin_Calendar_event_hystory_create = 'Добавлено в событие';
+$s_plugin_Calendar_add_new_event = 'Добавить новое событие';
+$s_plugin_Calendar_enter_report_details_title  = 'Введите данные события';
+$s_plugin_Calendar_insert_event = 'Добавить в существующее событие';
+$s_plugin_Calendar_delete_event_sure_msg = 'Вы уверены, что хотите удалить это событие?';
+$s_plugin_Calendar_delete_event_button = 'Удалить';
+$s_plugin_Calendar_not_update = 'Не обновлялось';
+$s_plugin_Calendar_last_update = 'Обновлялось';
+$s_plugin_Calendar_author = 'Автор';
+$s_plugin_Calendar_updater = 'Обновил';
+$s_plugin_Calendar_in = 'в';
+$s_plugin_Calendar_from_time = 'с';
+$s_plugin_Calendar_to_time = 'до';
+$s_plugin_Calendar_time_event = 'Время';
+$s_plugin_Calendar_pointer_to_calendar_key = 'Для выбора даты воспользуйтесь кнопкой';
+$s_plugin_Calendar_quantity = 'шт.';
+$s_plugin_Calendar_selected = 'Выбрано';
+$s_plugin_Calendar_add_button = 'Добавить';
+$s_plugin_Calendar_cancel_button = 'Отмена';
+$s_plugin_Calendar_event_edit_title = 'Редактировать событие';
+$s_plugin_Calendar_updating_event_advanced_title = 'Изменение сведений о событии';
+$s_plugin_Calendar_back_to_event_link = 'назад к событию';
+$s_plugin_Calendar_update_information_button = 'Изменить данные';
+$s_plugin_Calendar_update_successful_button = 'Событие изменено';
+$s_plugin_Calendar_save_button = 'Сохранить';
+$s_plugin_Calendar_close_button = 'Закрыть';
+
+$s_plugin_Calendar_week = 'Текущая неделя';
+$s_plugin_Calendar_day = 'День';
+$s_plugin_Calendar_next_period = 'Вперед';
+$s_plugin_Calendar_current_period = 'Текущий период';
+$s_plugin_Calendar_previous_period = 'Назад';
+
+$s_plugin_Calendar_assigned_event = 'Назначенные события';
+$s_plugin_Calendar_not_assigned_event = 'Нет назначеных событий';
+$s_plugin_Calendar_event_view_title = 'Просмотр события';
+$s_plugin_Calendar_id = 'Номер';
+$s_plugin_Calendar_last_update = 'Дата редактирования';
+$s_plugin_Calendar_not_last_update = 'Нет';
+$s_plugin_Calendar_event_relationships_bugs = 'Связанные задачи';
+$s_plugin_Calendar_date_from = 'Дата начала события';
+$s_plugin_Calendar_date_to = 'Дата окончания события';
+$s_plugin_Calendar_out_of_range = 'события вне диапазона';
+
+$s_plugin_Calendar_view_submitted_event_link = 'Просмотреть созданное событие %1$s';
+
+$MANTIS_ERROR[ERROR_DATE] = 'Дата/время начала события не должна быть равна или больше даты окончания события.';
+$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Событие %1$d не найдено.';

@@ -1,0 +1,188 @@
+/*
+# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar for MantisBT is free software: 
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, 
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for for MantisBT is distributed in the hope 
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Customer management plugin for MantisBT.  
+# If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+.calendar-user{
+    border-collapse: collapse;
+    width: calc(100%);
+    /*width: fit-content;*/
+    /*width: calc(100% - 20px);*/
+    /*min-width: 250px;*/
+    box-shadow: 0 0 7px #CACACA;
+    /*margin-top: 44px;*/
+    /*    margin-top: 10px;
+        margin-right: 10px;
+        margin-left: 10px;*/
+    /*margin: 10px;*/
+    /*margin: 0px;*/
+}
+.calendar-user td{
+    border: 1px solid #E0E0E0;
+    vertical-align: top;
+    padding: 0;
+    /*width: calc(10px);*/
+    height: 140px;
+}
+
+td.column-time-td{
+    /*width: 65px;*/
+}
+td.column-day-td{
+    min-width: 140px;
+    /*width: 65px;*/
+}
+
+td.column-this-day-td{
+    min-width: 140px;
+    background: rgba(3, 169, 244, 0.13);
+    /*width: 65px;*/
+}
+
+ul.column-header-day{
+    background: #F1EFDE;
+    padding: 10px;
+    margin: 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+ul.hour{
+    border-bottom: 1px solid #E0E0E0;
+    position: relative;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.hour li{
+    /*background: #fff;*/
+    height: 20px;
+    line-height: 22px;
+    text-align: center;
+    font-weight: bold;
+    color: #80808B;
+}
+
+/*ul.hour li:first-child{
+    font-weight: bold;
+    color: #80808B;
+}*/
+ul.hour li:last-child{
+    border-bottom: none;
+}
+
+.hour.last-row,
+.hour.last-row li{
+    border-bottom: none;
+    background: #F1F5F7;
+    /*display: inline-block;*/
+}
+
+
+.hour .event_week_expired{
+    overflow: hidden;
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    padding: 9px 11px;
+    box-sizing: border-box;
+    cursor: pointer;
+    /*border: 1px solid rgba(232, 232, 226, 0.82);*/
+    border: 1px solid rgb(206, 230, 105);
+    border-radius: 2px;
+    font-size: 12px;
+    background: rgba(232, 232, 226, 0.82);
+    /*box-shadow: 0 0 4px rgba(232, 232, 226, 0.82);*/
+    box-shadow: 0 0 4px #90A53B;
+    /*margin-right: -15px;*/
+}
+
+.hour .event_week_expired:hover{
+    background: #daec98;
+    box-shadow: 0 0 6px rgb(132, 148, 65);
+    z-index: 999999 !important;
+}
+
+.hour .event_week{
+    overflow: hidden;
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    /*padding: 9px 11px;*/
+    box-sizing: border-box;
+    /*cursor: pointer;*/
+    border: 1px solid rgb(206, 230, 105);
+    border-radius: 2px;
+    font-size: 12px;
+    background: rgba(215, 232, 143, 0.82);
+    box-shadow: 0 0 4px #90A53B;
+    /*margin-right: auto;*/
+}
+.hour .event_week:hover{
+    background: #daec98;
+    box-shadow: 0 0 6px rgb(132, 148, 65);
+    z-index: 999999 !important;
+}
+
+a#event_week{
+    text-decoration: none;
+    color: #535c69;
+}
+
+
+.tasks-list{
+    /*padding: 0 5px 0 0;*/
+    /*overflow-y: scroll;*/
+    /*height: 188px;*/
+}
+ul.tasks-list {
+    /*padding: 0 5px 0 0;*/
+    overflow-y: scroll;
+    margin: 0;
+    /*height: 188px;*/
+}
+.tasks-list a{
+    display: block;
+    margin: 3px 3px;
+    padding: 7px;
+    font-size: 12px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 3px;
+}
+
+.tasks-list-area{
+    height: 350px;
+    overflow-y: scroll;	
+}
+
+.task-area{
+    margin: 4px 4px;
+    border-radius: 2px;
+    position: relative;
+    font-size: 12px;
+}
+
+.task-area label{
+    cursor: pointer;
+    display: block;
+    padding: 7px;
+}
+
+.task-area b{
+    padding: 7px;
+}
