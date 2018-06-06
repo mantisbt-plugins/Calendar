@@ -14,7 +14,7 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-function install_date_from_date_to() { //version 0.0.2(schema 3)
+function install_date_from_date_to() { //version 0.9 (schema 3)
     $p_table_calendar_events = plugin_table( 'events' );
 
     if( db_table_exists( $p_table_calendar_events ) && db_is_connected() ) {
@@ -116,8 +116,8 @@ class CalendarPlugin extends MantisPlugin {
                                   'datetime_picker_format'              => 'DD-MM-Y',
                                   'short_date_format'                   => 'd-m-Y',
                                   'event_time_start_stop_picker_format' => 'HH:mm',
-                                  'startStepDays'                       => 0, // Начало рабочей недели
-                                  'countStepDays'                       => 7, // Количество дней для отображения
+                                  'startStepDays'                       => 0,
+                                  'countStepDays'                       => 7,
                                   'arWeekdaysName'                      => array( 'Mon' => ON,
                                                             'Tue' => ON,
                                                             'Wed' => ON,
@@ -125,8 +125,8 @@ class CalendarPlugin extends MantisPlugin {
                                                             'Fri' => ON,
                                                             'Sat' => ON,
                                                             'Sun' => ON ),
-                                  'timeDayStart'                        => 9,
-                                  'timeDayFinish'                       => 18,
+                                  'time_day_start'                      => 32400,
+                                  'time_day_finish'                     => 64800,
                                   'stepDayMinutesCount'                 => 2,
                                   'manage_calendar_threshold'           => DEVELOPER,
                                   'calendar_view_threshold'             => DEVELOPER,
@@ -145,6 +145,7 @@ class CalendarPlugin extends MantisPlugin {
 
         define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
         define( 'ERROR_DATE', 'ERROR_DATE' );
+        define( 'ERROR_RANGE_TIME', 'ERROR_RANGE_TIME' );
     }
 
     function hooks() {
