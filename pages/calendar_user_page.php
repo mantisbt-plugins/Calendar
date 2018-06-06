@@ -49,7 +49,7 @@ $f_full_time = gpc_get_bool( "full_time" );
         <div class="widget-header widget-header-small">
             <h4 class="widget-title lighter">
                 <i class="ace-icon fa fa-list-alt"></i>
-                <?php echo plugin_lang_get( 'menu_main_front' ). " ( GMT " . date("P"). " )"; ?>
+                <?php echo plugin_lang_get( 'menu_main_front' ) . " ( GMT " . date( "P" ) . " )"; ?>
             </h4>
         </div>
         <div class="widget-body">
@@ -61,7 +61,7 @@ $f_full_time = gpc_get_bool( "full_time" );
                         if( $f_full_time == FALSE ) {
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&week=" . $f_week . "&full_time=TRUE", "0-24" );
                         } else {
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&week=" . $f_week, plugin_config_get( 'timeDayStart' ) . "-" . plugin_config_get( 'timeDayFinish' ) );
+                            print_small_button( plugin_page( 'calendar_user_page' ) . "&week=" . $f_week, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
                         }
                         ?>
                     </div>
@@ -84,8 +84,8 @@ $f_full_time = gpc_get_bool( "full_time" );
             </div>
 
             <div class="widget-main no-padding">
-                                <div class="table-responsive" style="overflow-y: hidden;">
-                <!--<div class="table-responsive">-->
+                <div class="table-responsive" style="overflow-y: hidden;">
+                    <!--<div class="table-responsive">-->
                     <table class="calendar-user week">
                         <tr class="row-day">
                             <?php
