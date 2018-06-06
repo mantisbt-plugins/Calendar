@@ -20,39 +20,42 @@ function print_column_time( $p_full_time = FALSE ) {
     echo '<td class="column-time-td">';
     echo '<ul class="column-header-day">' . plugin_lang_get( 'time_event' ) . '</ul>';
 
+    $t_step_interval = plugin_config_get( 'stepDayMinutesCount' );
+
+    $t_time_count = 3600 / $t_step_interval;
+
     if( $p_full_time == TRUE ) {
-        $timeDayStart  = 0;
-        $timeDayFinish = 24;
+        $t_times_day = range( 0, 86400, $t_time_count );
     } else {
-        $timeDayStart  = plugin_config_get( 'timeDayStart' );
-        $timeDayFinish = plugin_config_get( 'timeDayFinish' );
+        $t_time_day_start  = plugin_config_get( 'time_day_start' );
+        $t_time_day_finish = plugin_config_get( 'time_day_finish' );
+        $t_times_day       = range( $t_time_day_start, $t_time_day_finish, $t_time_count );
     }
-    $stepDayMinutesCount = plugin_config_get( 'stepDayMinutesCount' );
-    $stepDayMinutes      = 60 / $stepDayMinutesCount;
 
-    for( $countHours = $timeDayStart; $countHours < $timeDayFinish; $countHours++ ) {
-        echo "<ul class=\"hour\" id=\"hour" . $countHours . "\">";
+    $t_count_times_day = count( $t_times_day ) - 1;
 
-        for( $z = 0, $min = $stepDayMinutes; $z < $stepDayMinutesCount; $z++ ) {
-            echo "<li>";
-            if( $z == 0 ) {
-                echo $countHours . ":00";
-            } else {
-                echo $countHours . ':' . $min;
-                $min = $min + $stepDayMinutes;
-            }
-            echo "</li>";
+    foreach( $t_times_day as $key => $t_time ) {
+
+        if( !($key % $t_step_interval) && $t_count_times_day != $key ) {
+            echo "<ul class=\"hour\" id=\"hour_" . $t_time . "\">";
+        }
+        if( $t_count_times_day == $key ) {
+            echo "<ul class=\"hour last-row\" id=\"hour_" . $t_time . "\">";
         }
 
-        echo "</ul>";
+        echo "<li>";
+        echo gmdate( "H:i", $t_time );
+        echo "</li>";
+
+        if( $key % $t_step_interval && $t_count_times_day != $key ) {
+            echo "</ul>";
+        }
+        if( $t_count_times_day == $key ) {
+            echo "</ul>";
+        }
     }
 
-    echo "<ul class=\"hour last-row\" id=\"hour" . $timeDayFinish . "\">";
-    echo "<li>" . $timeDayFinish . ':00</li>';
-    echo "</ul>";
-
     echo "</td>";
-//    echo "</tr>";
 }
 
 function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $p_full_time = FALSE ) {
