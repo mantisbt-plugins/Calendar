@@ -78,3 +78,4 @@ $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
 
 $MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
 $MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Event %1$d was not found.';
+$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
