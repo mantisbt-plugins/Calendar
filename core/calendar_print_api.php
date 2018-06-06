@@ -15,38 +15,28 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-function print_time_select_option( $p_selected_time = NULL ) {
+function print_time_select_option( $p_selected_time = NULL, $p_full_range = FALSE ) {
 
-    if( $p_selected_time != NULL ) {
-        $fdf                         = date( "H", $p_selected_time );
-        $fdf1                        = date( "i", $p_selected_time );
-        $t_time_format_selected_time = gmmktime( $fdf, $fdf1, 0, 1, 1, 1970 );
+    if( $p_full_range == FALSE ) {
+        $t_time_day_start_timestamp  = plugin_config_get( 'time_day_start' );
+        $t_time_day_finish_timestamp = plugin_config_get( 'time_day_finish' );
     } else {
-        $t_time_format_selected_time = NULL;
-    }
-
-    $t_time_day_start  = plugin_config_get( 'timeDayStart' );
-    $t_time_day_finish = plugin_config_get( 'timeDayFinish' );
-
-    $t_time_day_start_timestamp  = ($t_time_day_start * 60) * 60;
-    $t_time_day_finish_timestamp = ($t_time_day_finish * 60) * 60;
-
-    if( $t_time_format_selected_time < $t_time_day_start_timestamp && $p_selected_time != NULL || $t_time_format_selected_time > $t_time_day_finish_timestamp && $p_selected_time != NULL ) {
         $t_time_day_start_timestamp  = 0;
-        $t_time_day_finish_timestamp = (24 * 60) * 60;
+        $t_time_day_finish_timestamp = 86400;
     }
 
-    $stepDaySeconds        = (60 / plugin_config_get( 'stepDayMinutesCount' )) * 60;
-    $t_select_time_options = array();
-
-    for( $i = $t_time_day_start_timestamp; $i <= $t_time_day_finish_timestamp; $i = $i + $stepDaySeconds ) {
-        $t_select_time_options[] = $i;
+    if( $p_selected_time < $t_time_day_start_timestamp && $p_selected_time !== NULL || $p_selected_time > $t_time_day_finish_timestamp && $p_selected_time !== NULL ) {
+        $t_time_day_start_timestamp  = 0;
+        $t_time_day_finish_timestamp = 86400;
     }
+
+    $t_time_count          = 3600 / plugin_config_get( 'stepDayMinutesCount' );
+    $t_select_time_options = range( $t_time_day_start_timestamp, $t_time_day_finish_timestamp, $t_time_count );
 
     echo '<option value="--:--">--:--</option>';
     foreach( $t_select_time_options as $key => $t_current_time ) {
 
-        if( $t_time_format_selected_time !== $t_current_time ) {
+        if( $p_selected_time !== $t_current_time ) {
             echo '<option value="' . $t_current_time . '">' . gmdate( "H:i", $t_current_time ) . '</option>';
         } else {
             echo '<option selected value="' . $t_current_time . '">' . gmdate( "H:i", $t_current_time ) . '</option>';
