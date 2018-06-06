@@ -98,17 +98,13 @@ ul.hour li:last-child{
     position: absolute;
     left: -1px;
     right: -1px;
-    padding: 9px 11px;
     box-sizing: border-box;
     cursor: pointer;
-    /*border: 1px solid rgba(232, 232, 226, 0.82);*/
     border: 1px solid rgb(206, 230, 105);
     border-radius: 2px;
     font-size: 12px;
     background: rgba(232, 232, 226, 0.82);
-    /*box-shadow: 0 0 4px rgba(232, 232, 226, 0.82);*/
     box-shadow: 0 0 4px #90A53B;
-    /*margin-right: -15px;*/
 }
 
 .hour .event_week_expired:hover{
