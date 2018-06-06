@@ -87,17 +87,15 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
 
     echo '<ul class="column-header-day"><span>' . plugin_lang_get( date( "D", $p_day ) ) . ', ' . date( config_get( 'short_date_format' ), $p_day ) . '</span></ul>';
 
+    $t_count_times_day = count( $t_times_this_day ) - 1;
+
     foreach( $t_times_this_day as $key => $t_current_time ) {
 
-        if( !($key % $stepDayMinutesCount) ) {
-            echo "<ul class=\"hour\" id=\"area_hour\">";
+        if( !($key % $stepDayMinutesCount) && $t_count_times_day != $key ) {
+            echo "<ul class=\"hour\" id=\"area_hour_" . $t_current_time . "\">";
         }
-        if( !$p_events_id ) {
 
-            echo "<li id=\"area_min_" . $t_current_time . "\">";
-            echo "&nbsp;";
-            echo "</li>";
-        } else {
+        if( $t_count_times_day != $key ) {
 
             echo "<li id=\"area_min_" . $t_current_time . "\">";
 
@@ -215,8 +213,8 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
 
             echo "</li>";
         }
-        $r = count( $t_times_this_day ) - 1;
-        if( $key == $r ) {
+
+        if( $key == $t_count_times_day ) {
             echo "</ul>";
             echo "<ul class=\"hour last-row\" id=\"area_hour\">";
             if( count( $t_out_of_range_event ) != 0 ) {
@@ -224,7 +222,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
             } else {
                 echo "<li></li>";
             }
-        } else if( $key % $stepDayMinutesCount || $key == $r ) {
+        } else if( $key % $stepDayMinutesCount || $key == $t_count_times_day ) {
             echo "</ul>";
         }
     }
