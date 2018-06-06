@@ -1,4 +1,5 @@
 <?php
+
 # Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -19,19 +20,37 @@ form_security_validate( 'calendar_config_edit' );
 auth_reauthenticate();
 access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
 
-$t_days_week_config  = plugin_config_get('arWeekdaysName');
-$f_days_week_cheked = gpc_get_string_array( 'days_week', plugin_config_get( 'arWeekdaysName' ) );
+$t_days_week_config = plugin_config_get( 'arWeekdaysName' );
+$f_days_week_cheked = gpc_get_string_array( 'days_week' );
 
-foreach($t_days_week_config as $t_name_day=>$t_status) {
-    if( in_array( $t_name_day, $f_days_week_cheked)){
-       $t_days_week_config[$t_name_day] = ON;
+$f_time_start  = gpc_get_int( 'time_day_start' );
+$f_time_finish = gpc_get_int( 'time_day_finish' );
+
+foreach( $t_days_week_config as $t_name_day => $t_status ) {
+    if( in_array( $t_name_day, $f_days_week_cheked ) ) {
+        $t_days_week_config_set[$t_name_day] = ON;
     } else {
-        $t_days_week_config[$t_name_day] = OFF;
+        $t_days_week_config_set[$t_name_day] = OFF;
     }
-            
 }
-plugin_config_set( 'arWeekdaysName', $t_days_week_config );
 
+if( $f_time_start >= $f_time_finish ) {
+    error_parameters( plugin_lang_get( 'date_event' ) );
+    trigger_error( ERROR_RANGE_TIME, ERROR );
+}
+
+
+if( $t_days_week_config_set != $t_days_week_config ) {
+    plugin_config_set( 'arWeekdaysName', $t_days_week_config_set );
+}
+
+if( plugin_config_get( 'time_day_start' ) != $f_time_start ) {
+    plugin_config_set( 'time_day_start', $f_time_start );
+}
+
+if( plugin_config_get( 'time_day_finish' ) != $f_time_finish ) {
+    plugin_config_set( 'time_day_finish', $f_time_finish );
+}
 
 form_security_purge( plugin_page( 'config', true ) );
 
