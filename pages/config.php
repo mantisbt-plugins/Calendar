@@ -50,7 +50,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                 </colgroup>
 
                                 <tr <?php echo helper_alternate_class() ?>>
-                                    <td class="category" width="60%">
+                                    <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_days_week_display' ) ?>
 
                                     </td>
@@ -65,6 +65,32 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                             }
                                         }
                                         ?>
+                                    </td>
+                                </tr>
+
+                                <tr <?php echo helper_alternate_class() ?>>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_time_day_range' ) ?>
+
+                                    </td>
+
+                                    <td width="25%">
+                                        <select name="time_day_start">
+                                            <?php
+                                            $t_time_day_start = plugin_config_get( 'time_day_start' );
+
+                                            print_time_select_option( $t_time_day_start, TRUE );
+                                            ?>
+                                        </select>
+                                    </td>
+                                    <td width="25%">
+                                        <select name="time_day_finish">
+                                            <?php
+                                            $t_time_day_finish = plugin_config_get( 'time_day_finish' );
+
+                                            print_time_select_option( $t_time_day_finish, TRUE );
+                                            ?>
+                                        </select>
                                     </td>
                                 </tr>
 
