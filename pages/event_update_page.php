@@ -22,9 +22,6 @@ access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_eve
 $t_current_project = helper_get_current_project();
 $t_project_id      = gpc_get_int( 'project_id', $t_current_project );
 
-$t_time_day_start  = plugin_config_get( 'timeDayStart' );
-$t_time_day_finish = plugin_config_get( 'timeDayFinish' );
-
 $t_event = event_get( $f_event_id );
 
 if( $t_event->project_id != $t_current_project ) {
@@ -103,7 +100,7 @@ layout_page_begin();
                                         <span class="date-event time-event">
 
                                             <span class="event_time_start-area">
-                                                <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( $t_event->date_from ); ?></select>
+                                                <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_from ) . " GMT", 0 ) ); ?></select>
                                             </span>
 
                                         </span>
@@ -120,7 +117,7 @@ layout_page_begin();
                                     <td>
                                         <span class="date-event time-event">
                                             <span class="event_time_finish">
-                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( $t_event->date_to ); ?></select>
+                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_to ) . " GMT", 0 ) ); ?></select>
                                             </span>	
                                         </span>
                                     </td>
