@@ -37,21 +37,19 @@ function days_of_number_week( $p_start_step_days, $p_count_step_days, $t_week_da
 }
 
 function times_day( $p_date, $p_full_time = FALSE ) {
+
     if( $p_full_time == TRUE ) {
         $t_time_day_start  = 0;
-        $t_time_day_finish = 24;
+        $t_time_day_finish = 86400;
     } else {
-        $t_time_day_start  = plugin_config_get( 'timeDayStart' );
-        $t_time_day_finish = plugin_config_get( 'timeDayFinish' );
+        $t_time_day_start  = plugin_config_get( 'time_day_start' );
+        $t_time_day_finish = plugin_config_get( 'time_day_finish' );
     }
-    $t_time_start  = $p_date + ( ($t_time_day_start * 60) * 60);
-    $t_time_finish = $p_date + ( ($t_time_day_finish * 60) * 60);
-    $t_time_count  = 3600 / plugin_config_get( 'stepDayMinutesCount' );
-    $t_dates       = array();
 
-    for( $i = $t_time_start; $i < $t_time_finish; $i = $i + $t_time_count ) {
-        $t_dates[] = $i;
-    }
+    $t_time_start  = $p_date + $t_time_day_start;
+    $t_time_finish = $p_date + $t_time_day_finish;
+    $t_time_count  = 3600 / plugin_config_get( 'stepDayMinutesCount' );
+    $t_dates       = range( $t_time_start, $t_time_finish, $t_time_count );
 
     return $t_dates;
 }
@@ -113,7 +111,6 @@ function get_events_id_from_bug_id( $p_bug_id ) {
         for( $i = 0; $i < $t_row_count; $i++ ) {
             array_push( $cResult, db_fetch_array( $result ) );
             $pResult[$i] = $cResult[$i]["event_id"];
-//                $pResult[] = $cResult[$i]["event_id"];
         }
 
         return $pResult;
@@ -144,7 +141,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id ) {
 
     if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
 
-        $arDays = array(); // массив для записи событий
+        $arDays = array();
         db_param_push();
 
         $p_query = "SELECT id FROM " . $t_table_calendar_events . " WHERE activity = 'Y' AND date_from BETWEEN " . db_param() . " AND " . db_param();
