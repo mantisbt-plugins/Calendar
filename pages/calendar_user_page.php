@@ -116,7 +116,11 @@ $f_full_time = gpc_get_bool( "full_time" );
                 <div class="widget-toolbox padding-8 clearfix">
                     <div class="form-inline pull-left">
                         <?php
-                        print_small_button( plugin_page( 'event_add_page' ), plugin_lang_get( 'add_new_event' ) );
+                        if( $f_full_time == TRUE ) {
+                            print_small_button( plugin_page( 'event_add_page' ) . "&full_time=TRUE", plugin_lang_get( 'add_new_event' ) );
+                        } else {
+                            print_small_button( plugin_page( 'event_add_page' ), plugin_lang_get( 'add_new_event' ) );
+                        }
                         ?>
                     </div>
                 </div>

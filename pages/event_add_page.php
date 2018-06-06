@@ -14,7 +14,8 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-$f_bug_id = gpc_get_int( 'bug_id', 0 );
+$f_bug_id    = gpc_get_int( 'bug_id', 0 );
+$f_full_time = gpc_get_bool( "full_time" );
 
 if( $f_bug_id == 0 ) {
 
@@ -47,11 +48,11 @@ if( $f_bug_id == 0 ) {
     }
     access_ensure_project_level( plugin_config_get( 'calendar_edit_threshold' ) );
 } else {
-    bug_ensure_exists($f_bug_id);
-    
+    bug_ensure_exists( $f_bug_id );
+
     $t_project_id = bug_get_field( $f_bug_id, 'project_id' );
 
-    $g_project_override = bug_get_field( $f_bug_id, 'project_id');
+    $g_project_override = bug_get_field( $f_bug_id, 'project_id' );
 }
 
 
@@ -122,7 +123,7 @@ $t_form_encoding   = '';
                                     <span class="date-event time-event">
 
                                         <span class="event_time_start-area">
-                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option(); ?></select>
+                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
                                         </span>
 
                                     </span>
@@ -139,7 +140,7 @@ $t_form_encoding   = '';
                                 <td>
                                     <span class="date-event time-event">
                                         <span class="event_time_finish">
-                                            <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option(); ?></select>
+                                            <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
                                         </span>	
                                     </span>
                                 </td>
