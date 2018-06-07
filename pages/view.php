@@ -136,8 +136,92 @@ echo '</tr>';
 echo '</tbody></table>';
 echo '</div></div></div></div></div>';
 
-//relationship_event_view_box( $t_event->id );
+//show members list
+if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $f_event_id ) ) {
+    $t_users     = event_get_monitors( $f_event_id );
+    $t_num_users = sizeof( $t_users );
+
+    echo '<div class="col-md-12 col-xs-12">';
+    echo '<a id="members"></a>';
+    echo '<div class="space-10"></div>';
+
+    $t_collapse_block    = is_collapsed( 'monitoring' );
+    $t_block_css         = $t_collapse_block ? 'collapsed' : '';
+    $t_block_icon        = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
+    ?>
+    <div id="members" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
+        <div class="widget-header widget-header-small">
+            <h4 class="widget-title lighter">
+                <i class="ace-icon fa fa-users"></i>
+                <?php echo plugin_lang_get( 'members' ) ?>
+            </h4>
+            <div class="widget-toolbar">
+                <a data-action="collapse" href="#">
+                    <i class="1 ace-icon fa <?php echo $t_block_icon ?> bigger-125"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="widget-body">
+            <div class="widget-main no-padding">
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-condensed table-striped">
+                        <tr>
+                            <th class="category" width="15%">
+                                <?php echo lang_get( 'monitoring_user_list' ); ?>
+                            </th>
+                            <td>
+                                <?php
+                                $t_can_delete_others = access_has_event_level( plugin_config_get( 'member_delete_others_event_threshold' ), $f_event_id );
+                                for( $i = 0; $i < $t_num_users; $i++ ) {
+                                    echo ($i > 0) ? ', ' : '';
+                                    print_user( $t_users[$i] );
+                                    if( $t_can_delete_others ) {
+                                        echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '?event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
+                                    }
+                                }
+
+                                if( access_has_event_level( plugin_config_get( 'member_add_others_event_threshold' ), $f_event_id ) ) {
+
+                                    $project_users = project_get_all_user_rows( $t_event->project_id );
+                                    ?>
+                                    <br /><br />
+                                    <form method="post" action="<?php echo plugin_page( 'event_member_add' ) ?>" class="form-inline noprint">
+                                        <?php echo form_security_field( 'event_member_add' ) ?>
+                                        <input type="hidden" name="event_id" value="<?php echo (integer) $f_event_id; ?>" />
+                                        <?php if( is_array( $project_users ) && count( $project_users ) > 0 ): ?>			
+                                            <select size="8" multiple name="user_ids[]">
+                                                <?php foreach( $project_users as $project_user ): ?>
+                                                    <?php
+                                                    if( !in_array( $project_user['id'], $t_users ) ) {
+                                                        ?>
+                                                        <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
+                                                            <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
+                                                        <?php
+                                                        endif;
+                                                    }
+                                                    ?>
+                                            <?php endforeach; ?>
+                                            </select><br><br>
+        <?php endif; ?>
+                                        <input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="<?php echo plugin_lang_get( 'add_user_to_member' ) ?>" />
+                                    </form>
+    <?php } ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <?php
+} # show monitor list
 ?>
+
+
 
 <div class="col-md-12 col-xs-12">
     <div class="space-10"></div>
@@ -151,7 +235,7 @@ echo '</div></div></div></div></div>';
         <div class="widget-header widget-header-small">
             <h4 class="widget-title lighter">
                 <i class="ace-icon fa fa-sitemap"></i>
-                <?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
+<?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
             </h4>
             <div class="widget-toolbar">
                 <a data-action="collapse" href="#">

@@ -26,12 +26,12 @@ $t_event_data = new CalendarEventData;
 $f_event_time_start  = gpc_get_int( 'event_time_start' );
 $f_event_time_finish = gpc_get_int( 'event_time_finish' );
 
-$t_event_data->project_id     = gpc_get_int( 'project_id', helper_get_current_project() );
-$t_event_data->name           = gpc_get_string( 'name_event' );
-$t_event_data->activity       = "Y";
-$t_event_data->author_id      = auth_get_current_user_id();
-$t_event_data->date_from      = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_start;
-$t_event_data->date_to        = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish;
+$t_event_data->project_id = gpc_get_int( 'project_id', helper_get_current_project() );
+$t_event_data->name       = gpc_get_string( 'name_event' );
+$t_event_data->activity   = "Y";
+$t_event_data->author_id  = auth_get_current_user_id();
+$t_event_data->date_from  = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_start;
+$t_event_data->date_to    = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish;
 
 $t_event_id = $t_event_data->create();
 
@@ -57,6 +57,17 @@ if( $f_bugs[0] !== 0 && !is_blank( $t_event_id ) ) {
     }
 }
 
+$f_owner_is_members = gpc_get_bool( 'owner_is_members' );
+
+if( $f_owner_is_members ) {
+    event_monitor( $t_event_id, $t_event_data->author_id );
+}
+
+$f_member_user_list = gpc_get_int_array( 'user_ids', array( 0 ) );
+
+foreach( $f_member_user_list as $t_member ) {
+    event_monitor( $t_event_id, $t_member );
+}
 
 form_security_purge( 'event_add' );
 

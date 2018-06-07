@@ -400,3 +400,71 @@ function event_is_user_reporter( $p_event_id, $p_user_id ) {
         return false;
     }
 }
+
+/**
+ * enable monitoring of this event for the user
+ * @param integer $p_event_id  Integer representing event identifier.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return boolean true if successful, false if unsuccessful
+ * @access public
+ */
+function event_monitor( $p_event_id, $p_user_id ) {
+	$c_event_id = (int)$p_event_id;
+	$c_user_id = (int)$p_user_id;
+
+	# Make sure we aren't already monitoring this event
+	if( user_is_monitoring_event( $c_user_id, $c_event_id ) ) {
+		return true;
+	}
+
+	# Don't let the anonymous user monitor events
+	if( user_is_anonymous( $c_user_id ) ) {
+		return false;
+	}
+
+	# Insert monitoring record
+        $t_event_monitor_table = plugin_table( 'event_monitor' );
+	db_param_push();
+	$t_query = "INSERT INTO $t_event_monitor_table ( user_id, event_id ) VALUES (" . db_param() . "," . db_param() . ")";
+	db_query( $t_query, array( $c_user_id, $c_event_id ) );
+
+	# log new monitoring action
+//	history_log_event_special( $c_event_id, BUG_MONITOR, $c_user_id );
+
+	# updated the last_updated date
+	event_update_date( $p_event_id );
+
+//	email_monitor_added( $p_event_id, $p_user_id );
+
+	return true;
+}
+
+/**
+ * Returns the list of users monitoring the specified event
+ *
+ * @param integer $p_bevent_id Integer representing event identifier.
+ * @return array
+ */
+function event_get_monitors( $p_event_id ) {
+	if( ! access_has_event_level( config_get( 'show_monitor_list_threshold' ), $p_event_id ) ) {
+		return array();
+	}
+
+	# get the eventnote data
+        $t_event_monitor_table = plugin_table( 'event_monitor' );
+	db_param_push();
+	$t_query = "SELECT user_id, enabled
+			FROM $t_event_monitor_table m, {user} u
+			WHERE m.event_id=" . db_param() . " AND m.user_id = u.id
+			ORDER BY u.realname, u.username";
+	$t_result = db_query( $t_query, array( $p_event_id ) );
+
+	$t_users = array();
+	while( $t_row = db_fetch_array( $t_result ) ) {
+		$t_users[] = $t_row['user_id'];
+	}
+
+	user_cache_array_rows( $t_users );
+
+	return $t_users;
+}

@@ -140,9 +140,25 @@ $t_form_encoding   = '';
                                 <td>
                                     <span class="date-event time-event">
                                         <span class="event_time_finish">
-                                            <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
+                                            <select  <?php helper_get_tab_index() ?> name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
                                         </span>	
                                     </span>
+                                </td>
+                            </tr>
+
+                            <!--#owner_is_members-->
+
+                            <tr>
+                                <th class="category">
+                                    <label for="owner_is_members"><?php echo plugin_lang_get( 'owner_is_members' ) ?></label>
+                                </th>
+                                <td>
+
+                                    <label class="inline">
+                                        <input type="checkbox" name="owner_is_members" class="ace input-sm" id="owner_is_members" checked="checked">
+                                        <span class="lbl"></span>
+                                    </label>
+
                                 </td>
                             </tr>
 
@@ -150,50 +166,20 @@ $t_form_encoding   = '';
                     </div>    
 
 
-
-
-                    <?php
-                    $t_per_page        = null;
-                    $t_bug_count       = null;
-                    $t_page_count      = null;
-
-                    $t_bugs = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count, null, $t_project_id, null, true );
-
-//if ($rows === false) {
-//    print_header_redirect('view_all_set.php?type=0');
-//}
-
-                    $t_bugslist       = Array();
-                    $t_users_handlers = Array();
-                    $t_project_ids    = Array();
-                    $t_row_count      = count( $t_bugs );
-
-                    for( $i = 0; $i < $t_row_count; $i++ ) {
-                        array_push( $t_bugslist, $t_bugs[$i]->id );
-                        $t_users_handlers[] = $t_bugs[$i]->handler_id;
-                        $t_project_ids[]    = $t_bugs[$i]->project_id;
-                    }
-                    $t_unique_users_handlers = array_unique( $t_users_handlers );
-                    $t_unique_project_ids    = array_unique( $t_project_ids );
-                    user_cache_array_rows( $t_unique_users_handlers );
-                    project_cache_array_rows( $t_unique_project_ids );
-
-                    gpc_set_cookie( config_get( 'bug_list_cookie' ), implode( ',', $t_bugslist ) );
-                    ?>
-
+                    <?php #members_list_add ?>
                     <div class="col-md-12 col-xs-12">
                         <div class="space-10"></div>
 
                         <?php
-                        $t_collapse_block = is_collapsed( 'relationships_event' );
-                        $t_block_css      = $t_collapse_block ? 'collapsed' : '';
-                        $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
+                        $t_collapse_block  = 'collapsed';
+                        $t_block_css       = $t_collapse_block ? 'collapsed' : '';
+                        $t_block_icon      = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
                         ?>
-                        <div id="relationships" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
+                        <div id="members_list_add" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
                             <div class="widget-header widget-header-small">
                                 <h4 class="widget-title lighter">
-                                    <i class="ace-icon fa fa-sitemap"></i>
-                                    <?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
+                                    <i class="ace-icon fa fa-users"></i>
+                                    <?php echo plugin_lang_get( 'members' ) ?>
                                 </h4>
                                 <div class="widget-toolbar">
                                     <a data-action="collapse" href="#">
@@ -201,20 +187,99 @@ $t_form_encoding   = '';
                                     </a>
                                 </div>
                             </div>
+
                             <div class="widget-body">
                                 <div class="widget-main no-padding">
-                                    <div class="table-responsive">
-                                        <div class="tasks-list-area">
-                                            <?php
-                                            foreach( $t_bugs as $bug ) {
-                                                $bug_id           = $bug->id;
-                                                $bug_name         = $bug->summary;
-                                                $bug_status_color = get_status_color( bug_get_field( $bug_id, "status" ) );
-                                                $t_checked        = $bug_id == $f_bug_id ? "checked" : " ";
+                                    <table class="table table-bordered table-condensed table-striped">
+                                        <div class="table-responsive">
+                                            <tr>
+                                                <th class="category" width="15%">
+                                                    <?php echo lang_get( 'monitoring_user_list' ); ?>
+                                                </th>
+                                                <td>
+                                                    <?php
+                                                    $project_users     = project_get_all_user_rows( $t_project_id );
+                                                    ?>
 
-                                                echo '<div class="task-area" style="background-color:' . $bug_status_color . ';">';
-                                                echo '<label for="task_' . $bug_id . '">';
-                                                echo '<input
+                                                    <?php if( is_array( $project_users ) && count( $project_users ) > 0 ): ?>			
+                                                        <select size="8" multiple name="user_ids[]">
+                                                            <?php foreach( $project_users as $project_user ): ?>
+                                                                <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
+                                                                    <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
+                                                                <?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    <?php endif; ?>
+
+                                                </td>
+                                            </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <?php
+                $t_per_page   = null;
+                $t_bug_count  = null;
+                $t_page_count = null;
+
+                $t_bugs = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count, null, $t_project_id, null, true );
+
+                $t_bugslist       = Array();
+                $t_users_handlers = Array();
+                $t_project_ids    = Array();
+                $t_row_count      = count( $t_bugs );
+
+                for( $i = 0; $i < $t_row_count; $i++ ) {
+                    array_push( $t_bugslist, $t_bugs[$i]->id );
+                    $t_users_handlers[] = $t_bugs[$i]->handler_id;
+                    $t_project_ids[]    = $t_bugs[$i]->project_id;
+                }
+                $t_unique_users_handlers = array_unique( $t_users_handlers );
+                $t_unique_project_ids    = array_unique( $t_project_ids );
+                user_cache_array_rows( $t_unique_users_handlers );
+                project_cache_array_rows( $t_unique_project_ids );
+
+                gpc_set_cookie( config_get( 'bug_list_cookie' ), implode( ',', $t_bugslist ) );
+                ?>
+
+                <div class="col-md-12 col-xs-12">
+                    <div class="space-10"></div>
+
+                    <?php
+                    $t_collapse_block = is_collapsed( 'relationships_event' );
+                    $t_block_css      = $t_collapse_block ? 'collapsed' : '';
+                    $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
+                    ?>
+                    <div id="relationships" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
+                        <div class="widget-header widget-header-small">
+                            <h4 class="widget-title lighter">
+                                <i class="ace-icon fa fa-sitemap"></i>
+                                <?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
+                            </h4>
+                            <div class="widget-toolbar">
+                                <a data-action="collapse" href="#">
+                                    <i class="1 ace-icon fa <?php echo $t_block_icon ?> bigger-125"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main no-padding">
+                                <div class="table-responsive">
+                                    <div class="tasks-list-area">
+                                        <?php
+                                        foreach( $t_bugs as $bug ) {
+                                            $bug_id           = $bug->id;
+                                            $bug_name         = $bug->summary;
+                                            $bug_status_color = get_status_color( bug_get_field( $bug_id, "status" ) );
+                                            $t_checked        = $bug_id == $f_bug_id ? "checked" : " ";
+
+                                            echo '<div class="task-area" style="background-color:' . $bug_status_color . ';">';
+                                            echo '<label for="task_' . $bug_id . '">';
+                                            echo '<input
 							type="checkbox"
 							name="bugs_add[]"
 							id="task_' . $bug_id . '"
@@ -224,28 +289,28 @@ $t_form_encoding   = '';
 							data-options="{background-color:' . $bug_status_color . ';}"
 							>';
 
-                                                echo '<b>' . $bug_id . '</b>: ' . $bug_name;
-                                                echo '</label>';
-                                                echo '</div>';
-                                            }
-                                            ?>
-                                        </div>
+                                            echo '<b>' . $bug_id . '</b>: ' . $bug_name;
+                                            echo '</label>';
+                                            echo '</div>';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                </div>
-                <div class="widget-toolbox padding-8 clearfix">
-                    <span class="required pull-right"> * <?php echo lang_get( 'required' ) ?></span>
-                    <input <?php echo helper_get_tab_index() ?> type="submit" class="btn btn-primary btn-white btn-round" value="<?php echo plugin_lang_get( 'add_button' ) ?>" />
-                </div>
+            </div>
+            <div class="widget-toolbox padding-8 clearfix">
+                <span class="required pull-right"> * <?php echo lang_get( 'required' ) ?></span>
+                <input <?php echo helper_get_tab_index() ?> type="submit" class="btn btn-primary btn-white btn-round" value="<?php echo plugin_lang_get( 'add_button' ) ?>" />
             </div>
         </div>
+</div>
 
 
-    </form>
+</form>
 </div>
 
 <?php

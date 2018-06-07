@@ -50,6 +50,30 @@ function install_date_from_date_to() { //version 0.9 (schema 3)
     return TRUE;
 }
 
+function install_turn_user_owner_to_user_member() { //version 2.2.0 (schema 7)
+    $p_table_calendar_events        = plugin_table( 'events' );
+    $p_table_calendar_event_monitor = plugin_table( 'event_monitor' );
+
+    if( db_table_exists( $p_table_calendar_events ) && db_table_exists( $p_table_calendar_event_monitor ) && db_is_connected() ) {
+        $t_events_id = array();
+
+        $t_query = "SELECT id, author_id FROM " . $p_table_calendar_events;
+        $arRes   = db_query( $t_query, NULL, -1, -1 );
+
+        foreach( $arRes as $key => $t_event_id ) {
+
+            $query = "INSERT INTO $p_table_calendar_event_monitor
+                                                ( user_id, event_id
+                                                )
+                                              VALUES
+                                                ( " . db_param() . ',' . db_param() . ')';
+
+            db_query( $query, Array( $t_event_id['author_id'], $t_event_id['id'] ) );
+        }
+    }
+    return TRUE;
+}
+
 class CalendarPlugin extends MantisPlugin {
 
     function register() {
@@ -71,7 +95,7 @@ class CalendarPlugin extends MantisPlugin {
     function schema() {
 
         return array(
-                                  // version 0.0.1(schema 0)
+// version 0.0.1(schema 0)
                                   array( "CreateTableSQL", array( plugin_table( "events" ), "
 					id INT(10) NOTNULL AUTOINCREMENT PRIMARY,
                                         project_id INT(10) NOTNULL,
@@ -108,31 +132,45 @@ class CalendarPlugin extends MantisPlugin {
                                         hour_finish,
                                         minutes_finish
                                 " ) ),
+                                  //version 2.2.0 (schema 5)
+                                  array( "CreateTableSQL", array( plugin_table( "event_monitor" ), "
+                                        user_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0',
+                                        event_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0')
+                                " ) ),
+                                  //version 2.2.0 (schema 6)
+                                  array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "event_monitor" ), "
+                                      event_id
+                                      " ) ),
+                                  //version 2.2.0 (schema 7)
+                                  array( 'UpdateFunction', 'turn_user_owner_to_user_member' ),
         );
     }
 
     function config() {
         return array(
-                                  'datetime_picker_format'              => 'DD-MM-Y',
-                                  'short_date_format'                   => 'd-m-Y',
-                                  'event_time_start_stop_picker_format' => 'HH:mm',
-                                  'startStepDays'                       => 0,
-                                  'countStepDays'                       => 7,
-                                  'arWeekdaysName'                      => array( 'Mon' => ON,
+                                  'datetime_picker_format'               => 'DD-MM-Y',
+                                  'short_date_format'                    => 'd-m-Y',
+                                  'event_time_start_stop_picker_format'  => 'HH:mm',
+                                  'startStepDays'                        => 0,
+                                  'countStepDays'                        => 7,
+                                  'arWeekdaysName'                       => array( 'Mon' => ON,
                                                             'Tue' => ON,
                                                             'Wed' => ON,
                                                             'Thu' => ON,
                                                             'Fri' => ON,
                                                             'Sat' => ON,
                                                             'Sun' => ON ),
-                                  'time_day_start'                      => 32400,
-                                  'time_day_finish'                     => 64800,
-                                  'stepDayMinutesCount'                 => 2,
-                                  'manage_calendar_threshold'           => DEVELOPER,
-                                  'calendar_view_threshold'             => DEVELOPER,
-                                  'calendar_edit_threshold'             => DEVELOPER,
-                                  'report_event_threshold'              => DEVELOPER,
-                                  'update_event_threshold'              => DEVELOPER,
+                                  'time_day_start'                       => 32400,
+                                  'time_day_finish'                      => 64800,
+                                  'stepDayMinutesCount'                  => 2,
+                                  'manage_calendar_threshold'            => DEVELOPER,
+                                  'calendar_view_threshold'              => DEVELOPER,
+                                  'calendar_edit_threshold'              => DEVELOPER,
+                                  'report_event_threshold'               => DEVELOPER,
+                                  'update_event_threshold'               => DEVELOPER,
+                                  'show_member_list_threshold'           => DEVELOPER,
+                                  'member_delete_others_event_threshold' => DEVELOPER,
+                                  'member_add_others_event_threshold'    => DEVELOPER,
         );
     }
 
@@ -142,6 +180,7 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_access_api.php';
         require_once 'core/calendar_print_api.php';
         require_once 'core/Columns_api.php';
+        require_once 'core/calendar_user_api.php';
 
         define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
         define( 'ERROR_DATE', 'ERROR_DATE' );

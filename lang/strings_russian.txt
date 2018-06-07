@@ -33,6 +33,10 @@ $s_plugin_Calendar_menu_main_front = 'Календарь событий';
 $s_plugin_Calendar_name_event = 'Имя события';
 $s_plugin_Calendar_date_event = 'Дата события';
 $s_plugin_Calendar_event = 'Событие календаря';
+$s_plugin_Calendar_members = 'Участники события';
+$s_plugin_Calendar_owner_is_members = 'Учавствовать в событии?';
+$s_plugin_Calendar_add_user_to_member = 'Сделать пользователя участником события';
+
 $s_plugin_Calendar_event_hystory_create = 'Добавлено в событие';
 $s_plugin_Calendar_add_new_event = 'Добавить новое событие';
 $s_plugin_Calendar_enter_report_details_title  = 'Введите данные события';
