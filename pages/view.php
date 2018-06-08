@@ -138,14 +138,14 @@ echo '</div></div></div></div></div>';
 
 //show members list
 if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $f_event_id ) ) {
-    $t_users     = event_get_monitors( $f_event_id );
+    $t_users     = event_get_members( $f_event_id );
     $t_num_users = sizeof( $t_users );
 
     echo '<div class="col-md-12 col-xs-12">';
     echo '<a id="members"></a>';
     echo '<div class="space-10"></div>';
 
-    $t_collapse_block    = is_collapsed( 'monitoring' );
+    $t_collapse_block    = is_collapsed( 'member' );
     $t_block_css         = $t_collapse_block ? 'collapsed' : '';
     $t_block_icon        = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
     ?>
@@ -178,7 +178,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                     echo ($i > 0) ? ', ' : '';
                                     print_user( $t_users[$i] );
                                     if( $t_can_delete_others ) {
-                                        echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '?event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
+                                        echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '&event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
                                     }
                                 }
 
@@ -218,7 +218,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
     </div>
 
     <?php
-} # show monitor list
+} # show member list
 ?>
 
 

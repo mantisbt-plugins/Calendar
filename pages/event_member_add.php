@@ -11,10 +11,10 @@ form_security_validate( 'event_member_add' );
 $f_event_id  = gpc_get_int( 'event_id' );
 $f_usernames = gpc_get_int_array( 'user_ids', array( 0 ) );
 
-event_exists($f_event_id);
+event_ensure_exists($f_event_id);
 
 foreach($f_usernames as $t_user_id) {
-    event_monitor($f_event_id, $t_user_id);
+    event_member($f_event_id, $t_user_id);
 }
 
 form_security_purge( 'event_member_add' );

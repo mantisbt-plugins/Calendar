@@ -58,15 +58,14 @@ if( $f_bugs[0] !== 0 && !is_blank( $t_event_id ) ) {
 }
 
 $f_owner_is_members = gpc_get_bool( 'owner_is_members' );
+$f_member_user_list = gpc_get_int_array( 'user_ids', array() );
 
-if( $f_owner_is_members ) {
-    event_monitor( $t_event_id, $t_event_data->author_id );
+if( $f_owner_is_members || count( $f_member_user_list ) == 0 ) {
+    event_member( $t_event_id, $t_event_data->author_id );
 }
 
-$f_member_user_list = gpc_get_int_array( 'user_ids', array( 0 ) );
-
 foreach( $f_member_user_list as $t_member ) {
-    event_monitor( $t_event_id, $t_member );
+    event_member( $t_event_id, $t_member );
 }
 
 form_security_purge( 'event_add' );

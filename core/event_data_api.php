@@ -408,12 +408,12 @@ function event_is_user_reporter( $p_event_id, $p_user_id ) {
  * @return boolean true if successful, false if unsuccessful
  * @access public
  */
-function event_monitor( $p_event_id, $p_user_id ) {
+function event_member( $p_event_id, $p_user_id ) {
 	$c_event_id = (int)$p_event_id;
 	$c_user_id = (int)$p_user_id;
 
 	# Make sure we aren't already monitoring this event
-	if( user_is_monitoring_event( $c_user_id, $c_event_id ) ) {
+	if( user_is_member_event( $c_user_id, $c_event_id ) ) {
 		return true;
 	}
 
@@ -423,9 +423,9 @@ function event_monitor( $p_event_id, $p_user_id ) {
 	}
 
 	# Insert monitoring record
-        $t_event_monitor_table = plugin_table( 'event_monitor' );
+        $t_event_member_table = plugin_table( 'event_member' );
 	db_param_push();
-	$t_query = "INSERT INTO $t_event_monitor_table ( user_id, event_id ) VALUES (" . db_param() . "," . db_param() . ")";
+	$t_query = "INSERT INTO $t_event_member_table ( user_id, event_id ) VALUES (" . db_param() . "," . db_param() . ")";
 	db_query( $t_query, array( $c_user_id, $c_event_id ) );
 
 	# log new monitoring action
@@ -440,21 +440,53 @@ function event_monitor( $p_event_id, $p_user_id ) {
 }
 
 /**
- * Returns the list of users monitoring the specified event
+ * disable the membership in this event for the user
+ * if $p_user_id = null, then event is unmonitored for all users.
+ * @param integer $p_event_id  Integer representing event identifier.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return boolean (always true)
+ * @access public
+ * @uses database_api.php
+ */
+function event_unmember( $p_event_id, $p_user_id ) {
+
+    $t_event_member_table = plugin_table( 'event_member' );
+    # Delete monitoring record
+    db_param_push();
+    $t_query               = "DELETE FROM $t_event_member_table WHERE event_id = " . db_param();
+    $t_db_query_params[]   = $p_event_id;
+
+    if( $p_user_id !== null ) {
+        $t_query             .= ' AND user_id = ' . db_param();
+        $t_db_query_params[] = $p_user_id;
+    }
+
+    db_query( $t_query, $t_db_query_params );
+
+    # log new un-monitor action
+//	history_log_event_special( $p_bug_id, BUG_UNMONITOR, (int)$p_user_id );
+    # updated the last_updated date
+    event_update_date( $p_event_id );
+
+    return true;
+}
+
+/**
+ * Returns the list of users members the specified event
  *
  * @param integer $p_bevent_id Integer representing event identifier.
  * @return array
  */
-function event_get_monitors( $p_event_id ) {
-	if( ! access_has_event_level( config_get( 'show_monitor_list_threshold' ), $p_event_id ) ) {
+function event_get_members( $p_event_id ) {
+	if( ! access_has_event_level( config_get( 'show_member_list_threshold' ), $p_event_id ) ) {
 		return array();
 	}
 
 	# get the eventnote data
-        $t_event_monitor_table = plugin_table( 'event_monitor' );
+        $t_event_member_table = plugin_table( 'event_member' );
 	db_param_push();
 	$t_query = "SELECT user_id, enabled
-			FROM $t_event_monitor_table m, {user} u
+			FROM $t_event_member_table m, {user} u
 			WHERE m.event_id=" . db_param() . " AND m.user_id = u.id
 			ORDER BY u.realname, u.username";
 	$t_result = db_query( $t_query, array( $p_event_id ) );

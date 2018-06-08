@@ -51,10 +51,10 @@ function install_date_from_date_to() { //version 0.9 (schema 3)
 }
 
 function install_turn_user_owner_to_user_member() { //version 2.2.0 (schema 7)
-    $p_table_calendar_events        = plugin_table( 'events' );
-    $p_table_calendar_event_monitor = plugin_table( 'event_monitor' );
+    $p_table_calendar_events       = plugin_table( 'events' );
+    $p_table_calendar_event_member = plugin_table( 'event_member' );
 
-    if( db_table_exists( $p_table_calendar_events ) && db_table_exists( $p_table_calendar_event_monitor ) && db_is_connected() ) {
+    if( db_table_exists( $p_table_calendar_events ) && db_table_exists( $p_table_calendar_event_member ) && db_is_connected() ) {
         $t_events_id = array();
 
         $t_query = "SELECT id, author_id FROM " . $p_table_calendar_events;
@@ -62,7 +62,7 @@ function install_turn_user_owner_to_user_member() { //version 2.2.0 (schema 7)
 
         foreach( $arRes as $key => $t_event_id ) {
 
-            $query = "INSERT INTO $p_table_calendar_event_monitor
+            $query = "INSERT INTO $p_table_calendar_event_member
                                                 ( user_id, event_id
                                                 )
                                               VALUES
@@ -133,12 +133,12 @@ class CalendarPlugin extends MantisPlugin {
                                         minutes_finish
                                 " ) ),
                                   //version 2.2.0 (schema 5)
-                                  array( "CreateTableSQL", array( plugin_table( "event_monitor" ), "
+                                  array( "CreateTableSQL", array( plugin_table( "event_member" ), "
                                         user_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0',
                                         event_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0')
                                 " ) ),
                                   //version 2.2.0 (schema 6)
-                                  array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "event_monitor" ), "
+                                  array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "event_member" ), "
                                       event_id
                                       " ) ),
                                   //version 2.2.0 (schema 7)
@@ -169,8 +169,9 @@ class CalendarPlugin extends MantisPlugin {
                                   'report_event_threshold'               => DEVELOPER,
                                   'update_event_threshold'               => DEVELOPER,
                                   'show_member_list_threshold'           => DEVELOPER,
-                                  'member_delete_others_event_threshold' => DEVELOPER,
                                   'member_add_others_event_threshold'    => DEVELOPER,
+                                  'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
+                                  'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
         );
     }
 
@@ -185,6 +186,7 @@ class CalendarPlugin extends MantisPlugin {
         define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
         define( 'ERROR_DATE', 'ERROR_DATE' );
         define( 'ERROR_RANGE_TIME', 'ERROR_RANGE_TIME' );
+        define( 'ERROR_MIN_MEMBERS', 'ERROR_MIN_MEMBERS' );
     }
 
     function hooks() {
