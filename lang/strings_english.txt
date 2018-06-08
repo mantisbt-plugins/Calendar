@@ -27,11 +27,16 @@ $s_plugin_Calendar_Sun = 'Sun';
 
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display';
+$s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени';
 
 $s_plugin_Calendar_menu_main_front = 'Calendar';
 $s_plugin_Calendar_name_event = 'Event Name';
 $s_plugin_Calendar_date_event = 'Date of the event';
 $s_plugin_Calendar_event = 'Calendar Event';
+$s_plugin_Calendar_members = 'Event Members';
+$s_plugin_Calendar_owner_is_members = 'A member of the event?';
+$s_plugin_Calendar_add_user_to_member = 'Make user a member of the event';
+
 $s_plugin_Calendar_event_hystory_create = 'Added to the event';
 $s_plugin_Calendar_add_new_event = 'Add new event';
 $s_plugin_Calendar_enter_report_details_title = 'Enter Event Data';
@@ -72,6 +77,8 @@ $s_plugin_Calendar_id = 'Number';
 $s_plugin_Calendar_last_update = 'Date edited';
 $s_plugin_Calendar_not_last_update = 'No';
 $s_plugin_Calendar_event_relationships_bugs = 'Related tasks';
+$s_plugin_Calendar_date_from = 'Event start date';
+$s_plugin_Calendar_date_to = 'Event end date';
 $s_plugin_Calendar_out_of_range = 'events out of range';
 
 $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
@@ -79,3 +86,4 @@ $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
 $MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
 $MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Event %1$d was not found.';
 $MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'EVENT SHOULD BE ONE MEMBER';
