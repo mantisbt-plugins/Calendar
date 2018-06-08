@@ -168,7 +168,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'calendar_edit_threshold'              => DEVELOPER,
                                   'report_event_threshold'               => DEVELOPER,
                                   'update_event_threshold'               => DEVELOPER,
-                                  'show_member_list_threshold'           => DEVELOPER,
+                                  'show_member_list_threshold'           => REPORTER,
                                   'member_add_others_event_threshold'    => DEVELOPER,
                                   'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
@@ -199,8 +199,8 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     function resources() {
-        return
-                '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'Calendar.css' ) . '"></link>';
+        return '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'Calendar.css' ) . '"></link>'
+                . '<script type="text/javascript" src="' . plugin_file( 'calendar_filter.js' ) . '"></script>';
     }
 
     function menu_main_front() {

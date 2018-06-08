@@ -133,7 +133,7 @@ function group_events_by_time( $p_events_id ) {
     return $arEventsTemp;
 }
 
-function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time = FALSE ) {
+function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time = FALSE, $p_user_id = ALL_USERS ) {
 
     $t_table_calendar_events = plugin_table( 'events' );
 
@@ -147,7 +147,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time 
         $p_query = "SELECT id FROM " . $t_table_calendar_events . " WHERE activity = 'Y' AND date_from BETWEEN " . db_param() . " AND " . db_param();
 
         foreach( $p_ar_all_days as $t_day ) {
-            
+
             if( $p_full_time == TRUE ) {
                 $t_time_start_day  = $t_day;
                 $t_time_finish_day = $t_day + ( (24 * 60) * 59);
@@ -162,9 +162,11 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time 
                 for( $i = 0; $i < $t_event_count; $i++ ) {
                     $t_row = db_fetch_array( $t_result );
 
-                    if( in_array( event_get_field( $t_row["id"], 'project_id' ), $t_project_all ) || event_get_field( $t_row["id"], 'project_id' ) == $p_project_id ) {
-                        $t_string_time                         = event_get_field( $t_row["id"], 'hour_start' ) . ":" . event_get_field( $t_row["id"], 'minutes_start' );
-                        $t_time_event_start                    = strtotime( $t_string_time, 0 );
+                    $t_user_is_member = $p_user_id == ALL_USERS ? TRUE : in_array( $p_user_id, event_get_members( $t_row["id"] ) );
+
+                    if( in_array( event_get_field( $t_row["id"], 'project_id' ), $t_project_all ) && $t_user_is_member == TRUE || event_get_field( $t_row["id"], 'project_id' ) == $p_project_id && $t_user_is_member == TRUE ) {
+
+                        $t_time_event_start                    = event_get_field( $t_row["id"], 'date_from' );
                         $arDays[$t_day][$t_time_event_start][] = $t_row["id"];
                     } else {
                         $arDays[$t_day] = [];
