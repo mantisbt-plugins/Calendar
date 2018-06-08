@@ -100,7 +100,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
 
                             $t_days = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week );
 
-                            $t_days_and_events = get_events_id_inside_days( $t_days, $p_project_id, $f_full_time, $f_for_user );
+                            $t_days_and_events = get_events_id_inside_days( $t_days, $p_project_id, $f_for_user );
 
                             foreach( $t_days_and_events as $t_day_and_events => $t_events_id ) {
                                 print_column_this_day( $t_day_and_events, $t_events_id, count( $t_days_and_events ), $f_full_time );

@@ -133,7 +133,7 @@ function group_events_by_time( $p_events_id ) {
     return $arEventsTemp;
 }
 
-function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time = FALSE, $p_user_id = ALL_USERS ) {
+function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS ) {
 
     $t_table_calendar_events = plugin_table( 'events' );
 
@@ -148,13 +148,8 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_full_time 
 
         foreach( $p_ar_all_days as $t_day ) {
 
-            if( $p_full_time == TRUE ) {
-                $t_time_start_day  = $t_day;
-                $t_time_finish_day = $t_day + ( (24 * 60) * 59);
-            } else {
-                $t_time_start_day  = $t_day + plugin_config_get( 'time_day_start' );
-                $t_time_finish_day = $t_day + plugin_config_get( 'time_day_finish' );
-            }
+            $t_time_start_day  = $t_day;
+            $t_time_finish_day = $t_day + ( (24 * 60) * 59);
 
             $t_result      = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day ) );
             $t_event_count = db_num_rows( $t_result );
