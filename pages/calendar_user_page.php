@@ -52,7 +52,13 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                 <i class="ace-icon fa fa-list-alt"></i>
                 <?php echo plugin_lang_get( 'menu_main_front' ) . " ( GMT " . date( "P" ) . " )"; ?>
             </h4>
+            <div class="widget-toolbar no-border">
+                <div class="widget-menu">
+                    <?php print_small_button( plugin_page( 'user_config_page' ), plugin_lang_get( 'config_title' ) ); ?>
+                </div>
+            </div>
         </div>
+
         <div class="widget-body">
 
             <div class="widget-toolbox padding-8 clearfix">
@@ -131,7 +137,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                             <input type="hidden" name="week" value="<?php echo $f_week; ?>" />
                             <input type="hidden" name="full_time" value="<?php echo $f_full_time; ?>" />
 
-                            
+
                             <label class="inline"><?php echo plugin_lang_get( 'filter_text' ); ?></label>
                             <select name="for_user">
                                 <option value="<?php echo auth_get_current_user_id(); ?>"><?php echo '[' . lang_get( 'reset_query' ) . ']' ?></option>
