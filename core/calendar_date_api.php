@@ -154,6 +154,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
             $t_result      = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day ) );
             $t_event_count = db_num_rows( $t_result );
             if( $t_event_count > 0 ) {
+                $arDays[$t_day] = [];
                 for( $i = 0; $i < $t_event_count; $i++ ) {
                     $t_row = db_fetch_array( $t_result );
 
