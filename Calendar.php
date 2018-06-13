@@ -83,6 +83,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->page        = 'config';
 
         $this->version  = '2.3.0-dev';
+
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
         );
