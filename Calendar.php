@@ -82,7 +82,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config';
 
-        $this->version  = '2.2.0';
+        $this->version  = '2.2.0-dev';
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
         );
@@ -172,6 +172,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_add_others_event_threshold'    => DEVELOPER,
                                   'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
+                                  'oauth_key'                            => '',
         );
     }
 
@@ -182,6 +183,8 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_print_api.php';
         require_once 'core/Columns_api.php';
         require_once 'core/calendar_user_api.php';
+        require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
+        require_once 'core/calendar_form_api.php';
 
         define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
         define( 'ERROR_DATE', 'ERROR_DATE' );
