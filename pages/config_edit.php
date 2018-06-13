@@ -17,9 +17,6 @@
 
 form_security_validate( 'calendar_config_edit' );
 
-auth_reauthenticate();
-access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
-
 $t_days_week_config = plugin_config_get( 'arWeekdaysName' );
 $f_days_week_cheked = gpc_get_string_array( 'days_week' );
 

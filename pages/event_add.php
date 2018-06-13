@@ -68,6 +68,48 @@ foreach( $f_member_user_list as $t_member ) {
     event_member( $t_event_id, $t_member );
 }
 
+
+
+$t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
+if( $t_oauth ) {
+    $client      = new Google_Client();
+    $client->setAuthConfig( plugin_file_path( 'client.json', 'Calendar' ) );
+    $client->addScope( Google_Service_Calendar::CALENDAR );
+    $client->setAccessType( 'offline' );
+    $client->setIncludeGrantedScopes( true );
+    $client->setRedirectUri( "https://sd.sibprofi.ru/sdtest/plugin.php?page=Calendar/user_config" );
+    $auth_url = $client->createAuthUrl();
+    $client->setState( form_security_token( 'calendar_config_edit' ) );
+    $accessToken = $client->fetchAccessTokenWithRefreshToken( $t_oauth );
+    $client->setAccessToken( $accessToken );
+
+    $service = new Google_Service_Calendar( $client );
+
+    $event = new Google_Service_Calendar_Event( array(
+                              'summary' => $t_event_data->name,
+//                              'location'    => '800 Howard St., San Francisco, CA 94103',
+//                              'description' => 'A chance to hear more about Google\'s developer products.',
+                              'start'   => array(
+                                                        'dateTime' => $t_event_data->date_from,
+//                                                        'timeZone' => 'America/Los_Angeles',
+                              ),
+                              'end'     => array(
+                                                        'dateTime' => $t_event_data->date_to,
+//                                                        'timeZone' => 'America/Los_Angeles',
+                              ),
+//                              'recurrence'  => array(
+//                                                        'RRULE:FREQ=DAILY;COUNT=2'
+//                              ),
+            ) );
+
+    $calendarId = 'igflocal@gmail.com';
+    $event      = $service->events->insert( $calendarId, $event );
+}
+
+
+
+
+
 form_security_purge( 'event_add' );
 
 layout_page_header_begin();
