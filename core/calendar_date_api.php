@@ -149,7 +149,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
         foreach( $p_ar_all_days as $t_day ) {
 
             $t_time_start_day  = $t_day;
-            $t_time_finish_day = $t_day + ( (24 * 60) * 59);
+            $t_time_finish_day = $t_day + 86399;
 
             $t_result      = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day ) );
             $t_event_count = db_num_rows( $t_result );
@@ -163,8 +163,6 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
 
                         $t_time_event_start                    = event_get_field( $t_row["id"], 'date_from' );
                         $arDays[$t_day][$t_time_event_start][] = $t_row["id"];
-                    } else {
-                        $arDays[$t_day] = [];
                     }
                 }
             } else {
