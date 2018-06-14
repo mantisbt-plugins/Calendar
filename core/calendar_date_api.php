@@ -42,8 +42,8 @@ function times_day( $p_date, $p_full_time = FALSE ) {
         $t_time_day_start  = 0;
         $t_time_day_finish = 86400;
     } else {
-        $t_time_day_start  = plugin_config_get( 'time_day_start' );
-        $t_time_day_finish = plugin_config_get( 'time_day_finish' );
+        $t_time_day_start  = plugin_config_get( 'time_day_start', plugin_config_get( 'time_day_start' ), FALSE, auth_get_current_user_id() );
+        $t_time_day_finish = plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' ), FALSE, auth_get_current_user_id() );
     }
 
     $t_time_start  = $p_date + $t_time_day_start;

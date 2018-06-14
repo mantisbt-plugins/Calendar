@@ -15,20 +15,51 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
+form_security_validate( 'calendar_user_config_edit' );
 
-form_security_validate_google( 'calendar_config_edit' );
+$t_current_user_id = auth_get_current_user_id();
+
+$t_days_week_config = plugin_config_get( 'arWeekdaysName', plugin_config_get( 'arWeekdaysName' ), $p_global, $t_current_user_id );
+$f_days_week_cheked = gpc_get_string_array( 'days_week' );
+
+$f_time_start  = gpc_get_int( 'time_day_start' );
+$f_time_finish = gpc_get_int( 'time_day_finish' );
+
+$f_google_calendar_list = gpc_get_string( 'google_calendar_list' );
+
+foreach( $t_days_week_config as $t_name_day => $t_status ) {
+    if( in_array( $t_name_day, $f_days_week_cheked ) ) {
+        $t_days_week_config_set[$t_name_day] = ON;
+    } else {
+        $t_days_week_config_set[$t_name_day] = OFF;
+    }
+}
+
+if( $f_time_start >= $f_time_finish ) {
+    error_parameters( plugin_lang_get( 'date_event' ) );
+    trigger_error( ERROR_RANGE_TIME, ERROR );
+}
 
 
-//auth_reauthenticate();
-//access_ensure_global_level( config_get( 'update_event_threshold' ) );
+if( $t_days_week_config_set != $t_days_week_config ) {
+    plugin_config_set( 'arWeekdaysName', $t_days_week_config_set, $t_current_user_id );
+}
 
-$f_oauth_key = gpc_get_string( 'code' );
+if( plugin_config_get( 'time_day_start', plugin_config_get( 'time_day_start' ), FALSE, $t_current_user_id ) != $f_time_start ) {
+    plugin_config_set( 'time_day_start', $f_time_start, $t_current_user_id );
+}
 
-plugin_config_set( 'oauth_key', $f_oauth_key, auth_get_current_user_id() );
+if( plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' ), FALSE, $t_current_user_id ) != $f_time_finish ) {
+    plugin_config_set( 'time_day_finish', $f_time_finish, $t_current_user_id );
+}
+
+if( plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_current_user_id ) != $f_google_calendar_list ) {
+    plugin_config_set( 'google_calendar_sync_id', $f_google_calendar_list, $t_current_user_id );
+}
 
 form_security_purge( plugin_page( 'config', true ) );
 
-$t_redirect_url = plugin_page( 'config', true );
+$t_redirect_url = plugin_page( 'user_config_page', true );
 
 layout_page_header( null, $t_redirect_url );
 

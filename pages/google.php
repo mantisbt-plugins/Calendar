@@ -11,8 +11,9 @@ $client = new Google_Client();
 $client->setAuthConfig( plugin_file_path( 'client.json', 'Calendar' ) );
 
 $client->addScope( Google_Service_Calendar::CALENDAR );
-$client->setAccessType( 'offline' );
 $client->setRedirectUri( "https://sd.sibprofi.ru/sdtest/plugin.php?page=Calendar/user_config" );
+$client->setAccessType( 'offline' );
+$client->setApprovalPrompt('force');
 $client->setState( form_security_token( 'calendar_config_edit' ) );
 $auth_url = $client->createAuthUrl();
 header( 'Location: ' . filter_var( $auth_url, FILTER_SANITIZE_URL ) );

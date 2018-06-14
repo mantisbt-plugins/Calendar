@@ -18,8 +18,8 @@
 function print_time_select_option( $p_selected_time = NULL, $p_full_range = FALSE ) {
 
     if( $p_full_range == FALSE ) {
-        $t_time_day_start_timestamp  = plugin_config_get( 'time_day_start' );
-        $t_time_day_finish_timestamp = plugin_config_get( 'time_day_finish' );
+        $t_time_day_start_timestamp  = plugin_config_get( 'time_day_start', plugin_config_get( 'time_day_start' ), FALSE, auth_get_current_user_id() );
+        $t_time_day_finish_timestamp = plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' ), FALSE, auth_get_current_user_id() );
     } else {
         $t_time_day_start_timestamp  = 0;
         $t_time_day_finish_timestamp = 86400;

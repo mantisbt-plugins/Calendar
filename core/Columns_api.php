@@ -27,8 +27,8 @@ function print_column_time( $p_full_time = FALSE ) {
     if( $p_full_time == TRUE ) {
         $t_times_day = range( 0, 86400, $t_time_count );
     } else {
-        $t_time_day_start  = plugin_config_get( 'time_day_start' );
-        $t_time_day_finish = plugin_config_get( 'time_day_finish' );
+        $t_time_day_start  = plugin_config_get( 'time_day_start', plugin_config_get( 'time_day_start' ), FALSE, auth_get_current_user_id() );
+        $t_time_day_finish = plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' ), FALSE, auth_get_current_user_id() );
         $t_times_day       = range( $t_time_day_start, $t_time_day_finish, $t_time_count );
     }
 
@@ -75,7 +75,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
 
     foreach( $t_events_group_by_time as $t_time => $t_events ) {
         if( !in_array( $t_time, $t_times_this_day ) ) {
-            $t_out_of_range_event[] = $t_events[0];
+            $t_out_of_range_event = array_merge( $t_out_of_range_event, $t_events );
         }
     }
 

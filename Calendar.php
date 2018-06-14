@@ -186,6 +186,7 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_user_api.php';
         require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
         require_once 'core/calendar_form_api.php';
+        require_once 'core/calendar_google_api.php';
 
         define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
         define( 'ERROR_DATE', 'ERROR_DATE' );

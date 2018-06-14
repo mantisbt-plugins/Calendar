@@ -28,8 +28,8 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 <div class="col-md-12 col-xs-12">
     <div class="space-10"></div>
     <div class="form-container">
-        <form action="<?php echo plugin_page( 'config_edit' ) ?>" method="post">
-            <?php echo form_security_field( 'calendar_config_edit' ) ?>
+        <form action="<?php echo plugin_page( 'user_config' ) ?>" method="post">
+            <?php echo form_security_field( 'calendar_user_config_edit' ) ?>
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header widget-header-small">
                     <h4 class="widget-title lighter">
@@ -73,7 +73,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 
                                     </td>
 
-                                    <td width="25%">
+                                    <td class="center" width="25%">
                                         <select name="time_day_start">
                                             <?php
                                             $t_time_day_start = plugin_config_get( 'time_day_start' );
@@ -82,7 +82,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                             ?>
                                         </select>
                                     </td>
-                                    <td width="25%">
+                                    <td class="center" width="25%">
                                         <select name="time_day_finish">
                                             <?php
                                             $t_time_day_finish = plugin_config_get( 'time_day_finish' );
@@ -92,6 +92,28 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                         </select>
                                     </td>
                                 </tr>
+
+
+                                <tr <?php echo helper_alternate_class() ?>>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'user_config_enable_google_calendar' ) ?>
+
+                                    </td>
+
+                                    <td class="center" colspan="3">
+                                        <?php
+                                        $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
+                                        if( $t_oauth['error'] || $t_oauth == NULL ) {
+                                            print_small_button( get_response_google_url(), plugin_lang_get( 'user_config_enable_google_calendar_button' ) );
+                                        } else {
+                                            echo '<select name="google_calendar_list">';
+                                            print_google_calendar_list();
+                                            echo '</select>';
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+
 
                                 <tr>
                                     <td class="center" colspan="3">
