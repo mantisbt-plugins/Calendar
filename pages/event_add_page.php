@@ -38,13 +38,13 @@ if( $f_bug_id == 0 ) {
 
 # New issues cannot be reported for the 'All Project' selection
     if( ALL_PROJECTS == $t_current_project ) {
-        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page' ) );
+        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
     }
 # Check for bug report threshold
     if( !access_has_project_level( plugin_config_get( 'calendar_edit_threshold' ) ) ) {
         # If can't report on current project, show project selector if there is any other allowed project
         access_ensure_any_project_level( plugin_config_get( 'calendar_edit_threshold' ) );
-        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page' ) );
+        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
     }
     access_ensure_project_level( plugin_config_get( 'calendar_edit_threshold' ) );
 } else {

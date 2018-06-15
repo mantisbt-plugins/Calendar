@@ -29,6 +29,7 @@ $s_plugin_Calendar_config_title = 'Настройка';
 $s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в календаре';
 $s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени';
 
+$s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными данными для доступа к google api';
 $s_plugin_Calendar_user_config_enable_google_calendar = 'Состояние синхронизации с Google Calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Включить синхронизацию с Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Выберите календарь';

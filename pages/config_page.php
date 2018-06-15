@@ -15,12 +15,13 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 auth_reauthenticate();
-
-access_ensure_global_level( config_get( 'calendar_edit_threshold' ) );
+access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
 
 layout_page_header( plugin_lang_get( 'name_plugin_description_page' ) );
 
 layout_page_begin( 'manage_overview_page.php' );
+
+print_manage_menu();
 
 $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 ?>
@@ -28,8 +29,8 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 <div class="col-md-12 col-xs-12">
     <div class="space-10"></div>
     <div class="form-container">
-        <form action="<?php echo plugin_page( 'user_config' ) ?>" method="post">
-            <?php echo form_security_field( 'calendar_user_config_edit' ) ?>
+        <form action="<?php echo plugin_page( 'config' ) ?>" method="post" enctype="multipart/form-data">
+            <?php echo form_security_field( 'config' ) ?>
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header widget-header-small">
                     <h4 class="widget-title lighter">
@@ -93,28 +94,28 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
-                                <?php if( plugin_config_get( 'google_client_secret' ) ) { ?>
-                                    <tr <?php echo helper_alternate_class() ?>>
-                                        <td class="category" width="50%">
-                                            <?php echo plugin_lang_get( 'user_config_enable_google_calendar' ) ?>
+                                <tr <?php echo helper_alternate_class() ?>>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_google_api_file' ) ?>
+                                    </td>
 
-                                        </td>
+                                    <td class="center" colspan="2">
+                                        <?php
+                                        $t_max_file_size    = (int) min( ini_get_number( 'upload_max_filesize' ), ini_get_number( 'post_max_size' ), config_get( 'max_file_size' ) );
+                                        $t_google_client_id = json_decode( plugin_config_get( 'google_client_secret' ), TRUE );
+                                        ?>
 
-                                        <td class="center" colspan="3">
+                                        <div class = "fallback">
                                             <?php
-                                            $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
-                                            if( $t_oauth['error'] || $t_oauth == NULL ) {
-                                                print_small_button( get_response_google_url(), plugin_lang_get( 'user_config_enable_google_calendar_button' ) );
-                                            } else {
-                                                echo '<select name="google_calendar_list">';
-                                                print_google_calendar_list();
-                                                echo '</select>';
+                                            if( $t_google_client_id['web']['client_id'] ) {
+                                                echo $t_google_client_id['web']['client_id'];
+                                                echo '</br>';
                                             }
                                             ?>
-                                        </td>
-                                    </tr>
-                                        <?php } ?>
+                                            <input style="display: inline" id="ufile" name="ufile" type="file" size="15" accept="application/json"/>
+                                        </div>
 
+                                    </td>
 
                                 <tr>
                                     <td class="center" colspan="3">

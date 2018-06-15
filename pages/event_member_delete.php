@@ -55,6 +55,6 @@ layout_page_begin( plugin_page( 'view' ) );
 
 html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $f_event_id, plugin_lang_get( 'update_successful_button' ) );
 
-html_meta_redirect( plugin_page( 'view' ) . "&event_id=" . $f_event_id );
+html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $f_event_id );
 
 layout_page_end();

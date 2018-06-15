@@ -61,40 +61,17 @@ $f_owner_is_members = gpc_get_bool( 'owner_is_members' );
 $f_member_user_list = gpc_get_int_array( 'user_ids', array() );
 
 if( $f_owner_is_members || count( $f_member_user_list ) == 0 ) {
-    event_member( $t_event_id, $t_event_data->author_id );
+    $f_member_user_list[] = $t_event_data->author_id;
 }
 
 foreach( $f_member_user_list as $t_member ) {
     event_member( $t_event_id, $t_member );
 }
 
+foreach( $f_member_user_list as $t_member ) {
 
-$service = new Google_Service_Calendar( getClient() );
-
-$event = new Google_Service_Calendar_Event( array(
-//                              'summary' => $t_event_data->name,
-                          'location'    => '800 Howard St., San Francisco, CA 94103',
-                          'description' => 'A chance to hear more about Google\'s developer products.',
-                          'start'       => array(
-                                                    'dateTime' => $t_event_data->date_from,
-                                                    'timeZone' => 'America/Los_Angeles',
-                          ),
-                          'end'         => array(
-                                                    'dateTime' => $t_event_data->date_to,
-                                                    'timeZone' => 'America/Los_Angeles',
-                          ),
-//                              'recurrence'  => array(
-//                                                        'RRULE:FREQ=DAILY;COUNT=2'
-//                              ),
-        ) );
-
-$calendarId = 'igflocal@gmail.com';
-$event      = $service->events->insert( $calendarId, $event );
-
-
-
-
-
+    event_google_add( $t_event_id, $t_member );
+}
 
 form_security_purge( 'event_add' );
 
@@ -110,7 +87,7 @@ if( $f_bugs[0] == 0 ) {
                               array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
     );
-    html_meta_redirect( plugin_page( 'calendar_user_page' ) );
+    html_meta_redirect( plugin_page( 'calendar_user_page', TRUE ) );
 } else if( $f_bugs[0] != 0 || count( $f_bugs ) == 1 ) {
     $t_buttons = array(
                               array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
@@ -122,7 +99,7 @@ if( $f_bugs[0] == 0 ) {
                               array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
     );
-    html_meta_redirect( plugin_page( 'view' ) . "&event_id=" . $t_event_id );
+    html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_id );
 }
 
 html_operation_confirmation( $t_buttons, '', CONFIRMATION_TYPE_SUCCESS );

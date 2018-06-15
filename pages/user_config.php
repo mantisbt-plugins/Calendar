@@ -57,9 +57,9 @@ if( plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_current_user_i
     plugin_config_set( 'google_calendar_sync_id', $f_google_calendar_list, $t_current_user_id );
 }
 
-form_security_purge( plugin_page( 'config', true ) );
+form_security_purge( plugin_page( 'config', TRUE ) );
 
-$t_redirect_url = plugin_page( 'user_config_page', true );
+$t_redirect_url = plugin_page( 'user_config_page', TRUE );
 
 layout_page_header( null, $t_redirect_url );
 

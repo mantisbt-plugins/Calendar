@@ -26,13 +26,10 @@ $f_oauth_key = gpc_get_string( 'code' );
 
 $client      = new Google_Client();
 $client->setAuthConfig( plugin_file_path( 'client.json', 'Calendar' ) );
-//$client->addScope( Google_Service_Calendar::CALENDAR );
-$client->setRedirectUri( "https://sd.sibprofi.ru/sdtest/plugin.php?page=Calendar/user_config_google" );
+
+$client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
 $client->setAccessType( 'offline' );
-//$client->setApprovalPrompt( 'force' );
-//$client->setIncludeGrantedScopes( true );
-//$auth_url    = $client->createAuthUrl();
-//$client->setState( form_security_token( 'calendar_config_edit' ) );
+
 $accessToken = $client->fetchAccessTokenWithAuthCode( $f_oauth_key );
 
 plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );

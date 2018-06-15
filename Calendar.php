@@ -80,9 +80,9 @@ class CalendarPlugin extends MantisPlugin {
 
         $this->name        = plugin_lang_get( 'name_plugin_description_page' );
         $this->description = plugin_lang_get( 'description' );
-        $this->page        = 'config';
+        $this->page        = 'config_page';
 
-        $this->version  = '2.3.0-dev';
+        $this->version = '2.3.0-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -144,6 +144,15 @@ class CalendarPlugin extends MantisPlugin {
                                       " ) ),
                                   //version 2.2.0 (schema 7)
                                   array( 'UpdateFunction', 'turn_user_owner_to_user_member' ),
+                                  //version 2.3.0 (schema 8)
+                                  array( "CreateTableSQL", array( plugin_table( "google_sync" ), "
+                                      event_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0',                                        
+                                      google_id VARCHAR(255) NOTNULL
+                                " ) ),
+                                  //version 2.3.0 (schema 9)
+                                  array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "google_sync" ), "
+                                      event_id
+                                      " ) ),
         );
     }
 
@@ -173,7 +182,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_add_others_event_threshold'    => DEVELOPER,
                                   'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
-                                  'oauth_key'                            => '',
+                                  'oauth_key'                            => NULL,
         );
     }
 

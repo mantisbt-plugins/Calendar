@@ -73,6 +73,6 @@ form_security_purge( 'event_update' );
 
 html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $t_event_data->id, plugin_lang_get( 'update_successful_button' ) );
 
-html_meta_redirect( plugin_page( 'view' ) . "&event_id=" . $t_event_data->id );
+html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_data->id );
 
 layout_page_end();

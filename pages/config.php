@@ -1,4 +1,5 @@
 <?php
+
 # Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -14,105 +15,55 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-auth_reauthenticate();
-access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
+form_security_validate( 'config' );
 
-layout_page_header( plugin_lang_get( 'name_plugin_description_page' ) );
+$t_days_week_config = plugin_config_get( 'arWeekdaysName' );
+$f_days_week_cheked = gpc_get_string_array( 'days_week' );
 
-layout_page_begin( 'manage_overview_page.php' );
+$f_time_start  = gpc_get_int( 'time_day_start' );
+$f_time_finish = gpc_get_int( 'time_day_finish' );
 
-print_manage_menu();
+$f_file          = gpc_get_file( 'ufile', array() );
+$t_client_secret = file_get_contents( $f_file['tmp_name'] );
 
-$t_name_days_week = plugin_config_get( 'arWeekdaysName' );
-?>
-
-<div class="col-md-12 col-xs-12">
-    <div class="space-10"></div>
-    <div class="form-container">
-        <form action="<?php echo plugin_page( 'config_edit' ) ?>" method="post">
-            <?php echo form_security_field( 'calendar_config_edit' ) ?>
-            <div class="widget-box widget-color-blue2">
-                <div class="widget-header widget-header-small">
-                    <h4 class="widget-title lighter">
-                        <i class="ace-icon fa fa-cubes"></i>
-                        <?php echo plugin_lang_get( 'name_plugin_description_page' ) . ': ' . plugin_lang_get( 'config_title' ) ?>
-                    </h4>
-                </div>
-
-                <div class="widget-body">
-                    <div class="widget-main no-padding">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-condensed table-hover">
-                                <colgroup>
-                                    <col style="width:25%" />
-                                    <col style="width:25%" />
-                                    <col style="width:25%" />
-                                </colgroup>
-
-                                <tr <?php echo helper_alternate_class() ?>>
-                                    <td class="category" width="50%">
-                                        <?php echo plugin_lang_get( 'config_days_week_display' ) ?>
-
-                                    </td>
-
-                                    <td colspan="3" width="50%">
-                                        <?php
-                                        foreach( $t_name_days_week as $t_name_day => $t_status ) {
-                                            if( $t_status == ON ) {
-                                                echo '<label><input type="checkbox" name="days_week[]" value="' . $t_name_day . '" checked="checked">' . plugin_lang_get( $t_name_day ) . '</input></label><br>';
-                                            } else {
-                                                echo '<label><input type="checkbox" name="days_week[]" value="' . $t_name_day . '">' . plugin_lang_get( $t_name_day ) . '</input></label><br>';
-                                            }
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-
-                                <tr <?php echo helper_alternate_class() ?>>
-                                    <td class="category" width="50%">
-                                        <?php echo plugin_lang_get( 'config_time_day_range' ) ?>
-
-                                    </td>
-
-                                    <td width="25%">
-                                        <select name="time_day_start">
-                                            <?php
-                                            $t_time_day_start = plugin_config_get( 'time_day_start' );
-
-                                            print_time_select_option( $t_time_day_start, TRUE );
-                                            ?>
-                                        </select>
-                                    </td>
-                                    <td width="25%">
-                                        <select name="time_day_finish">
-                                            <?php
-                                            $t_time_day_finish = plugin_config_get( 'time_day_finish' );
-
-                                            print_time_select_option( $t_time_day_finish, TRUE );
-                                            ?>
-                                        </select>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="center" colspan="3">
-                                        <input type="submit" class="button" value="<?php echo lang_get( 'change_configuration' ) ?>" />
-                                    </td>
-                                </tr>
-
-                            </table>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<?php
-if( !function_exists( 'html_page_bottom' ) ) {
-    layout_page_end();
-} else {
-    html_page_bottom();
+foreach( $t_days_week_config as $t_name_day => $t_status ) {
+    if( in_array( $t_name_day, $f_days_week_cheked ) ) {
+        $t_days_week_config_set[$t_name_day] = ON;
+    } else {
+        $t_days_week_config_set[$t_name_day] = OFF;
+    }
 }
+
+if( $f_time_start >= $f_time_finish ) {
+    error_parameters( plugin_lang_get( 'date_event' ) );
+    trigger_error( ERROR_RANGE_TIME, ERROR );
+}
+
+
+if( $t_days_week_config_set != $t_days_week_config ) {
+    plugin_config_set( 'arWeekdaysName', $t_days_week_config_set );
+}
+
+if( plugin_config_get( 'time_day_start' ) != $f_time_start ) {
+    plugin_config_set( 'time_day_start', $f_time_start );
+}
+
+if( plugin_config_get( 'time_day_finish' ) != $f_time_finish ) {
+    plugin_config_set( 'time_day_finish', $f_time_finish );
+}
+
+if( plugin_config_get( 'google_client_secret' ) != $t_client_secret && $t_client_secret != FALSE ) {
+    plugin_config_set( 'google_client_secret', $t_client_secret );
+}
+
+form_security_purge( plugin_page( 'config', true ) );
+
+$t_redirect_url = plugin_page( 'config_page', true );
+
+layout_page_header( null, $t_redirect_url );
+
+layout_page_begin( $t_redirect_url );
+
+html_operation_successful( $t_redirect_url );
+
+layout_page_end();

@@ -29,4 +29,4 @@ $t_event->update();
 
 form_security_purge( 'event_delete' );
 
-print_header_redirect( plugin_page( 'calendar_user_page' ) );
+print_header_redirect( plugin_page( 'calendar_user_page', TRUE ) );
