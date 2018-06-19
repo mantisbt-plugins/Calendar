@@ -14,18 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
-
-
 //form_security_validate_google( 'calendar_config_edit' );
-
-
 //auth_reauthenticate();
 //access_ensure_global_level( config_get( 'update_event_threshold' ) );
 
 $f_oauth_key = gpc_get_string( 'code' );
 
-$client      = new Google_Client();
-$client->setAuthConfig( plugin_file_path( 'client.json', 'Calendar' ) );
+$client = new Google_Client();
+$client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
 
 $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
 $client->setAccessType( 'offline' );
