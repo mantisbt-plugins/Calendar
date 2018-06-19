@@ -25,7 +25,7 @@ $f_days_week_cheked = gpc_get_string_array( 'days_week' );
 $f_time_start  = gpc_get_int( 'time_day_start' );
 $f_time_finish = gpc_get_int( 'time_day_finish' );
 
-$f_google_calendar_list = gpc_get_string( 'google_calendar_list' );
+$f_google_calendar_list = gpc_get_string( 'google_calendar_list', NULL );
 
 foreach( $t_days_week_config as $t_name_day => $t_status ) {
     if( in_array( $t_name_day, $f_days_week_cheked ) ) {
