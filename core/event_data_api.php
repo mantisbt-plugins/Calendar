@@ -1,4 +1,5 @@
 <?php
+
 # Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -42,7 +43,7 @@ class CalendarEventData {
                 break;
 
             case 'name':
-                $p_value = trim( $value );
+                $value = trim( $value );
                 break;
 
             case 'date_changed':
@@ -408,35 +409,34 @@ function event_is_user_reporter( $p_event_id, $p_user_id ) {
  * @return boolean true if successful, false if unsuccessful
  * @access public
  */
-function event_member( $p_event_id, $p_user_id ) {
-	$c_event_id = (int)$p_event_id;
-	$c_user_id = (int)$p_user_id;
+function event_member_add( $p_event_id, $p_user_id ) {
+    $c_event_id = (int) $p_event_id;
+    $c_user_id  = (int) $p_user_id;
 
-	# Make sure we aren't already monitoring this event
-	if( user_is_member_event( $c_user_id, $c_event_id ) ) {
-		return true;
-	}
+    # Make sure we aren't already monitoring this event
+    if( user_is_member_event( $c_user_id, $c_event_id ) ) {
+        return true;
+    }
 
-	# Don't let the anonymous user monitor events
-	if( user_is_anonymous( $c_user_id ) ) {
-		return false;
-	}
+    # Don't let the anonymous user monitor events
+    if( user_is_anonymous( $c_user_id ) ) {
+        return false;
+    }
 
-	# Insert monitoring record
-        $t_event_member_table = plugin_table( 'event_member' );
-	db_param_push();
-	$t_query = "INSERT INTO $t_event_member_table ( user_id, event_id ) VALUES (" . db_param() . "," . db_param() . ")";
-	db_query( $t_query, array( $c_user_id, $c_event_id ) );
+    # Insert monitoring record
+    $t_event_member_table = plugin_table( 'event_member' );
+    db_param_push();
+    $t_query              = "INSERT INTO $t_event_member_table ( user_id, event_id ) VALUES (" . db_param() . "," . db_param() . ")";
+    db_query( $t_query, array( $c_user_id, $c_event_id ) );
 
-	# log new monitoring action
+    # log new monitoring action
 //	history_log_event_special( $c_event_id, BUG_MONITOR, $c_user_id );
-
-	# updated the last_updated date
-	event_update_date( $p_event_id );
+    # updated the last_updated date
+    event_update_date( $p_event_id );
 
 //	email_monitor_added( $p_event_id, $p_user_id );
 
-	return true;
+    return true;
 }
 
 /**
@@ -448,13 +448,13 @@ function event_member( $p_event_id, $p_user_id ) {
  * @access public
  * @uses database_api.php
  */
-function event_unmember( $p_event_id, $p_user_id ) {
+function event_member_delete( $p_event_id, $p_user_id ) {
 
     $t_event_member_table = plugin_table( 'event_member' );
     # Delete monitoring record
     db_param_push();
-    $t_query               = "DELETE FROM $t_event_member_table WHERE event_id = " . db_param();
-    $t_db_query_params[]   = $p_event_id;
+    $t_query              = "DELETE FROM $t_event_member_table WHERE event_id = " . db_param();
+    $t_db_query_params[]  = $p_event_id;
 
     if( $p_user_id !== null ) {
         $t_query             .= ' AND user_id = ' . db_param();
@@ -478,25 +478,75 @@ function event_unmember( $p_event_id, $p_user_id ) {
  * @return array
  */
 function event_get_members( $p_event_id ) {
-	if( ! access_has_event_level( config_get( 'show_member_list_threshold' ), $p_event_id ) ) {
-		return array();
-	}
+    if( !access_has_event_level( config_get( 'show_member_list_threshold' ), $p_event_id ) ) {
+        return array();
+    }
 
-	# get the eventnote data
-        $t_event_member_table = plugin_table( 'event_member' );
-	db_param_push();
-	$t_query = "SELECT user_id, enabled
+    # get the eventnote data
+    $t_event_member_table = plugin_table( 'event_member' );
+    db_param_push();
+    $t_query              = "SELECT user_id, enabled
 			FROM $t_event_member_table m, {user} u
 			WHERE m.event_id=" . db_param() . " AND m.user_id = u.id
 			ORDER BY u.realname, u.username";
-	$t_result = db_query( $t_query, array( $p_event_id ) );
+    $t_result             = db_query( $t_query, array( $p_event_id ) );
 
-	$t_users = array();
-	while( $t_row = db_fetch_array( $t_result ) ) {
-		$t_users[] = $t_row['user_id'];
-	}
+    $t_users = array();
+    while( $t_row   = db_fetch_array( $t_result ) ) {
+        $t_users[] = $t_row['user_id'];
+    }
 
-	user_cache_array_rows( $t_users );
+    user_cache_array_rows( $t_users );
 
-	return $t_users;
+    return $t_users;
+}
+
+function get_bugs_id_from_event( $event_id ) {
+    $p_table_calendar_relationship = plugin_table( "relationship" );
+
+    if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
+        $query  = "SELECT bug_id
+				  FROM $p_table_calendar_relationship
+				  WHERE event_id=" . db_param();
+        $result = db_query( $query, (array) $event_id );
+
+
+        $cResult     = array();
+        $t_row_count = db_num_rows( $result );
+        $pResult     = Array();
+        for( $i = 0; $i < $t_row_count; $i++ ) {
+            array_push( $cResult, db_fetch_array( $result ) );
+            $pResult[$i] = $cResult[$i]["bug_id"];
+        }
+
+        sort( $pResult );
+
+        return $pResult;
+    }
+}
+
+function get_events_id_from_bug_id( $p_bug_id ) {
+
+    $p_table_calendar_relationship = plugin_table( "relationship" );
+
+    if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
+        $query = "SELECT event_id
+				  FROM $p_table_calendar_relationship
+				  WHERE bug_id=" . db_param();
+
+        $result = db_query( $query, array( $p_bug_id ) );
+
+
+        $cResult = array();
+
+        $t_row_count = db_num_rows( $result );
+        $pResult     = Array();
+
+        for( $i = 0; $i < $t_row_count; $i++ ) {
+            array_push( $cResult, db_fetch_array( $result ) );
+            $pResult[$i] = $cResult[$i]["event_id"];
+        }
+
+        return $pResult;
+    }
 }
