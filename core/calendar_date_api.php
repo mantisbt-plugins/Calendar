@@ -69,54 +69,6 @@ function get_dates_event_from_events_id( $p_events_id ) {
     return $t_dates;
 }
 
-function get_bugs_id_from_event( $event_id ) {
-    $p_table_calendar_relationship = plugin_table( "relationship" );
-
-    if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
-        $query  = "SELECT bug_id
-				  FROM $p_table_calendar_relationship
-				  WHERE event_id=" . db_param();
-        $result = db_query( $query, (array) $event_id );
-
-
-        $cResult     = array();
-        $t_row_count = db_num_rows( $result );
-        $pResult     = Array();
-        for( $i = 0; $i < $t_row_count; $i++ ) {
-            array_push( $cResult, db_fetch_array( $result ) );
-            $pResult[$i] = $cResult[$i]["bug_id"];
-        }
-
-        return $pResult;
-    }
-}
-
-function get_events_id_from_bug_id( $p_bug_id ) {
-
-    $p_table_calendar_relationship = plugin_table( "relationship" );
-
-    if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
-        $query = "SELECT event_id
-				  FROM $p_table_calendar_relationship
-				  WHERE bug_id=" . db_param();
-
-        $result = db_query( $query, array( $p_bug_id ) );
-
-
-        $cResult = array();
-
-        $t_row_count = db_num_rows( $result );
-        $pResult     = Array();
-
-        for( $i = 0; $i < $t_row_count; $i++ ) {
-            array_push( $cResult, db_fetch_array( $result ) );
-            $pResult[$i] = $cResult[$i]["event_id"];
-        }
-
-        return $pResult;
-    }
-}
-
 function group_events_by_time( $p_events_id ) {
     if( $p_events_id == false || $p_events_id == 0 )
         return 0;
