@@ -198,16 +198,16 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                                         ?>
                                                         <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
                                                             <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
-                                                        <?php
+                                                            <?php
                                                         endif;
                                                     }
                                                     ?>
-                                            <?php endforeach; ?>
+                                                <?php endforeach; ?>
                                             </select><br><br>
-        <?php endif; ?>
+                                        <?php endif; ?>
                                         <input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="<?php echo plugin_lang_get( 'add_user_to_member' ) ?>" />
                                     </form>
-    <?php } ?>
+                                <?php } ?>
                             </td>
                         </tr>
                     </table>
@@ -235,7 +235,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
         <div class="widget-header widget-header-small">
             <h4 class="widget-title lighter">
                 <i class="ace-icon fa fa-sitemap"></i>
-<?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
+                <?php echo plugin_lang_get( 'event_relationships_bugs' ) ?>
             </h4>
             <div class="widget-toolbar">
                 <a data-action="collapse" href="#">
@@ -260,9 +260,8 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                             }
 
                             $t_bug_summary = bug_get_field( $t_bug_id, "summary" );
-                            $t_bug_url     = "/view.php?id=" . $t_bug_id;
 
-                            echo "<li><a href=\"" . $t_bug_url . "\" target=\"_self\" style=\"background-color:" . get_status_color( bug_get_field( $t_bug_id, "status" ) ) . ";\">" . $t_bug_id . ": " . $t_bug_summary . "</a></li>";
+                            echo "<li><a href=\"" . string_get_bug_view_url( $t_bug_id ) . "\" target=\"_self\" style=\"background-color:" . get_status_color( bug_get_field( $t_bug_id, "status" ) ) . ";\">" . $t_bug_id . ": " . $t_bug_summary . "</a></li>";
                         }
                     }
                     echo "</ul>";
