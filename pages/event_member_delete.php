@@ -43,7 +43,9 @@ if( count( event_get_members( $f_event_id ) ) <= 1 ) {
     trigger_error( 'ERROR_MIN_MEMBERS', ERROR );
 }
 
-event_unmember( $f_event_id, $t_user_id );
+event_member_delete( $f_event_id, $t_user_id );
+
+event_google_update( event_get( $f_event_id ) );
 
 form_security_purge( 'event_member_delete' );
 

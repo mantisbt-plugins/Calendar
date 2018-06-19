@@ -27,6 +27,8 @@ $t_event->activity = "N";
 
 $t_event->update();
 
+event_google_delete( $t_event );
+
 form_security_purge( 'event_delete' );
 
 print_header_redirect( plugin_page( 'calendar_user_page', TRUE ) );

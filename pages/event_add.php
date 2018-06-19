@@ -65,13 +65,11 @@ if( $f_owner_is_members || count( $f_member_user_list ) == 0 ) {
 }
 
 foreach( $f_member_user_list as $t_member ) {
-    event_member( $t_event_id, $t_member );
+    event_member_add( $t_event_id, $t_member );
 }
 
-foreach( $f_member_user_list as $t_member ) {
+event_google_add( $t_event_id, $t_event_data->author_id, $f_member_user_list );
 
-    event_google_add( $t_event_id, $t_member );
-}
 
 form_security_purge( 'event_add' );
 
