@@ -27,32 +27,43 @@ form_security_validate( 'event_update' );
 
 $f_event_id = gpc_get_int( 'event_id' );
 
-$t_event_data = event_get( $f_event_id );
+$t_event_existing_data = event_get( $f_event_id );
+
+$t_event_update_data = clone $t_event_existing_data;
 
 $f_event_time_start  = gpc_get_int( 'event_time_start' );
 $f_event_time_finish = gpc_get_int( 'event_time_finish' );
 
-$t_event_data->name            = gpc_get_string( 'name_event' );
-$t_event_data->activity        = "Y";
-$t_event_data->changed_user_id = auth_get_current_user_id();
-$t_event_data->date_from       = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_start;
-$t_event_data->date_to         = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_finish;
+$t_event_update_data->name            = gpc_get_string( 'name_event' );
+$t_event_update_data->activity        = "Y";
+$t_event_update_data->changed_user_id = auth_get_current_user_id();
+$t_event_update_data->date_from       = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_start;
+$t_event_update_data->date_to         = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_finish;
 
-$t_event_data->update();
+if( $t_event_update_data != $t_event_existing_data ) {
+    $t_event_update_data->update();
+}
 
 
-$t_table_calendar_relationship = plugin_table( "relationship" );
-
-$query = "DELETE FROM $t_table_calendar_relationship
-			          WHERE event_id=" . db_param();
-
-db_query( $query, array( $f_event_id ) );
 
 $f_bugs = gpc_get_int_array( 'bugs_add', array( 0 ) );
 
-if( $f_bugs[0] !== 0 ) {
+sort( $f_bugs );
+
+$t_current_bugs = get_bugs_id_from_event( $t_event_update_data->id );
+
+//sort( $f_bugs );
+//sort( $t_current_bugs );
+
+if( $f_bugs != $t_current_bugs ) {
 
     $t_table_calendar_relationship = plugin_table( "relationship" );
+
+    $query = "DELETE FROM $t_table_calendar_relationship
+			          WHERE event_id=" . db_param();
+
+    db_query( $query, array( $f_event_id ) );
+
 
     $query = "INSERT
                                               INTO $t_table_calendar_relationship
@@ -64,15 +75,18 @@ if( $f_bugs[0] !== 0 ) {
         if( !bug_exists( $t_bug_id ) ) {
             continue;
         }
-        db_query( $query, Array( $t_event_data->id, $t_bug_id ) );
-        plugin_history_log( $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . $t_event_data->name );
+        db_query( $query, Array( $t_event_update_data->id, $t_bug_id ) );
+        plugin_history_log( $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . $t_event_update_data->name );
     }
+}
+if( $t_event_update_data != $t_event_existing_data || $f_bugs != $t_current_bugs ) {
+    event_google_update( $t_event_update_data );
 }
 
 form_security_purge( 'event_update' );
 
-html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $t_event_data->id, plugin_lang_get( 'update_successful_button' ) );
+html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $t_event_update_data->id, plugin_lang_get( 'update_successful_button' ) );
 
-html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_data->id );
+html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_update_data->id );
 
 layout_page_end();
