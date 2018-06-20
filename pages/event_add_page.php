@@ -307,11 +307,9 @@ $t_form_encoding   = '';
                 <input <?php echo helper_get_tab_index() ?> type="submit" class="btn btn-primary btn-white btn-round" value="<?php echo plugin_lang_get( 'add_button' ) ?>" />
             </div>
         </div>
+    </form>
 </div>
 
-
-</form>
-</div>
 
 <?php
 layout_page_end();
