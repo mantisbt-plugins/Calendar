@@ -99,6 +99,23 @@ echo '<td class="bug-reporter" >';
 echo strtotime( $t_last_updated ) == 0 ? plugin_lang_get( 'not_last_update' ) : $t_last_updated;
 echo '</td>';
 echo '</tr>';
+
+#Date last sync from google calendar
+$t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
+if( $t_oauth['error'] != NULL || $t_oauth != NULL ) {
+    $t_event_google_id        = event_google_get_id( $t_event_id );
+    $t_event_google_last_sync = event_google_get_last_sync( $t_event_google_id );
+
+    echo '<tr>';
+    echo '<th class="bug-reporter category">', plugin_lang_get( 'view_event_google_last_sync' ), '</th>';
+    echo '<td class="bug-reporter" >';
+    echo strtotime( $t_event_google_last_sync ) == 0 ? plugin_lang_get( 'not_last_update' ) : date( config_get( 'normal_date_format' ), $t_event_google_last_sync );
+    echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_google_sync' ) . '&event_id=' . $f_event_id . htmlspecialchars( form_security_param( 'event_google_sync' ) ) . '"><i class="fa fa-refresh"></i></a>';
+    echo '</td>';
+    echo '</tr>';
+}
+
+
 #
 # Reporter,
 # 

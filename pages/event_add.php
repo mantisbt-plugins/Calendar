@@ -70,7 +70,6 @@ foreach( $f_member_user_list as $t_member ) {
 
 event_google_add( $t_event_id, $t_event_data->author_id, $f_member_user_list );
 
-
 form_security_purge( 'event_add' );
 
 layout_page_header_begin();

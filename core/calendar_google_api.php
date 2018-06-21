@@ -22,6 +22,8 @@ function print_google_calendar_list() {
 }
 
 function get_response_google_url() {
+    $t_state = array( 'user_config_google' );
+
     $client = new Google_Client();
 
     $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
@@ -30,13 +32,13 @@ function get_response_google_url() {
     $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
     $client->setAccessType( 'offline' );
     $client->setApprovalPrompt( 'force' );
-    $client->setState( form_security_token( 'calendar_config_edit' ) );
+    $client->setState( json_encode( $t_state ) );
     $auth_url = $client->createAuthUrl();
 //    header( 'Location: ' . filter_var( $auth_url, FILTER_SANITIZE_URL ) );
     return filter_var( $auth_url, FILTER_SANITIZE_URL );
 }
 
-function getClient( $p_user_id = NULL ) {
+function getClient( $p_user_id = NULL, $p_state = NULL ) {
 
     if( $p_user_id == NULL ) {
         $t_user_id = auth_get_current_user_id();
@@ -44,27 +46,34 @@ function getClient( $p_user_id = NULL ) {
         $t_user_id = $p_user_id;
     }
 
+    if( $p_state == NULL ) {
+        $p_state = $_REQUEST['page'];
+    }
+
     $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, $t_user_id );
 
-    $client = new Google_Client();
-    $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
-    $client->addScope( Google_Service_Calendar::CALENDAR );
-    $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
+    try {
+        $client = new Google_Client();
+        $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
+        $client->addScope( Google_Service_Calendar::CALENDAR );
+        $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
 
-    $client->setAccessType( 'offline' );
-    $client->setIncludeGrantedScopes( true );
-    $client->setState( form_security_token( 'calendar_config_edit' ) );
-    $client->refreshToken( $t_oauth["refresh_token"] );
+        $client->setAccessType( 'offline' );
+        $client->setApprovalPrompt( 'force' );
+        $client->setIncludeGrantedScopes( true );
+        $client->setState( json_encode( $p_state ) );
+        $client->refreshToken( $t_oauth["refresh_token"] );
 
-    if( $client->isAccessTokenExpired() ) {
-        try {
+        if( $client->isAccessTokenExpired() ) {
             $client->fetchAccessTokenWithRefreshToken( $client->getRefreshToken() );
             plugin_config_set( 'oauth_key', $client->getAccessToken(), $t_user_id );
-        } catch( Exception $e ) {
-            plugin_config_delete( 'oauth_key', $t_user_id );
         }
+        return $client;
+    } catch( Exception $e ) {
+        plugin_config_delete( 'oauth_key', $t_user_id );
+        header( 'Location: ' . $client->createAuthUrl() );
+        exit();
     }
-    return $client;
 }
 
 function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
@@ -87,7 +96,7 @@ function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
     }
 
     try {
-        $service = new Google_Service_Calendar( getClient( $p_creator_id ) );
+        $service = new Google_Service_Calendar( getClient( $p_creator_id, array( 'event_add' => $p_event_id ) ) );
 
         $event = new Google_Service_Calendar_Event( array(
                                   'summary'     => project_get_field( event_get_field( $p_event_id, 'project_id' ), 'name' ) . ": " . event_get_field( $p_event_id, 'name' ),
@@ -116,11 +125,12 @@ function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
 
     $c_event_id        = (int) $p_event_id;
     $c_event_google_id = $event_data['id'];
+//    $c_update_time     = strtotime( $event_data->getUpdated() );
 
     $t_google_sync_table = plugin_table( 'google_sync' );
     db_param_push();
-    $t_query             = "INSERT INTO $t_google_sync_table ( event_id, google_id ) VALUES (" . db_param() . "," . db_param() . ")";
-    db_query( $t_query, array( $c_event_id, $c_event_google_id ) );
+    $t_query             = "INSERT INTO $t_google_sync_table ( event_id, google_id, last_sync ) VALUES (" . db_param() . "," . db_param() . "," . db_param() . ")";
+    db_query( $t_query, array( $c_event_id, $c_event_google_id, db_now() ) );
 
     return true;
 }
@@ -151,7 +161,7 @@ function event_google_update( CalendarEventData $p_update_event ) {
     }
 
     try {
-        $service = new Google_Service_Calendar( getClient( $t_creator_id ) );
+        $service = new Google_Service_Calendar( getClient( $t_creator_id, array( 'event_update' => $p_update_event->id ) ) );
 
         $t_existing_google_event = $service->events->get( plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_creator_id ), $t_google_event_id );
 
@@ -177,6 +187,8 @@ function event_google_update( CalendarEventData $p_update_event ) {
         $t_update_google_event->setAttendees( $t_users_email );
 
         $event_data = $service->events->update( $t_google_calendar_id, $t_google_event_id, $t_update_google_event );
+
+        event_google_update_date( $event_data->id, time() );
     } catch( Exception $e ) {
         return;
     }
@@ -188,7 +200,7 @@ function event_google_delete( CalendarEventData $p_event ) {
     $t_google_calendar_id = plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_creator_id );
     if( $t_google_event_id != NULL ) {
         try {
-            $service = new Google_Service_Calendar( getClient( $t_creator_id ) );
+            $service = new Google_Service_Calendar( getClient( $t_creator_id, array( 'event_delete' => $p_event->id ) ) );
 
             $service->events->delete( $t_google_calendar_id, $t_google_event_id );
 
@@ -200,6 +212,19 @@ function event_google_delete( CalendarEventData $p_event ) {
             return;
         }
     }
+}
+
+function event_google_get_last_sync( $p_event_google_id ) {
+    $t_google_sync_table = plugin_table( 'google_sync' );
+
+    db_param_push();
+
+    $t_query = "SELECT last_sync FROM $t_google_sync_table
+				  WHERE google_id=" . db_param();
+
+    $t_result = db_query( $t_query, array( $p_event_google_id ) );
+
+    return db_fetch_array( $t_result )['last_sync'];
 }
 
 function event_google_get_id( int $p_event_id ) {
@@ -217,11 +242,9 @@ function event_google_get_id( int $p_event_id ) {
 
 function event_is_synchronized_with_google( $p_event_id ) {
 
-
-
     $t_result = event_google_get_id( $p_event_id );
 
-    if( 0 == $t_result ) {
+    if( !$t_result ) {
         return false;
     } else {
         return true;
@@ -235,4 +258,16 @@ function string_get_google_description( $p_event_id ) {
         $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . bug_get_field( $t_bug_id, 'summary' ) . '</a><br><br>';
     }
     return $t_description;
+}
+
+function event_google_update_date( $p_event_google_id, $p_date ) {
+
+    $t_google_sync_table = plugin_table( 'google_sync' );
+
+    $query = "UPDATE $t_google_sync_table
+				  SET last_sync= " . db_param() . "
+				  WHERE google_id=" . db_param();
+    db_query( $query, Array( $p_date, $p_event_google_id ) );
+
+    return true;
 }

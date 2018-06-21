@@ -153,6 +153,10 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "google_sync" ), "
                                       event_id
                                       " ) ),
+                                  //version 2.3.1 (schema 10)
+                                  array( 'AddColumnSQL', array( plugin_table( "google_sync" ), "
+                                        last_sync INT(10) UNSIGNED NOTNULL DEFAULT 1
+                                " ) ),
         );
     }
 

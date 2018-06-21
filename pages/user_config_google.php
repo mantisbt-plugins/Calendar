@@ -17,27 +17,63 @@
 //form_security_validate_google( 'calendar_config_edit' );
 //auth_reauthenticate();
 //access_ensure_global_level( config_get( 'update_event_threshold' ) );
+//form_security_purge( plugin_page( 'config', true ) );
 
-$f_oauth_key = gpc_get_string( 'code' );
 
-$client = new Google_Client();
-$client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
+$f_oauth_key = gpc_get_string( 'code', NULL );
+$f_state     = json_decode( gpc_get_string( 'state', NULL ), TRUE );
 
-$client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
-$client->setAccessType( 'offline' );
+try {
+    $client = new Google_Client();
+    $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
 
-$accessToken = $client->fetchAccessTokenWithAuthCode( $f_oauth_key );
+    $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
+    $client->setAccessType( 'offline' );
+    $client->setApprovalPrompt( 'force' );
 
-plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );
+    $accessToken = $client->fetchAccessTokenWithAuthCode( $f_oauth_key );
+    if( $accessToken['error'] ) {
+        throw new InvalidArgumentException( $accessToken['error_description'] );
+    }
+    plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );
 
-form_security_purge( plugin_page( 'config', true ) );
+    foreach( $f_state as $key => $t_value ) {
 
-$t_redirect_url = plugin_page( 'user_config_page', true );
+        switch( $key ) {
 
-layout_page_header( null, $t_redirect_url );
+            case 'user_config_google':
+                $t_redirect_url = plugin_page( 'user_config_page', true );
+                break;
 
-layout_page_begin( $t_redirect_url );
+            case 'event_add':
+                $t_event_id     = $t_value;
+                event_google_add( $t_event_id, event_get_field( $t_event_id, 'author_id' ), event_get_members( $t_event_id ) );
+                $t_redirect_url = plugin_page( 'view', true ) . '&event_id=' . $t_event_id;
+                break;
 
-html_operation_successful( $t_redirect_url );
+            case 'event_update':
+                $t_event        = event_get( $t_value );
+                event_google_update( $t_event );
+                $t_redirect_url = plugin_page( 'view', true ) . '&event_id=' . $t_event->id;
+                break;
+
+            case 'event_delete':
+                $t_event        = event_get( $t_value );
+                event_google_delete( $t_event );
+                $t_redirect_url = plugin_page( 'calendar_user_page', true );
+                break;
+        }
+    }
+    layout_page_header( null, $t_redirect_url );
+    layout_page_begin( $t_redirect_url );
+
+    html_operation_successful( $t_redirect_url );
+} catch( Exception $ex ) {
+
+    $t_redirect_url = plugin_page( 'user_config_page', true );
+    layout_page_header( null, $t_redirect_url );
+    layout_page_begin( $t_redirect_url );
+    html_operation_failure( $t_redirect_url, sprintf( plugin_lang_get( 'config_user_google_access_denie' ), $ex->getMessage() ) );
+}
 
 layout_page_end();

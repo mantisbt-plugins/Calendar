@@ -29,10 +29,17 @@ $s_plugin_Calendar_config_title = 'Настройка';
 $s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в календаре';
 $s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени';
 
-$s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными данными для доступа к google api';
+$s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными данными для доступа к google api
+(<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Получить доступ к Google API Calendar</a>)<br>
+В настройках в пункте "Разрешенные URI перенаправления" нужно будет указать сдедующий URL:<br>
+%1$s';
+$s_plugin_Calendar_config_page_google_api_settings = 'Текущий JSON файл с учётными данными для доступа к google api';
+$s_plugin_Calendar_config_page_google_client_id = 'Текущий id клиента';
+
 $s_plugin_Calendar_user_config_enable_google_calendar = 'Состояние синхронизации с Google Calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Включить синхронизацию с Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Выберите календарь';
+$s_plugin_Calendar_config_user_google_access_denie = 'Сервер отклонил запрос. <br> Строка ошибки: %1$s';
 
 $s_plugin_Calendar_menu_main_front = 'Календарь событий';
 $s_plugin_Calendar_name_event = 'Имя события';
@@ -82,6 +89,7 @@ $s_plugin_Calendar_not_assigned_event = 'Нет назначеных событ�
 $s_plugin_Calendar_event_view_title = 'Просмотр события';
 $s_plugin_Calendar_id = 'Номер';
 $s_plugin_Calendar_last_update = 'Дата редактирования';
+$s_plugin_Calendar_view_event_google_last_sync = 'Синхронизированно с google';
 $s_plugin_Calendar_not_last_update = 'Нет';
 $s_plugin_Calendar_event_relationships_bugs = 'Связанные задачи';
 $s_plugin_Calendar_date_from = 'Дата начала события';

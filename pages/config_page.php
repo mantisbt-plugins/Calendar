@@ -29,7 +29,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 <div class="col-md-12 col-xs-12">
     <div class="space-10"></div>
     <div class="form-container">
-        <form action="<?php echo plugin_page( 'config' ) ?>" method="post" enctype="multipart/form-data">
+        <form action="<?php echo plugin_page( 'config' ) ?>" method="post" enctype="multipart/form-data"> 
             <?php echo form_security_field( 'config' ) ?>
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header widget-header-small">
@@ -94,28 +94,49 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
+                                <?php
+                                $t_google_client_id = json_decode( plugin_config_get( 'google_client_secret' ), TRUE );
+                                if( $t_google_client_id['web']['client_id'] ) {
+                                    ?>
+
+                                    <tr <?php echo helper_alternate_class() ?>>
+                                        <td class="category" width="50%">
+                                            <?php echo plugin_lang_get( 'config_page_google_api_settings' ) ?>
+                                        </td>
+
+                                        <td colspan="2">
+
+                                            <div class = "fallback">
+                                                <pre>
+                                                    <?php
+//                                                echo plugin_lang_get( 'config_page_google_client_id' ) . ': ' . $t_google_client_id['web']['client_id'];
+                                                    print_r( $t_google_client_id['web'] );
+//                                                echo '</br>';
+//                                                foreach( $t_google_client_id['web']['redirect_uris'] as $t_url ) {
+//                                                    echo $t_url;
+//                                                    echo '</br>';
+//                                                }
+                                                    ?>
+                                                </pre>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+
                                 <tr <?php echo helper_alternate_class() ?>>
                                     <td class="category" width="50%">
-                                        <?php echo plugin_lang_get( 'config_google_api_file' ) ?>
+                                        <?php echo sprintf( plugin_lang_get( 'config_google_api_file' ), config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) ) ?>
                                     </td>
 
                                     <td class="center" colspan="2">
-                                        <?php
-                                        $t_max_file_size    = (int) min( ini_get_number( 'upload_max_filesize' ), ini_get_number( 'post_max_size' ), config_get( 'max_file_size' ) );
-                                        $t_google_client_id = json_decode( plugin_config_get( 'google_client_secret' ), TRUE );
-                                        ?>
 
                                         <div class = "fallback">
-                                            <?php
-                                            if( $t_google_client_id['web']['client_id'] ) {
-                                                echo $t_google_client_id['web']['client_id'];
-                                                echo '</br>';
-                                            }
-                                            ?>
                                             <input style="display: inline" id="ufile" name="ufile" type="file" size="15" accept="application/json"/>
                                         </div>
 
                                     </td>
+                                </tr>
 
                                 <tr>
                                     <td class="center" colspan="3">
