@@ -12,7 +12,7 @@ $f_event_id = gpc_get_int( 'event_id' );
 
 event_ensure_exists( $f_event_id );
 
-if( event_is_synchronized_with_google( $f_event_id ) ) {
+if( event_is_synchronized_with_google( $f_event_id ) || event_google_get_id( $f_event_id ) != NULL ) {
     event_google_update( event_get( $f_event_id ) );
 } else {
     event_google_add( $f_event_id, event_get_field( $f_event_id, 'author_id' ), event_get_members( $f_event_id ) );
