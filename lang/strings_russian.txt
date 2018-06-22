@@ -15,7 +15,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 $s_plugin_Calendar_name_plugin_description_page = 'Календарь событий';
-$s_plugin_Calendar_description = 'Добавляет в MantisBT фунцию планирования выполнения задач на основе календаря событий';
+$s_plugin_Calendar_description = 'Добавляет в MantisBT фунцию планирования выполнения задач на основе календаря событий с возможностью односторонней синхронизацией с Google Calendar.';
 
 $s_plugin_Calendar_Mon = 'Пн';
 $s_plugin_Calendar_Tue = 'Вт';

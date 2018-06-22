@@ -15,7 +15,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 $s_plugin_Calendar_name_plugin_description_page = 'Calendar of Events';
-$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the event calendar';
+$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar';
 
 $s_plugin_Calendar_Mon = 'Mon';
 $s_plugin_Calendar_Tue = 'Tue';
