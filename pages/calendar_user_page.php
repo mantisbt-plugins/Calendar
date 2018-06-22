@@ -135,7 +135,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                             <?php # CSRF protection not required here - form does not result in modifications?>
                             <input type="hidden" name="page" value="Calendar/calendar_user_page" />
                             <input type="hidden" name="week" value="<?php echo $f_week; ?>" />
-                            <input type="hidden" name="full_time" value="<?php echo $f_full_time; ?>" />
+                            <input type="hidden" name="full_time" value="<?php echo $f_full_time == TRUE ? '1' : '0'; ?>" />
 
 
                             <label class="inline"><?php echo plugin_lang_get( 'filter_text' ); ?></label>

@@ -155,7 +155,7 @@ class CalendarPlugin extends MantisPlugin {
                                       " ) ),
                                   //version 2.3.1 (schema 10)
                                   array( 'AddColumnSQL', array( plugin_table( "google_sync" ), "
-                                        last_sync INT(10) UNSIGNED NOTNULL DEFAULT 1
+                                        last_sync INT(10) UNSIGNED NOTNULL DEFAULT 0
                                 " ) ),
         );
     }
