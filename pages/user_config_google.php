@@ -25,6 +25,7 @@ $f_state     = json_decode( gpc_get_string( 'state', NULL ), TRUE );
 
 try {
     $client = new Google_Client();
+    $client->setApplicationName( "MantisBT Calendar plugin" );
     $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
 
     $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );

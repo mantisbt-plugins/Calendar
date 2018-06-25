@@ -25,7 +25,7 @@ function get_response_google_url() {
     $t_state = array( 'user_config_google' );
 
     $client = new Google_Client();
-    $client->setApplicationName("MantisBT Calendar plugin");
+    $client->setApplicationName( "MantisBT Calendar plugin" );
 
     $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
 
@@ -55,6 +55,7 @@ function getClient( $p_user_id = NULL, $p_state = NULL ) {
 
     try {
         $client = new Google_Client();
+        $client->setApplicationName( "MantisBT Calendar plugin" );
         $client->setAuthConfig( json_decode( plugin_config_get( 'google_client_secret' ), TRUE ) );
         $client->addScope( Google_Service_Calendar::CALENDAR );
         $client->setRedirectUri( config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) );
