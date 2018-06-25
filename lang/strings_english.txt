@@ -27,7 +27,19 @@ $s_plugin_Calendar_Sun = 'Sun';
 
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display';
-$s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени';
+$s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range';
+
+$s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for access to google api
+(<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
+In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
+%1$s';
+$s_plugin_Calendar_config_page_google_api_settings = 'Current JSON file with credentials for access to google api';
+$s_plugin_Calendar_config_page_google_client_id = 'Current client id';
+
+$s_plugin_Calendar_user_config_enable_google_calendar = 'The status of one-way synchronization with Google Calendar';
+$s_plugin_Calendar_user_config_enable_google_calendar_button = 'Enable sync with Google Calendar';
+$s_plugin_Calendar_user_config_google_calendar_list = 'Select a calendar...';
+$s_plugin_Calendar_config_user_google_access_denie = 'The server denied the request. <br> Error: %1$s';
 
 $s_plugin_Calendar_menu_main_front = 'Calendar';
 $s_plugin_Calendar_name_event = 'Event Name';
@@ -77,6 +89,7 @@ $s_plugin_Calendar_not_assigned_event = 'No events assigned';
 $s_plugin_Calendar_event_view_title = 'Event Viewer';
 $s_plugin_Calendar_id = 'Number';
 $s_plugin_Calendar_last_update = 'Date edited';
+$s_plugin_Calendar_view_event_google_last_sync = 'Synced with google';
 $s_plugin_Calendar_not_last_update = 'No';
 $s_plugin_Calendar_event_relationships_bugs = 'Related tasks';
 $s_plugin_Calendar_date_from = 'Event start date';
