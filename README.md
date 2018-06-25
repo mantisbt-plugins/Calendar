@@ -14,7 +14,7 @@ Features
 Download
 --------
 Please download the stable version.
-(https://github.com/brlumen/Calendar/releases/tag/release-x.x.x)
+(https://github.com/brlumen/Calendar/releases)
 
 
 How to install
