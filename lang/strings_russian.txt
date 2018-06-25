@@ -26,8 +26,8 @@ $s_plugin_Calendar_Sat = 'Сб';
 $s_plugin_Calendar_Sun = 'Вс';
 
 $s_plugin_Calendar_config_title = 'Настройка';
-$s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в календаре';
-$s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени';
+$s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в (Настройки пользователя перекрывают настройки по умолчанию)';
+$s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени (Настройки пользователя перекрывают настройки по умолчанию)';
 
 $s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными данными для доступа к google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Получить доступ к Google API Calendar</a>)<br>

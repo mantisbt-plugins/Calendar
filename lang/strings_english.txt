@@ -26,8 +26,8 @@ $s_plugin_Calendar_Sat = 'Sat';
 $s_plugin_Calendar_Sun = 'Sun';
 
 $s_plugin_Calendar_config_title = 'Settings';
-$s_plugin_Calendar_config_days_week_display = 'Days of the week for display';
-$s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range';
+$s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
+$s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';
 
 $s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for access to google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
