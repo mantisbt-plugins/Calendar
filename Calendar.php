@@ -96,7 +96,7 @@ class CalendarPlugin extends MantisPlugin {
     function schema() {
 
         return array(
-// version 0.0.1(schema 0)
+                                  // version 0.0.1(schema 0)
                                   array( "CreateTableSQL", array( plugin_table( "events" ), "
 					id INT(10) NOTNULL AUTOINCREMENT PRIMARY,
                                         project_id INT(10) NOTNULL,
@@ -209,7 +209,7 @@ class CalendarPlugin extends MantisPlugin {
 
     function hooks() {
         $hooks = array(
-                                  "EVENT_LAYOUT_RESOURCES" => "resources",
+                                  'EVENT_LAYOUT_RESOURCES' => 'resources',
                                   'EVENT_MENU_MAIN_FRONT'  => 'menu_main_front',
                                   'EVENT_VIEW_BUG_DETAILS' => 'html_print_calendar',
         );
