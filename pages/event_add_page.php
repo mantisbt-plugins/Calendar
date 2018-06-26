@@ -226,7 +226,9 @@ $t_form_encoding   = '';
                 $t_bug_count  = null;
                 $t_page_count = null;
 
-                $t_bugs = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count, null, $t_project_id, null, true );
+                $t_custom_filter = filter_get_default();
+
+                $t_bugs = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count, $t_custom_filter, $t_project_id, null, true );
 
                 $t_bugslist       = Array();
                 $t_users_handlers = Array();
