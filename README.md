@@ -5,9 +5,10 @@ Adds the task scheduling function in MantisBT based on the calendar of events wi
 
 Features
 --------
-- The ability to create a single event.
-- Binding of any number of tasks for the event.
-- Visual display of events in tasks.
+- The ability to create event.
+- Binding any number of bugs to event.
+- Bug can be related to any number of events.
+- Visual display of events in bugs view page.
 - One-way synchronization with Google Calendar (v. >= 2.3.0)
 - Support for different time zones.
 
