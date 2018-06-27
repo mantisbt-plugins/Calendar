@@ -53,8 +53,14 @@ if( plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' )
     plugin_config_set( 'time_day_finish', $f_time_finish, $t_current_user_id );
 }
 
-if( plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_current_user_id ) != $f_google_calendar_list ) {
-    plugin_config_set( 'google_calendar_sync_id', $f_google_calendar_list, $t_current_user_id );
+$t_google_calendar_sync_id = plugin_config_get( 'google_calendar_sync_id', "0", FALSE, $t_current_user_id );
+
+if( $t_google_calendar_sync_id !== $f_google_calendar_list ) {
+    if( $f_google_calendar_list === "0" ) {
+        plugin_config_delete( 'google_calendar_sync_id', $t_current_user_id );
+    } else {
+        plugin_config_set( 'google_calendar_sync_id', $f_google_calendar_list, $t_current_user_id );
+    }
 }
 
 form_security_purge( plugin_page( 'config', TRUE ) );
