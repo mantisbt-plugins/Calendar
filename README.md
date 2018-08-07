@@ -11,7 +11,7 @@ Features
 - Visual display of events in bugs view page.
 - One-way synchronization with Google Calendar (v. >= 2.3.0)
 - Support for different time zones.
-- Recurring events.
+- Recurring events(v. >= 2.4.0-dev).
 
 Download
 --------
