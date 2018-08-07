@@ -1,0 +1,104 @@
+<?php
+# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar for MantisBT is free software: 
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, 
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for for MantisBT is distributed in the hope 
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Customer management plugin for MantisBT.  
+# If not, see <http://www.gnu.org/licenses/>.
+
+$s_plugin_Calendar_name_plugin_description_page = 'Calendar of Events';
+$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar';
+
+$s_plugin_Calendar_Mon = 'Lun';
+$s_plugin_Calendar_Tue = 'Mar';
+$s_plugin_Calendar_Wed = 'Mie';
+$s_plugin_Calendar_Thu = 'Jue';
+$s_plugin_Calendar_Fri = 'Vie';
+$s_plugin_Calendar_Sat = 'Sab';
+$s_plugin_Calendar_Sun = 'Dom';
+
+$s_plugin_Calendar_config_title = 'Configuración';
+$s_plugin_Calendar_config_days_week_display = 'Días de la semana para mostrar de manera predeterminada (la configuración del usuario anula la predeterminada)';
+$s_plugin_Calendar_config_time_day_range = 'Rango de horas de trabajo (la configuración del usuario anula la predeterminada)';
+
+$s_plugin_Calendar_config_google_api_file = 'Archivo JSON para acceder a google api
+(<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Obtener acceso a Google API Calendar</a>)<br>
+En la configuración de "Redirección de URI permitida", deberá especificar la siguiente URL:<br>
+%1$s';
+$s_plugin_Calendar_config_page_google_api_settings = 'Archivo JSON actual con credenciales para acceder a google api';
+$s_plugin_Calendar_config_page_google_client_id = 'ID del cliente actual';
+
+$s_plugin_Calendar_user_config_enable_google_calendar = 'Estado de la sincronización con google calendar';
+$s_plugin_Calendar_user_config_enable_google_calendar_button = 'Habilitar la sincronización con Google Calendar';
+$s_plugin_Calendar_user_config_google_calendar_list = 'Seleccionar un calendario...';
+$s_plugin_Calendar_config_user_google_access_denie = 'El servidor negó la solicitud. <br> Error: %1$s';
+
+$s_plugin_Calendar_menu_main_front = 'Calendario';
+$s_plugin_Calendar_name_event = 'Nombre del evento';
+$s_plugin_Calendar_date_event = 'Fecha del evento';
+$s_plugin_Calendar_event = 'Evento de calendario';
+$s_plugin_Calendar_members = 'Miembros del evento';
+$s_plugin_Calendar_owner_is_members = '¿Un miembro del evento?';
+$s_plugin_Calendar_add_user_to_member = 'Hacer al usuario miembro del evento';
+$s_plugin_Calendar_select_all_users = 'Todos los usuarios';
+$s_plugin_Calendar_filter_text = 'Filtrar por:';
+
+$s_plugin_Calendar_event_hystory_create = 'Agregado al evento';
+$s_plugin_Calendar_add_new_event = 'Añadir nuevo evento';
+$s_plugin_Calendar_enter_report_details_title = 'Ingrese los datos del evento';
+$s_plugin_Calendar_insert_event = 'Agregar a un evento existente';
+$s_plugin_Calendar_delete_event_sure_msg = '¿Seguro que quieres eliminar este evento?';
+$s_plugin_Calendar_delete_event_button = 'Eliminar';
+$s_plugin_Calendar_not_update = 'No actualizado';
+$s_plugin_Calendar_last_update = 'Actualizado';
+$s_plugin_Calendar_author = 'Autor';
+$s_plugin_Calendar_updater = 'Actualizado';
+$s_plugin_Calendar_in = 'en';					//no lo encontre en el prlugin
+$s_plugin_Calendar_from_time = 'desde';			
+$s_plugin_Calendar_to_time = 'hasta';				
+$s_plugin_Calendar_time_event = 'Hora';
+$s_plugin_Calendar_pointer_to_calendar_key = 'Use el botón para seleccionar la fecha';
+$s_plugin_Calendar_quantity = 'PCS';
+$s_plugin_Calendar_selected = 'Seleccionado';
+$s_plugin_Calendar_add_button = 'Añadir';
+$s_plugin_Calendar_cancel_button = 'Cancelar';
+$s_plugin_Calendar_event_edit_title = 'Edit Event';
+$s_plugin_Calendar_updating_event_advanced_title = 'Cambiar los detalles del evento';
+$s_plugin_Calendar_back_to_event_link = 'volver al evento';
+$s_plugin_Calendar_update_information_button = 'Editar datos';
+$s_plugin_Calendar_update_successful_button = 'Evento cambiado';
+$s_plugin_Calendar_save_button = 'Guardar';
+$s_plugin_Calendar_close_button = 'Cerrar';
+
+$s_plugin_Calendar_week = 'Semana actual';
+$s_plugin_Calendar_day = 'Día';
+$s_plugin_Calendar_next_period = 'Siguiente';
+$s_plugin_Calendar_current_period = 'Período actual';
+$s_plugin_Calendar_previous_period = 'Atrás';
+
+$s_plugin_Calendar_assigned_event = 'Eventos asignados';
+$s_plugin_Calendar_not_assigned_event = 'No hay eventos asignados';
+$s_plugin_Calendar_event_view_title = 'Visor de eventos';
+$s_plugin_Calendar_id = 'Number';
+$s_plugin_Calendar_last_update = 'Editar Fecha';
+$s_plugin_Calendar_view_event_google_last_sync = 'Sincronizado con google';
+$s_plugin_Calendar_not_last_update = 'No';
+$s_plugin_Calendar_event_relationships_bugs = 'Tareas relacionadas';
+$s_plugin_Calendar_date_from = 'Fecha de inicio del evento';
+$s_plugin_Calendar_date_to = 'Fecha de finalización del evento';
+$s_plugin_Calendar_out_of_range = 'eventos fuera de rango';
+
+$s_plugin_Calendar_view_submitted_event_link = 'Ver el evento creado %1$s';
+
+$MANTIS_ERROR[ERROR_DATE] = 'La fecha / hora del comienzo del evento no debe ser igual o mayor que la fecha de finalización del evento.';
+$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Evento %1$d No encontrado.';
+$MANTIS_ERROR[ERROR_RANGE_TIME] = 'EL RANGO de INICIO/FINALIZACION DEL TRABAJO NO SE ASIGNO CORRECTAMENTE ';
+$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'EL EVENTO DEBE SER UN MIEMBRO';
