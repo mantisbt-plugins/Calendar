@@ -25,6 +25,23 @@ $s_plugin_Calendar_Fri = 'Пт';
 $s_plugin_Calendar_Sat = 'Сб';
 $s_plugin_Calendar_Sun = 'Вс';
 
+$s_plugin_Calendar_update_event_sure_msg = 'Обновить событие?';
+$s_plugin_Calendar_never_ending_repetition = 'Никогда';
+$s_plugin_Calendar_ending_repetition = 'Окончание';
+$s_plugin_Calendar_event_is_repeated = 'Повторять событие с интервалом?';
+$s_plugin_Calendar_NO_REPEAT = 'не повторять';
+$s_plugin_Calendar_DAILY = 'день';
+$s_plugin_Calendar_WEEKLY = 'неделя';
+$s_plugin_Calendar_MONTHLY = 'месяц';
+$s_plugin_Calendar_YEARLY = 'год';
+
+$s_plugin_Calendar_this_event = 'Только это событие';
+$s_plugin_Calendar_this_and_future_event = 'Это и последующие события';
+$s_plugin_Calendar_all_event = 'Все события';
+
+$s_plugin_Calendar_repeat_to = "До";
+$s_plugin_Calendar_not_repeat = "Нет";
+
 $s_plugin_Calendar_config_title = 'Настройка';
 $s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в (Настройки пользователя перекрывают настройки по умолчанию)';
 $s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени (Настройки пользователя перекрывают настройки по умолчанию)';

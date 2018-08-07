@@ -39,9 +39,9 @@ compress_enable();
 html_robots_noindex();
 
 
-$f_week      = gpc_get_int( "week", date( "W" ) );
-$f_full_time = gpc_get_bool( "full_time" );
-$f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
+$f_week        = gpc_get_int( "week", date( "W" ) );
+$f_is_fulltime = gpc_get_bool( "full_time" );
+$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
 ?>
 
 <div class="col-md-12 col-xs-12">
@@ -65,7 +65,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                 <div class="btn-toolbar">
                     <div class="btn-group pull-left">
                         <?php
-                        if( $f_full_time == FALSE ) {
+                        if( $f_is_fulltime == FALSE ) {
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . $f_week . "&full_time=TRUE", "0-24" );
                         } else {
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . $f_week, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
@@ -75,7 +75,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
 
                     <div class="btn-group pull-right">
                         <?php
-                        if( $f_full_time == FALSE ) {
+                        if( $f_is_fulltime == FALSE ) {
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week - 1), plugin_lang_get( 'previous_period' ) );
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . (int) date( "W" ), plugin_lang_get( 'week' ) );
                             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week + 1), plugin_lang_get( 'next_period' ) );
@@ -96,7 +96,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                     <table class="calendar-user week">
                         <tr class="row-day">
                             <?php
-                            print_column_time( $f_full_time );
+                            print_column_time( $f_is_fulltime );
 
                             $p_project_id = helper_get_current_project();
 
@@ -106,10 +106,13 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
 
                             $t_days = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week );
 
-                            $t_days_and_events = get_events_id_inside_days( $t_days, $p_project_id, $f_for_user );
+                            $t_days_times_events = get_events_id_inside_days( $t_days, $p_project_id, $f_for_user );
 
-                            foreach( $t_days_and_events as $t_day_and_events => $t_events_id ) {
-                                print_column_this_day( $t_day_and_events, $t_events_id, count( $t_days_and_events ), $f_full_time );
+                            foreach( $t_days_times_events as $t_day_and_events => $t_events_id ) {
+//                                print_column_this_day( $t_day_and_events, $t_events_id, count( $t_days_and_events ), $f_full_time );
+                                $t_day_events                    = array();
+                                $t_day_events[$t_day_and_events] = $t_events_id;
+                                print_column_this_day( $t_day_events, count( $t_days_times_events ), $f_is_fulltime );
                             }
                             ?>
                     </table>
@@ -123,7 +126,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                 <div class="widget-toolbox padding-8 clearfix">
                     <div class="form-inline pull-left">
                         <?php
-                        if( $f_full_time == TRUE ) {
+                        if( $f_is_fulltime == TRUE ) {
                             print_small_button( plugin_page( 'event_add_page' ) . "&full_time=TRUE", plugin_lang_get( 'add_new_event' ) );
                         } else {
                             print_small_button( plugin_page( 'event_add_page' ), plugin_lang_get( 'add_new_event' ) );
@@ -135,7 +138,7 @@ $f_for_user  = gpc_get_int( "for_user", auth_get_current_user_id() );
                             <?php # CSRF protection not required here - form does not result in modifications?>
                             <input type="hidden" name="page" value="Calendar/calendar_user_page" />
                             <input type="hidden" name="week" value="<?php echo $f_week; ?>" />
-                            <input type="hidden" name="full_time" value="<?php echo $f_full_time == TRUE ? '1' : '0'; ?>" />
+                            <input type="hidden" name="full_time" value="<?php echo $f_is_fulltime == TRUE ? '1' : '0'; ?>" />
 
 
                             <label class="inline"><?php echo plugin_lang_get( 'filter_text' ); ?></label>

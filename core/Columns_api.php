@@ -58,23 +58,26 @@ function print_column_time( $p_full_time = FALSE ) {
     echo "</td>";
 }
 
-function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $p_full_time = FALSE ) {
+function print_column_this_day( $p_day_events, $p_total_number_of_days, $p_full_time = FALSE ) {
 
-    $t_times_this_day                   = times_day( $p_day, $p_full_time );
+    $p_day       = key( $p_day_events );
+    $p_times     = key( $p_day_events[$p_day] );
+    $p_events_id = $p_day_events[$p_day][$p_times];
+
+    $t_work_times_current_day           = times_day( $p_day, $p_full_time );
     $t_this_day                         = date( "U", strtotime( date( "j.n.Y" ) ) );
     $stepDayMinutesCount                = plugin_config_get( 'stepDayMinutesCount' ); //2
     $STEP_INTERVAL_TIME_HEIGHT          = $stepDayMinutesCount / 1.46;
     $t_step_day_minutes_for_clock_count = plugin_config_get( 'stepDayMinutesCount' ); //2
-
-    $t_events_group_by_time   = group_events_by_time( $p_events_id );
-    $t_indent_divisor_counter = 0;
-    $t_events_intersection    = false;
-    $t_events_collision_ar    = array();
-    $t_events_collision_ar1   = array();
-    $t_out_of_range_event     = array();
+    $t_events_group_by_time             = $p_day_events[$p_day];
+    $t_indent_divisor_counter           = 0;
+    $t_events_intersection              = false;
+    $t_events_collision_ar              = array();
+    $t_events_collision_ar1             = array();
+    $t_out_of_range_event               = array();
 
     foreach( $t_events_group_by_time as $t_time => $t_events ) {
-        if( !in_array( $t_time, $t_times_this_day ) ) {
+        if( !in_array( $t_time, $t_work_times_current_day ) ) {
             $t_out_of_range_event = array_merge( $t_out_of_range_event, $t_events );
         }
     }
@@ -87,9 +90,9 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
 
     echo '<ul class="column-header-day"><span>' . plugin_lang_get( date( "D", $p_day ) ) . ', ' . date( config_get( 'short_date_format' ), $p_day ) . '</span></ul>';
 
-    $t_count_times_day = count( $t_times_this_day ) - 1;
+    $t_count_times_day = count( $t_work_times_current_day ) - 1;
 
-    foreach( $t_times_this_day as $key => $t_current_time ) {
+    foreach( $t_work_times_current_day as $key => $t_current_time ) {
 
         if( !($key % $stepDayMinutesCount) && $t_count_times_day != $key ) {
             echo "<ul class=\"hour\" id=\"area_hour_" . $t_current_time . "\">";
@@ -135,13 +138,14 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
                     $t_indent_divisor_counter = 0;
                 }
 
-                $countInterval = (( event_get_field( $t_current_event_id, "date_to" ) - event_get_field( $t_current_event_id, "date_from" )) / 60) / $t_step_day_minutes_for_clock_count;
+                $countInterval = ( event_get_field( $t_current_event_id, "duration" ) / 60) / $t_step_day_minutes_for_clock_count;
 
                 if( strtotime( date( "j.n.Y" ) ) <= $p_day ) {
                     if( $t_indent_divisor_counter == 0 && $t_width_divisor_counter >= 1 || $t_width_divisor_counter == 0 ) {
                         $t_width_divisor_counter++;
                         echo "<a href=" . plugin_page( 'view' ) .
                         "&event_id=" . $t_current_event_id .
+                        "&date=" . $t_current_time .
                         " id=\"event_week\" value=" . $t_current_event_id .
                         " class=\"event_week\" style=\"z-index:" . $t_current_event_id . "; "
                         . "height:" . $STEP_INTERVAL_TIME_HEIGHT * $countInterval . "px; "
@@ -154,6 +158,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
                         $fopwf                    = $t_width_divisor_counter + 1;
                         echo "<a href=" . plugin_page( 'view' )
                         . "&event_id=" . $t_current_event_id .
+                        "&date=" . $t_current_time .
                         " id=\"event_week\" value=" . $t_current_event_id .
                         " class=\"event_week\" "
                         . "style=\"z-index:" . $t_current_event_id . "; "
@@ -167,6 +172,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
                         $t_width_divisor_counter++;
                         echo "<a href=" . plugin_page( 'view' ) .
                         "&event_id=" . $t_current_event_id .
+                        "&date=" . $t_current_time .
                         " id=\"event_week\" value=" . $t_current_event_id .
                         " class=\"event_week_expired\" "
                         . "style=\"z-index:" . $t_current_event_id . "; "
@@ -181,6 +187,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
 
                         echo "<a href=" . plugin_page( 'view' ) .
                         "&event_id=" . $t_current_event_id .
+                        "&date=" . $t_current_time .
                         " id=\"event_week\" value=" . $t_current_event_id .
                         " class=\"event_week_expired\" "
                         . "style=\"z-index:" . $t_current_event_id . "; "
@@ -204,7 +211,7 @@ function print_column_this_day( $p_day, $p_events_id, $p_total_number_of_days, $
                 echo "</br>";
 
                 $t_time_start  = date( "H:i", event_get_field( $t_current_event_id, "date_from" ) );
-                $t_time_finish = date( "H:i", event_get_field( $t_current_event_id, "date_to" ) );
+                $t_time_finish = date( "H:i", event_get_field( $t_current_event_id, "date_from" ) + event_get_field( $t_current_event_id, "duration" ) );
                 echo $t_time_start . " - " . $t_time_finish;
 
 

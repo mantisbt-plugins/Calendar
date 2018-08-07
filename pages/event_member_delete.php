@@ -20,6 +20,7 @@ form_security_validate( 'event_member_delete' );
 $f_event_id = gpc_get_int( 'event_id' );
 $t_event    = event_get( $f_event_id );
 $f_user_id  = gpc_get_int( 'user_id', NO_USER );
+$f_date     = gpc_get_int( 'date' );
 
 $t_logged_in_user_id = auth_get_current_user_id();
 
@@ -64,8 +65,8 @@ layout_page_header_end();
 
 layout_page_begin( plugin_page( 'view' ) );
 
-html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $f_event_id, plugin_lang_get( 'update_successful_button' ) );
+html_operation_successful( plugin_page( 'view' ) . "&event_id=" . $f_event_id . "&date=" . $f_date, plugin_lang_get( 'update_successful_button' ) );
 
-html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $f_event_id );
+html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $f_event_id . "&date=" . $f_date );
 
 layout_page_end();

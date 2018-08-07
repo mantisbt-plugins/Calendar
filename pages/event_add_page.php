@@ -14,8 +14,8 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-$f_bug_id    = gpc_get_int( 'bug_id', 0 );
-$f_full_time = gpc_get_bool( "full_time" );
+$f_bug_id      = gpc_get_int( 'bug_id', 0 );
+$f_is_fulltime = gpc_get_bool( "full_time" );
 
 if( $f_bug_id == 0 ) {
 
@@ -107,7 +107,7 @@ $t_form_encoding   = '';
                                     echo '<input ' . helper_get_tab_index() . ' type="text" id="date_event" name="date_event" class="datetimepicker input-sm" ' .
                                     'data-picker-locale="' . lang_get_current_datetime_locale() .
                                     '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
-                                    'size="20" maxlength="16" value="' . $t_date_to_display . '" />'
+                                    'size="10" maxlength="10" />'
                                     ?>
                                     <i class="fa fa-calendar fa-xlg datetimepicker"></i>
                                 </td>
@@ -123,7 +123,7 @@ $t_form_encoding   = '';
                                     <span class="date-event time-event">
 
                                         <span class="event_time_start-area">
-                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
+                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( NULL, $f_is_fulltime ); ?></select>
                                         </span>
 
                                     </span>
@@ -140,7 +140,7 @@ $t_form_encoding   = '';
                                 <td>
                                     <span class="date-event time-event">
                                         <span class="event_time_finish">
-                                            <select  <?php helper_get_tab_index() ?> name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_full_time ); ?></select>
+                                            <select  <?php helper_get_tab_index() ?> name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_is_fulltime ); ?></select>
                                         </span>	
                                     </span>
                                 </td>
@@ -162,18 +162,57 @@ $t_form_encoding   = '';
                                 </td>
                             </tr>
 
+                            <!--#recurrence-->
+
+                            <tr>
+                                <th class="category">
+                                    <label for="event_is_repeated"><?php echo plugin_lang_get( 'event_is_repeated' ) ?></label>
+                                </th>
+                                <td>
+                                    <input style="width: 50px;" type="number" id="interval_value" name="interval_value" min="1" value="1" step="1"/>
+
+                                    <select name="selected_freq">
+
+                                        <?php
+                                        $t_frequency_list  = plugin_config_get( 'frequencies' );
+
+                                        foreach( $t_frequency_list as $key => $t_type_freq ) {
+                                            ?>
+                                            <option value="<?php echo $t_type_freq; ?>"><?php echo plugin_lang_get( $t_type_freq ) ?></option>
+                                            <?php
+                                        }
+                                        ?>
+
+                                    </select>
+
+                                    <label for="event_is_repeated"><?php echo plugin_lang_get( 'ending_repetition' ) ?></label>
+
+                                    <?php
+                                    echo '<input ' . helper_get_tab_index() . ' type="text" id="date_ending_repetition" name="date_ending_repetition" class="datetimepicker input-sm" ' .
+                                    'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                    '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                    'size="10" maxlength="10" value="' . plugin_lang_get( 'never_ending_repetition' ) . '"/>'
+                                    ?>
+                                    <i class="fa fa-calendar fa-xlg datetimepicker"></i>
+
+
+                                </td>
+
+                            </tr>
+
                         </table>
                     </div>    
 
 
-                    <?php #members_list_add ?>
+                    <?php #members_list_add   ?>
                     <div class="col-md-12 col-xs-12">
                         <div class="space-10"></div>
 
                         <?php
-                        $t_collapse_block  = 'collapsed';
-                        $t_block_css       = $t_collapse_block ? 'collapsed' : '';
-                        $t_block_icon      = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
+//                        $t_collapse_block = 'collapsed';
+                        $t_collapse_block = '';
+                        $t_block_css      = $t_collapse_block ? 'collapsed' : '';
+                        $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
                         ?>
                         <div id="members_list_add" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
                             <div class="widget-header widget-header-small">
@@ -198,7 +237,7 @@ $t_form_encoding   = '';
                                                 </th>
                                                 <td>
                                                     <?php
-                                                    $project_users     = project_get_all_user_rows( $t_project_id );
+                                                    $project_users    = project_get_all_user_rows( $t_project_id );
                                                     ?>
 
                                                     <?php if( is_array( $project_users ) && count( $project_users ) > 0 ): ?>			

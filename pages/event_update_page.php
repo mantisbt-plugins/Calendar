@@ -15,8 +15,17 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 $f_event_id = gpc_get_int( 'event_id' );
+$f_date     = gpc_get_int( 'date' );
 
 access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
+
+event_ensure_exists( $f_event_id );
+
+$t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
+
+if( $t_event_is_rerecurrences ) {
+    event_occurrence_ensure_exist( $f_event_id, $f_date );
+}
 
 # Get Project Id and set it as current
 $t_current_project = helper_get_current_project();
@@ -24,13 +33,17 @@ $t_project_id      = gpc_get_int( 'project_id', $t_current_project );
 
 $t_event = event_get( $f_event_id );
 
+if( $t_event_is_rerecurrences ) {
+    $t_event->date_from = $f_date;
+}
+
 if( $t_event->project_id != $t_current_project ) {
     # in case the current project is not the same project of the bug we are viewing...
     # ... override the current project. This to avoid problems with categories and handlers lists etc.
     $g_project_override = $t_event->project_id;
 }
 
-$t_bugs_id = get_bugs_id_from_event( $f_event_id );
+$t_bugs_id = event_get_bugs_id( $f_event_id );
 
 layout_page_header();
 
@@ -42,6 +55,7 @@ layout_page_begin();
             <?php echo form_security_field( 'event_update' ); ?>
             <input type="hidden" name="event_id" value="<?php echo $f_event_id ?>" />
             <input type="hidden" name="last_updated" value="<?php echo $t_event->date_changed ?>" />
+            <input type="hidden" name="date" value="<?php echo $f_date ?>" />
 
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header widget-header-small">
@@ -117,19 +131,83 @@ layout_page_begin();
                                     <td>
                                         <span class="date-event time-event">
                                             <span class="event_time_finish">
-                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_to ) . " GMT", 0 ), TRUE ); ?></select>
+                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_from + $t_event->duration ) . " GMT", 0 ), TRUE ); ?></select>
                                             </span>	
                                         </span>
                                     </td>
                                 </tr>
+
+                                <!--#recurrence-->
+
+                                <tr>
+                                    <th class="category">
+                                        <label for="event_is_repeated"><?php echo plugin_lang_get( 'event_is_repeated' ) ?></label>
+                                    </th>
+                                    <td>
+                                        <?php
+                                        $t_rrule_string    = event_get_field( $t_event->id, 'recurrence_pattern' );
+                                        if( !is_blank( $t_rrule_string ) ) {
+                                            $t_rset   = new \RRule\RSet( $t_rrule_string );
+                                            $t_rrules = $t_rset->getRRules();
+                                            $t_rule   = $t_rrules[0]->getRule();
+                                        }
+
+                                        if( $t_rule['INTERVAL'] ) {
+                                            ?>
+                                            <input style="width: 50px;" type="number" id="interval_value" name="interval_value" min="1" value="<?php echo $t_rule['INTERVAL'] ?>" step="1"/>
+                                        <?php } else { ?>
+                                            <input style="width: 50px;" type="number" id="interval_value" name="interval_value" min="1" value="1" step="1"/>
+                                        <?php } ?>
+                                        <select name="selected_freq">
+
+                                            <?php
+                                            $t_frequency_list = plugin_config_get( 'frequencies' );
+
+
+
+                                            foreach( $t_frequency_list as $key => $t_type_freq ) {
+                                                if( $t_rule['FREQ'] == $t_type_freq ) {
+                                                    ?>
+                                                    <option selected="selected" value="<?php echo $t_type_freq; ?>"><?php echo plugin_lang_get( $t_type_freq ) ?></option>
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <option value="<?php echo $t_type_freq; ?>"><?php echo plugin_lang_get( $t_type_freq ) ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+
+                                        </select>
+
+                                        <label for="event_is_repeated"><?php echo plugin_lang_get( 'ending_repetition' ) ?></label>
+
+                                        <?php
+                                        if( $t_rule['UNTIL'] ) {
+                                            $t_time_until = $t_rule['UNTIL']->format( config_get( 'short_date_format' ) );
+                                        } else {
+                                            $t_time_until = plugin_lang_get( 'never_ending_repetition' );
+                                        }
+                                        echo '<input ' . helper_get_tab_index() . ' type="text" id="date_ending_repetition" name="date_ending_repetition" class="datetimepicker input-sm" ' .
+                                        'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                        '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                        'size="10" maxlength="10" value="' . $t_time_until . '"/>'
+                                        ?>
+                                        <i class="fa fa-calendar fa-xlg datetimepicker"></i>
+
+
+                                    </td>
+
+                                </tr>
+
                             </table>
                         </div>
 
 
                         <?php
-                        $t_per_page        = null;
-                        $t_bug_count       = null;
-                        $t_page_count      = null;
+                        $t_per_page   = null;
+                        $t_bug_count  = null;
+                        $t_page_count = null;
 
                         $t_custom_filter = filter_get_default();
 
@@ -220,7 +298,6 @@ layout_page_begin();
                 </div>
             </div>
     </div>
-</div>
 </div>
 
 <?php

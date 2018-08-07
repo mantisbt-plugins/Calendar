@@ -25,6 +25,23 @@ $s_plugin_Calendar_Fri = 'Fri';
 $s_plugin_Calendar_Sat = 'Sat';
 $s_plugin_Calendar_Sun = 'Sun';
 
+$s_plugin_Calendar_update_event_sure_msg = 'Update event?';
+$s_plugin_Calendar_never_ending_repetition = 'Never';
+$s_plugin_Calendar_ending_repetition = 'Ends';
+$s_plugin_Calendar_event_is_repeated = 'Repeat the event at intervals?';
+$s_plugin_Calendar_NO_REPEAT = 'do not repeat';
+$s_plugin_Calendar_DAILY = 'Daily';
+$s_plugin_Calendar_WEEKLY = 'Weekly';
+$s_plugin_Calendar_MONTHLY = 'Monthly';
+$s_plugin_Calendar_YEARLY = 'Yearly';
+
+$s_plugin_Calendar_this_event = 'Only this event';
+$s_plugin_Calendar_this_and_future_event = 'This and following events';
+$s_plugin_Calendar_all_event = 'All events';
+
+$s_plugin_Calendar_repeat_to = "to";
+$s_plugin_Calendar_not_repeat = "Not";
+
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
 $s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';

@@ -16,11 +16,24 @@
 
 $f_event_id = gpc_get_int( 'event_id' );
 
+$f_date = gpc_get_int( 'date' );
+
 event_ensure_exists( $f_event_id );
+
+$t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
+
+if( $t_event_is_rerecurrences ) {
+    event_occurrence_ensure_exist( $f_event_id, $f_date );
+}
+
 
 $g_project_override = event_get_field( $f_event_id, 'project_id' );
 
 $t_event = event_get( $f_event_id );
+
+if( $t_event_is_rerecurrences ) {
+    $t_event->date_from = $f_date;
+}
 
 //access_ensure_bug_level(plugin_config_get( 'view_event_threshold' ), $f_bug_id );
 
@@ -64,8 +77,8 @@ if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'cale
     echo '<tfoot>';
     echo '<tr class="noprint"><td colspan="2">';
 
-    print_small_button( plugin_page( 'event_update_page' ) . "&event_id=" . $f_event_id, lang_get( 'update_bug_button' ) );
-    print_small_button( plugin_page( 'event_delete' ) . "&event_id=" . $f_event_id . form_security_param( 'event_delete' ), lang_get( 'delete_bug_button' ) );
+    print_small_button( plugin_page( 'event_update_page' ) . "&event_id=" . $f_event_id . "&date=" . $f_date, lang_get( 'update_bug_button' ) );
+    print_small_button( plugin_page( 'event_delete' ) . "&event_id=" . $f_event_id . "&date=" . $f_date . form_security_param( 'event_delete' ), lang_get( 'delete_bug_button' ) );
 
     echo '</tr>';
     echo '</tfoot>';
@@ -113,7 +126,7 @@ if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'cale
         echo $t_event_google_last_sync == 0 ? plugin_lang_get( 'not_last_update' ) : date( config_get( 'normal_date_format' ), $t_event_google_last_sync );
 
         if( $t_event->author_id == auth_get_current_user_id() ) {
-            echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_google_sync' ) . '&event_id=' . $f_event_id . htmlspecialchars( form_security_param( 'event_google_sync' ) ) . '"><i class="fa fa-refresh"></i></a>';
+            echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_google_sync' ) . '&event_id=' . $f_event_id  . "&date=" . $f_date . htmlspecialchars( form_security_param( 'event_google_sync' ) ) . '"><i class="fa fa-refresh"></i></a>';
         }
 
         echo '</td>';
@@ -143,8 +156,33 @@ echo '<tr>';
 echo '<th class="bug-reporter category">', plugin_lang_get( 'time_event' ), '</th>';
 echo '<td class="bug-reporter" >';
 $t_time_start  = date( "H:i", event_get_field( $t_event_id, "date_from" ) );
-$t_time_finish = date( "H:i", event_get_field( $t_event_id, "date_to" ) );
+$t_time_finish = date( "H:i", event_get_field( $t_event_id, "date_from" ) + event_get_field( $t_event_id, "duration" ) );
 echo $t_time_start . " " . plugin_lang_get( 'to_time' ) . " " . $t_time_finish;
+echo '</td>';
+echo '</tr>';
+
+#reccurency 
+echo '<tr>';
+echo '<th class="bug-reporter category">', plugin_lang_get( 'event_is_repeated' ), '</th>';
+echo '<td class="bug-reporter" >';
+$t_rrule_string = event_get_field( $t_event_id, 'recurrence_pattern' );
+if( !is_blank( $t_rrule_string ) ) {
+    $t_rset   = new \RRule\RSet( $t_rrule_string );
+    $t_rrules = $t_rset->getRRules();
+    foreach( $t_rrules as $t_rrule ) {
+        $t_rule = $t_rrule->getRule();
+        echo $t_rule['INTERVAL'];
+        echo " ";
+        echo plugin_lang_get( $t_rule['FREQ'] );
+        echo " ";
+        echo plugin_lang_get( 'repeat_to' );
+        echo " ";
+        echo $t_rule['UNTIL']->format( config_get( 'normal_date_format' ) );
+    }
+} else {
+    echo plugin_lang_get( 'not_repeat' );
+}
+
 echo '</td>';
 echo '</tr>';
 
@@ -200,7 +238,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                     echo ($i > 0) ? ', ' : '';
                                     print_user( $t_users[$i] );
                                     if( $t_can_delete_others ) {
-                                        echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '&event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
+                                        echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '&event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . "&date=" . $f_date . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
                                     }
                                 }
 
@@ -212,6 +250,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                     <form method="post" action="<?php echo plugin_page( 'event_member_add' ) ?>" class="form-inline noprint">
                                         <?php echo form_security_field( 'event_member_add' ) ?>
                                         <input type="hidden" name="event_id" value="<?php echo (integer) $f_event_id; ?>" />
+                                        <input type="hidden" name="date" value="<?php echo (integer) $f_date; ?>" />
                                         <?php if( is_array( $project_users ) && count( $project_users ) > 0 ): ?>			
                                             <select size="8" multiple name="user_ids[]">
                                                 <?php foreach( $project_users as $project_user ): ?>
@@ -273,7 +312,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
 
                     echo "<ul class=\"tasks-list\">";
 
-                    $t_bugs_id = get_bugs_id_from_event( $t_event_id ); // получим массив задач для текущего события
+                    $t_bugs_id = event_get_bugs_id( $t_event_id ); // получим массив задач для текущего события
                     if( $t_bugs_id ) {
 
                         foreach( $t_bugs_id as $t_bug_id ) {

@@ -74,6 +74,35 @@ function install_turn_user_owner_to_user_member() { //version 2.2.0 (schema 7)
     return TRUE;
 }
 
+function install_calculate_duration() { //version 2.4.0 (schema 12)
+    $t_table_calendar_events = plugin_table( 'events' );
+
+    if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
+
+        $t_query = "SELECT id, date_from, date_to FROM " . $t_table_calendar_events;
+        $arRes   = db_query( $t_query, NULL, -1, -1 );
+
+        foreach( $arRes as $key => $t_event ) {
+
+            $t_calcalate_duration = $t_event['date_to'] - $t_event['date_from'];
+
+            $query = "UPDATE $t_table_calendar_events
+                                            SET duration=" . db_param();
+
+            $t_fields = Array(
+                                      $t_calcalate_duration,
+            );
+
+            $query .= " WHERE id=" . db_param();
+
+            $t_fields[] = $t_event['id'];
+
+            db_query( $query, $t_fields );
+        }
+    }
+    return TRUE;
+}
+
 class CalendarPlugin extends MantisPlugin {
 
     function register() {
@@ -157,6 +186,14 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'AddColumnSQL', array( plugin_table( "google_sync" ), "
                                         last_sync INT(10) UNSIGNED NOTNULL DEFAULT 0
                                 " ) ),
+                                  //version 2.4.0 (schema 11)
+                                  array( 'AddColumnSQL', array( plugin_table( "events" ), "
+                                        duration INT(10) UNSIGNED NOTNULL,
+                                        recurrence_pattern VARCHAR(255) DEFAULT NULL,
+                                        parent_id INT(10) NOTNULL
+                                " ) ),
+                                  //version 2.4.0 (schema 12)
+                                  array( 'UpdateFunction', 'calculate_duration' ),
         );
     }
 
@@ -167,7 +204,8 @@ class CalendarPlugin extends MantisPlugin {
                                   'event_time_start_stop_picker_format'  => 'HH:mm',
                                   'startStepDays'                        => 0,
                                   'countStepDays'                        => 7,
-                                  'arWeekdaysName'                       => array( 'Mon' => ON,
+                                  'arWeekdaysName'                       => array(
+                                                            'Mon' => ON,
                                                             'Tue' => ON,
                                                             'Wed' => ON,
                                                             'Thu' => ON,
@@ -187,14 +225,25 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
                                   'oauth_key'                            => NULL,
+                                  'frequencies'                          => array(
+                                                            'NO_REPEAT',
+                                                            'DAILY',
+                                                            'WEEKLY',
+                                                            'MONTHLY',
+                                                            'YEARLY' )
         );
     }
 
     function init() {
+        require_once 'api/php-rrule-1.6.1/src/RRuleInterface.php';
+        require_once 'api/php-rrule-1.6.1/src/RRule.php';
+        require_once 'api/php-rrule-1.6.1/src/RSet.php';
+        require_once 'api/php-rrule-1.6.1/src/RfcParser.php';
         require_once 'core/event_data_api.php';
         require_once 'core/calendar_date_api.php';
         require_once 'core/calendar_access_api.php';
         require_once 'core/calendar_print_api.php';
+        require_once 'core/calendar_helper_api.php';
         require_once 'core/Columns_api.php';
         require_once 'core/calendar_user_api.php';
         require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
@@ -272,8 +321,10 @@ class CalendarPlugin extends MantisPlugin {
                                         <tr class="row-day">
                                             <?php print_column_time(); ?>
                                             <?php
-                                            foreach( $t_days_events as $t_day_and_events => $t_events ) {
-                                                print_column_this_day( $t_day_and_events, $t_events, count( $t_days_events ) );
+                                            foreach( $t_days_events as $t_day_and_events => $t_events_id ) {
+                                                $t_day_events                    = array();
+                                                $t_day_events[$t_day_and_events] = $t_events_id;
+                                                print_column_this_day( $t_day_events, count( $t_days_and_events ), $f_is_fulltime );
                                             }
                                             ?>
                                     </table>

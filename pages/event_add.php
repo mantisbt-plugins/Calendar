@@ -21,17 +21,38 @@ form_security_validate( 'event_add' );
 
 $f_bugs = gpc_get_int_array( 'bugs_add', array( 0 ) );
 
-$t_event_data = new CalendarEventData;
+$f_event_time_start       = gpc_get_int( 'event_time_start' );
+$f_event_time_finish      = gpc_get_int( 'event_time_finish' );
+$f_date_ending_repetition = strtotime( gpc_get_string( 'date_ending_repetition', NULL ) );
+$f_selected_freq          = gpc_get_string( 'selected_freq', 'NO_REPEAT' );
 
-$f_event_time_start  = gpc_get_int( 'event_time_start' );
-$f_event_time_finish = gpc_get_int( 'event_time_finish' );
+$t_event_data = new CalendarEventData();
 
 $t_event_data->project_id = gpc_get_int( 'project_id', helper_get_current_project() );
 $t_event_data->name       = gpc_get_string( 'name_event' );
 $t_event_data->activity   = "Y";
 $t_event_data->author_id  = auth_get_current_user_id();
 $t_event_data->date_from  = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_start;
-$t_event_data->date_to    = strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish;
+$t_event_data->duration   = $f_event_time_finish - $f_event_time_start;
+
+switch( $f_selected_freq ) {
+    case 'DAILY':
+    case 'WEEKLY':
+    case 'MONTHLY':
+    case 'YEARLY':
+        $t_event_data->date_to            = $f_date_ending_repetition == NULL ? strtotime( '01-01-2038' ) + $f_event_time_finish : $f_date_ending_repetition + $f_event_time_finish;
+        $t_rrule                          = new RRule\RRule( array(
+                                  'DTSTART'  => $t_event_data->date_from,
+                                  'UNTIL'    => $t_event_data->date_to,
+                                  'FREQ'     => $f_selected_freq,
+                                  'INTERVAL' => gpc_get_int( 'interval_value' )
+                ) );
+        $t_event_data->recurrence_pattern = $t_rrule->rfcString();
+
+        break;
+    default :
+        $t_event_data->date_to = $f_date_ending_repetition == NULL ? strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish : $f_date_ending_repetition + $f_event_time_finish;
+}
 
 $t_event_id = $t_event_data->create();
 
@@ -81,22 +102,22 @@ layout_page_begin( plugin_page( 'event_add_page' ) );
 
 if( $f_bugs[0] == 0 ) {
     $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
+                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
     );
     html_meta_redirect( plugin_page( 'calendar_user_page', TRUE ) );
 } else if( $f_bugs[0] != 0 || count( $f_bugs ) == 1 ) {
     $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
+                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
     );
     html_meta_redirect( string_get_bug_view_url( $f_bugs[0] ) );
 } else {
     $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
+                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
     );
-    html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_id );
+    html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from );
 }
 
 html_operation_confirmation( $t_buttons, '', CONFIRMATION_TYPE_SUCCESS );

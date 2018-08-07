@@ -18,16 +18,19 @@
 class CalendarEventData {
 
     protected $id;
-    protected $project_id      = null;
-    protected $author_id       = 0;
-    protected $changed_user_id = 0;
-    protected $status          = false;
-    protected $name            = '';
-    protected $activity        = 'Y';
-    protected $date_changed    = '';
-    protected $date_from       = '';
-    protected $date_to         = '';
-    private $loading           = false;
+    protected $parent_id          = 0;
+    protected $project_id         = null;
+    protected $author_id          = 0;
+    protected $changed_user_id    = 0;
+    protected $status             = false;
+    protected $name               = '';
+    protected $activity           = 'Y';
+    protected $date_changed       = '';
+    protected $date_from          = '';
+    protected $date_to            = '';
+    protected $duration           = '';
+    protected $recurrence_pattern = null;
+    private $loading              = false;
 
     /**
      * @private
@@ -52,6 +55,7 @@ class CalendarEventData {
                 if( !is_numeric( $value ) ) {
                     $value = strtotime( $value, 0 );
                 }
+                $value = (int) $value;
                 break;
         }
         $this->$name = $value;
@@ -123,9 +127,9 @@ class CalendarEventData {
 //		}
     }
 
-    function __construct( $id ) {
-        $this->id = $id;
-    }
+//    function __construct( $parts, $dtstart = null ) {
+//        parent::__construct( $parts, $dtstart = null );
+//    }
 
     function create() {
 
@@ -137,16 +141,19 @@ class CalendarEventData {
         $query = "INSERT INTO $t_event_table
                                                 ( project_id, name,
                                                   activity, author_id, date_changed,
-                                                  changed_user_id, date_from, date_to
+                                                  changed_user_id, date_from, date_to,
+                                                  duration, recurrence_pattern, parent_id
                                                 )
                                               VALUES
                                                 ( " . db_param() . ',' . db_param() . ",
+                                                  " . db_param() . ',' . db_param() . ',' . db_param() . ",
                                                   " . db_param() . ',' . db_param() . ',' . db_param() . ",
                                                   " . db_param() . ',' . db_param() . ',' . db_param() . ')';
 
         db_query( $query, Array( $this->project_id, $this->name,
                                   $this->activity, $this->author_id, $this->date_changed,
-                                  $this->changed_user_id, $this->date_from, $this->date_to ) );
+                                  $this->changed_user_id, $this->date_from, $this->date_to,
+                                  $this->duration, $this->recurrence_pattern, $this->parent_id ) );
 
         $this->id = db_insert_id( $t_event_table );
 //
@@ -184,12 +191,14 @@ class CalendarEventData {
         $query = "UPDATE $t_calendar_event_table
                                             SET name=" . db_param() . ",
 						activity=" . db_param() . ", changed_user_id=" . db_param() . ",
-                                                date_from=" . db_param() . ", date_to=" . db_param();
+                                                date_from=" . db_param() . ", date_to=" . db_param() . ",
+                                                recurrence_pattern=" . db_param() . ", parent_id=" . db_param();
 
         $t_fields = Array(
                                   $this->name,
                                   $this->activity, $this->changed_user_id,
                                   $this->date_from, $this->date_to,
+                                  $this->recurrence_pattern, $this->parent_id,
         );
 
         $query .= " WHERE id=" . db_param();
@@ -202,6 +211,33 @@ class CalendarEventData {
 
         # Update the last update date
         event_update_date( $t_event_id );
+
+        return true;
+    }
+
+    /**
+     * Delete a event from the given data structure
+     * @param bool p_update_extended
+     * @param bool p_bypass_email Default false, set to true to avoid generating emails (if sending elsewhere)
+     * @return bool (always true)
+     * @access public
+     */
+    function delete() {
+
+        $t_calendar_event_table = plugin_table( 'events' );
+
+        $query = "DELETE FROM $t_calendar_event_table";
+
+        $query .= " WHERE id=" . db_param();
+
+        $t_fields[] = $this->id;
+
+        db_query( $query, $t_fields );
+
+        event_clear_cache( $this->id );
+
+        # Update the last update date
+        event_update_date( $this->id );
 
         return true;
     }
@@ -242,6 +278,26 @@ function event_exists( $p_event_id ) {
     } else {
         return false;
     }
+}
+
+function event_occurrence_ensure_exist( $p_event_id, $p_date ) {
+    if( !event_occurrence_exists( $p_event_id, $p_date ) ) {
+        plugin_error( "Event #$p_event_id in time period not found" );
+    }
+}
+
+function event_occurrence_exists( $p_event_id, $p_date ) {
+
+    $t_event = event_get( $p_event_id );
+
+    $t_rset = new \RRule\RSet( $t_event->recurrence_pattern );
+
+    return $t_rset->occursAt( $p_date );
+}
+
+function event_is_recurrences( $p_event_id ) {
+    $t_rrule_string = event_get_field( $p_event_id, 'recurrence_pattern' );
+    return !is_blank( $t_rrule_string );
 }
 
 /**
@@ -448,7 +504,7 @@ function event_member_add( $p_event_id, $p_user_id ) {
  * @access public
  * @uses database_api.php
  */
-function event_member_delete( $p_event_id, $p_user_id ) {
+function event_member_delete( $p_event_id, $p_user_id = NULL ) {
 
     $t_event_member_table = plugin_table( 'event_member' );
     # Delete monitoring record
@@ -466,7 +522,7 @@ function event_member_delete( $p_event_id, $p_user_id ) {
     # log new un-monitor action
 //	history_log_event_special( $p_bug_id, BUG_UNMONITOR, (int)$p_user_id );
     # updated the last_updated date
-    event_update_date( $p_event_id );
+//    event_update_date( $p_event_id );
 
     return true;
 }
@@ -501,7 +557,7 @@ function event_get_members( $p_event_id ) {
     return $t_users;
 }
 
-function get_bugs_id_from_event( $event_id ) {
+function event_get_bugs_id( $event_id ) {
     $p_table_calendar_relationship = plugin_table( "relationship" );
 
     if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
@@ -549,4 +605,35 @@ function get_events_id_from_bug_id( $p_bug_id ) {
 
         return $pResult;
     }
+}
+
+function event_bug_delete( $p_event_id ) {
+
+    $t_table_calendar_relationship = plugin_table( "relationship" );
+
+    $query = "DELETE FROM $t_table_calendar_relationship
+			          WHERE event_id=" . db_param();
+
+    db_query( $query, array( $p_event_id ) );
+
+    return TRUE;
+}
+
+function event_bugs_add( $p_event_id, $p_bugs_id ) {
+    $t_table_calendar_relationship = plugin_table( "relationship" );
+
+    $query = "INSERT
+                                              INTO $t_table_calendar_relationship
+                                                  ( event_id, bug_id )
+                                              VALUES
+                                                  ( " . db_param() . ', ' . db_param() . ')';
+
+    foreach( $p_bugs_id as $t_bug_id ) {
+        if( !bug_exists( $t_bug_id ) ) {
+            continue;
+        }
+        db_query( $query, Array( $p_event_id, $t_bug_id ) );
+        plugin_history_log( $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . $t_event_update_data->name );
+    }
+    return TRUE;
 }

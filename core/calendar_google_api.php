@@ -12,7 +12,7 @@
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
 function print_google_calendar_list() {
@@ -109,6 +109,8 @@ function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
     try {
         $service = new Google_Service_Calendar( getClient( $p_creator_id, array( 'event_add' => $p_event_id ) ) );
 
+        $t_rrule = strstr( event_get_field( $p_event_id, 'recurrence_pattern' ), 'RRULE:' );
+
         $event = new Google_Service_Calendar_Event( array(
                                   'summary'     => project_get_field( event_get_field( $p_event_id, 'project_id' ), 'name' ) . ": " . event_get_field( $p_event_id, 'name' ),
 //                          'location'    => '800 Howard St., San Francisco, CA 94103',
@@ -118,13 +120,11 @@ function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
                                                             'timeZone' => date_default_timezone_get(),
                                   ),
                                   'end'         => array(
-                                                            'dateTime' => date( "c", event_get_field( $p_event_id, 'date_to' ) ),
+                                                            'dateTime' => date( "c", event_get_field( $p_event_id, 'date_from' ) + event_get_field( $p_event_id, 'duration' ) ),
                                                             'timeZone' => date_default_timezone_get(),
                                   ),
                                   'attendees'   => $t_users_email,
-//                              'recurrence'  => array(
-//                                                        'RRULE:FREQ=DAILY;COUNT=2'
-//                              ),
+                                  'recurrence'  => $t_rrule == FALSE ? NULL : array( $t_rrule ),
                 ) );
 
 
@@ -147,6 +147,7 @@ function event_google_add( $p_event_id, $p_creator_id, $p_members_id ) {
 }
 
 function event_google_update( CalendarEventData $p_update_event ) {
+
     $t_google_event_id    = event_google_get_id( $p_update_event->id );
     $t_creator_id         = $p_update_event->author_id;
     $t_google_calendar_id = plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_creator_id );
@@ -188,7 +189,7 @@ function event_google_update( CalendarEventData $p_update_event ) {
 
         $t_update_google_event->setEnd(
                 new Google_Service_Calendar_EventDateTime( array(
-                                  'dateTime' => date( "c", $p_update_event->date_to ),
+                                  'dateTime' => date( "c", $p_update_event->date_from + $p_update_event->duration ),
                                   'timeZone' => date_default_timezone_get() ) )
         );
 
@@ -196,6 +197,12 @@ function event_google_update( CalendarEventData $p_update_event ) {
                 string_get_google_description( $p_update_event->id )
         );
         $t_update_google_event->setAttendees( $t_users_email );
+
+        $t_rrule = strstr( $p_update_event->recurrence_pattern, 'RRULE:' );
+
+        if( !is_blank( $t_rrule ) ) {
+            $t_update_google_event->setRecurrence( array( $t_rrule ) );
+        }
 
         $event_data = $service->events->update( $t_google_calendar_id, $t_google_event_id, $t_update_google_event );
 
@@ -263,7 +270,7 @@ function event_is_synchronized_with_google( $p_event_id ) {
 }
 
 function string_get_google_description( $p_event_id ) {
-    $t_bugs_id = get_bugs_id_from_event( $p_event_id );
+    $t_bugs_id = event_get_bugs_id( $p_event_id );
 
     foreach( $t_bugs_id as $t_bug_id ) {
         $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . bug_get_field( $t_bug_id, 'summary' ) . '</a><br><br>';
