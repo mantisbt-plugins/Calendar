@@ -3,6 +3,14 @@ Overview
 --------
 Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar.
 
+Screenshots
+-----------
+
+doc/main_view_with_filter_list.png
+doc/view_event_layers_in_bug_view.png
+doc/add_event_view.png
+doc/plugin_config_view.png
+
 Features
 --------
 - The ability to create event.
