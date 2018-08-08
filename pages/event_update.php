@@ -39,7 +39,7 @@ $t_event_child_data->changed_user_id = auth_get_current_user_id();
 $t_event_child_data->date_from       = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_start;
 $t_event_child_data->duration        = $f_event_time_finish - $f_event_time_start;
 
-if( event_is_recurrences( $f_event_id ) && $t_event_parent_data->date_from != $f_date ) {
+if( event_is_recurrences( $f_event_id ) ) {
 
     event_occurrence_ensure_exist( $f_event_id, $f_date );
     $t_range = helper_ensure_event_update_confirmed( plugin_lang_get( 'update_event_sure_msg' ) );
