@@ -37,6 +37,9 @@ How to install
 5. Find Calendar in the list.
 6. Click Install.
 
+Detailed instructions are provided in the project wiki.
+https://github.com/mantisbt-plugins/Calendar/wiki#how-to-enabled-google-calendar-sync
+
 How to use Google Calendar Sync (for Calendar version >= 2.3.0 )
 ----------------------------------------------------------------
 
