@@ -191,13 +191,13 @@ class CalendarEventData {
         $query = "UPDATE $t_calendar_event_table
                                             SET name=" . db_param() . ",
 						activity=" . db_param() . ", changed_user_id=" . db_param() . ",
-                                                date_from=" . db_param() . ", date_to=" . db_param() . ",
+                                                date_from=" . db_param() . ", date_to=" . db_param() . ", duration=" . db_param() . ",
                                                 recurrence_pattern=" . db_param() . ", parent_id=" . db_param();
 
         $t_fields = Array(
                                   $this->name,
                                   $this->activity, $this->changed_user_id,
-                                  $this->date_from, $this->date_to,
+                                  $this->date_from, $this->date_to, $this->duration,
                                   $this->recurrence_pattern, $this->parent_id,
         );
 
