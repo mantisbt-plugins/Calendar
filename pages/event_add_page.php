@@ -107,7 +107,7 @@ $t_form_encoding   = '';
                                     echo '<input ' . helper_get_tab_index() . ' type="text" id="date_event" name="date_event" class="datetimepicker input-sm" ' .
                                     'data-picker-locale="' . lang_get_current_datetime_locale() .
                                     '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
-                                    'size="10" maxlength="10" />'
+                                    'size="10" maxlength="10" required />'
                                     ?>
                                     <i class="fa fa-calendar fa-xlg datetimepicker"></i>
                                 </td>
