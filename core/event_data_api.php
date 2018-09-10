@@ -25,10 +25,10 @@ class CalendarEventData {
     protected $status             = false;
     protected $name               = '';
     protected $activity           = 'Y';
-    protected $date_changed       = '';
-    protected $date_from          = '';
-    protected $date_to            = '';
-    protected $duration           = '';
+    protected $date_changed       = NULL;
+    protected $date_from          = 1;
+    protected $date_to            = 1;
+    protected $duration           = 0;
     protected $recurrence_pattern = null;
     private $loading              = false;
 
