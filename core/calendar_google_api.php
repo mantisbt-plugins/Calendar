@@ -245,15 +245,17 @@ function event_google_get_last_sync( $p_event_google_id ) {
     return db_fetch_array( $t_result )['last_sync'];
 }
 
-function event_google_get_id( int $p_event_id ) {
+function event_google_get_id( $p_event_id ) {
     $t_google_sync_table = plugin_table( 'google_sync' );
+
+    $c_event_id = (int) $p_event_id;
 
     db_param_push();
 
     $t_query = "SELECT google_id FROM $t_google_sync_table
 				  WHERE event_id=" . db_param();
 
-    $t_result = db_query( $t_query, array( (int) $p_event_id ) );
+    $t_result = db_query( $t_query, array( (int) $c_event_id ) );
 
     return db_fetch_array( $t_result )['google_id'];
 }
