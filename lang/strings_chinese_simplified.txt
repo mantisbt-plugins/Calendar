@@ -1,0 +1,122 @@
+<?php
+# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar for MantisBT is free software: 
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, 
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for for MantisBT is distributed in the hope 
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Customer management plugin for MantisBT.  
+# If not, see <http://www.gnu.org/licenses/>.
+
+$s_plugin_Calendar_name_plugin_description_page = '事件日历';
+$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar';
+
+$s_plugin_Calendar_Mon = '周一';
+$s_plugin_Calendar_Tue = '周二';
+$s_plugin_Calendar_Wed = '周三';
+$s_plugin_Calendar_Thu = '周四';
+$s_plugin_Calendar_Fri = '周五';
+$s_plugin_Calendar_Sat = '周六';
+$s_plugin_Calendar_Sun = '周日';
+
+$s_plugin_Calendar_update_event_sure_msg = '是否更新事件?';
+$s_plugin_Calendar_never_ending_repetition = '从不';
+$s_plugin_Calendar_ending_repetition = '截止日期';
+$s_plugin_Calendar_event_is_repeated = '是否每隔一段时间重复此事件?';
+$s_plugin_Calendar_NO_REPEAT = '无需重复';
+$s_plugin_Calendar_DAILY = '每天';
+$s_plugin_Calendar_WEEKLY = '每周';
+$s_plugin_Calendar_MONTHLY = '每月';
+$s_plugin_Calendar_YEARLY = '每年';
+
+$s_plugin_Calendar_this_event = '仅限此事件';
+$s_plugin_Calendar_this_and_future_event = '仅限于此事件及其关联事件';
+$s_plugin_Calendar_all_event = '所有事件';
+
+$s_plugin_Calendar_repeat_to = "截止到";
+$s_plugin_Calendar_not_repeat = "无需重复";
+
+$s_plugin_Calendar_config_title = '设置';
+$s_plugin_Calendar_config_days_week_display = '设置一周需显示的天数 (用户设置将覆盖默认设置)';
+$s_plugin_Calendar_config_time_day_range = '设置工作开始与结束时间 (用户设置将覆盖默认设置)';
+
+$s_plugin_Calendar_config_google_api_file = '用于访问google api凭证的JSON文件
+(<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>获取Google 日历的API</a>)<br>
+In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
+%1$s';
+$s_plugin_Calendar_config_page_google_api_settings = '当前用于连接google api的JSON文件';
+$s_plugin_Calendar_config_page_google_client_id = '当前客户端ID';
+
+$s_plugin_Calendar_user_config_enable_google_calendar = '与Google日历同步的状态';
+$s_plugin_Calendar_user_config_enable_google_calendar_button = '启用Google日历同步功能';
+$s_plugin_Calendar_user_config_google_calendar_list = '选择一个日历...';
+$s_plugin_Calendar_config_user_google_access_denie = '服务器拒绝此请求. <br> Error: %1$s';
+
+$s_plugin_Calendar_menu_main_front = '日历';
+$s_plugin_Calendar_name_event = '事件名称';
+$s_plugin_Calendar_date_event = '创建日期';
+$s_plugin_Calendar_event = '事件日历';
+$s_plugin_Calendar_members = '事件成员';
+$s_plugin_Calendar_owner_is_members = '是否为此事件成员?';
+$s_plugin_Calendar_add_user_to_member = '添加该成员到事件中';
+$s_plugin_Calendar_select_all_users = '所有成员';
+$s_plugin_Calendar_filter_text = '筛选方式:';
+
+$s_plugin_Calendar_event_hystory_create = '加入此事件中';
+$s_plugin_Calendar_add_new_event = '添加新事件';
+$s_plugin_Calendar_enter_report_details_title = '填写事件资料';
+$s_plugin_Calendar_insert_event = '加入已存在事件中';
+$s_plugin_Calendar_delete_event_sure_msg = '是否确认删除此事件?';
+$s_plugin_Calendar_delete_event_button = '删除';
+$s_plugin_Calendar_not_update = '未更新';
+$s_plugin_Calendar_last_update = '已更新';
+$s_plugin_Calendar_author = '创建者';
+$s_plugin_Calendar_updater = '已更新';
+$s_plugin_Calendar_in = 'in';
+$s_plugin_Calendar_from_time = '开始时间';
+$s_plugin_Calendar_to_time = '结束时间';
+$s_plugin_Calendar_time_event = '时间';
+$s_plugin_Calendar_pointer_to_calendar_key = '使用此按钮选择日期';
+$s_plugin_Calendar_quantity = 'pcs';
+$s_plugin_Calendar_selected = '选中';
+$s_plugin_Calendar_add_button = '添加';
+$s_plugin_Calendar_cancel_button = '取消';
+$s_plugin_Calendar_event_edit_title = '编辑事件';
+$s_plugin_Calendar_updating_event_advanced_title = '改变事件细节';
+$s_plugin_Calendar_back_to_event_link = '返回事件';
+$s_plugin_Calendar_update_information_button = '编辑数据';
+$s_plugin_Calendar_update_successful_button = '事件已变更';
+$s_plugin_Calendar_save_button = '保存';
+$s_plugin_Calendar_close_button = '关闭';
+
+$s_plugin_Calendar_week = '本周';
+$s_plugin_Calendar_day = '天';
+$s_plugin_Calendar_next_period = '前进';
+$s_plugin_Calendar_current_period = '本期';
+$s_plugin_Calendar_previous_period = '后退';
+
+$s_plugin_Calendar_assigned_event = '已分配事件';
+$s_plugin_Calendar_not_assigned_event = '未分配事件';
+$s_plugin_Calendar_event_view_title = '事件查看';
+$s_plugin_Calendar_id = '序号';
+$s_plugin_Calendar_last_update = '编辑时间';
+$s_plugin_Calendar_view_event_google_last_sync = '与Google同步';
+$s_plugin_Calendar_not_last_update = '否';
+$s_plugin_Calendar_event_relationships_bugs = '关联任务';
+$s_plugin_Calendar_date_from = '事件开始时间';
+$s_plugin_Calendar_date_to = '事件结束时间';
+$s_plugin_Calendar_out_of_range = '超出范围的事件';
+
+$s_plugin_Calendar_view_submitted_event_link = '查看已创建事件 %1$s';
+
+$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = '无法找到事件 %1$d .';
+$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$MANTIS_ERROR[ERROR_MIN_MEMBERS] = '事件至少需要一位成员';
