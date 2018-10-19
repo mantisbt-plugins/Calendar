@@ -40,6 +40,7 @@
 
 td.column-time-td{
     width: 65px;
+    min-width: 65px;
 }
 td.column-day-td{
     min-width: 140px;
