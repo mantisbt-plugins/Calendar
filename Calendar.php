@@ -111,7 +111,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.4.6';
+        $this->version = '2.4.7';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -194,6 +194,10 @@ class CalendarPlugin extends MantisPlugin {
                                 " ) ),
                                   //version 2.4.0 (schema 12)
                                   array( 'UpdateFunction', 'calculate_duration' ),
+				  //version 2.4.7 (schema 13)
+                                  array( 'ChangeTableSQL', array( plugin_table( "events" ), "
+                                        recurrence_pattern MEDIUMTEXT
+                                " ) ),
         );
     }
 
