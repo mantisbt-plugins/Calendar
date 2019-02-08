@@ -24,7 +24,7 @@ Features
 Download
 --------
 Please download the stable version.
-(https://github.com/brlumen/Calendar/releases)
+(https://github.com/mantisbt-plugins/Calendar/releases/latest)
 
 
 How to install
