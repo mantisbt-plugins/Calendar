@@ -17,9 +17,9 @@
 
 form_security_validate( 'event_delete' );
 
-$f_event_id = gpc_get_int( 'event_id' );
-
+$f_event_id    = gpc_get_int( 'event_id' );
 $f_date_select = gpc_get_int( 'date' );
+$f_from_bug_id   = gpc_get_int( 'from_bug_id', 0 );
 
 event_ensure_exists( $f_event_id );
 
@@ -31,7 +31,8 @@ if( event_is_recurrences( $f_event_id ) ) {
     $t_range = 'ALL';
 }
 
-$t_event_data = event_get( $f_event_id );
+$t_event_data    = event_get( $f_event_id );
+$t_bugs_attached = event_get_attached_bugs_id( $t_event_data->id );
 
 switch( $t_range ) {
 
@@ -40,7 +41,7 @@ switch( $t_range ) {
         if( $t_rset_current->count() == 1 ) {
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
-            event_bug_delete( $t_event_data->id );
+            event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
@@ -56,7 +57,7 @@ switch( $t_range ) {
         if( $t_event_data->date_from == $f_date_select ) {
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
-            event_bug_delete( $t_event_data->id );
+            event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
@@ -82,7 +83,7 @@ switch( $t_range ) {
         if( $t_rset_new->count() == 0 ) {
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
-            event_bug_delete( $t_event_data->id );
+            event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
@@ -100,15 +101,19 @@ switch( $t_range ) {
     default:
         helper_ensure_confirmed( plugin_lang_get( 'delete_event_sure_msg' ), plugin_lang_get( 'delete_event_button' ) );
 
-        $t_event_data->delete();
-
         event_member_delete( $t_event_data->id );
 
-        event_bug_delete( $t_event_data->id );
+        event_detach_issue( $t_event_data->id, $t_bugs_attached );
 
         event_google_delete( $t_event_data );
+        
+        $t_event_data->delete();
 }
 
 form_security_purge( 'event_delete' );
 
-print_header_redirect( plugin_page( 'calendar_user_page', TRUE ) . "&week=" . date( "W", $f_date_select ) );
+if( $f_from_bug_id != 0 && bug_exists( $f_from_bug_id ) ) {
+    print_successful_redirect_to_bug( $f_from_bug_id );
+} else {
+    print_header_redirect( plugin_page( 'calendar_user_page', TRUE ) . "&week=" . date( "W", $f_date_select ) );
+}

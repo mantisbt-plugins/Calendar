@@ -29,7 +29,7 @@ class CalendarEventData {
     protected $date_from          = 1;
     protected $date_to            = 1;
     protected $duration           = 0;
-    protected $recurrence_pattern = null;
+    protected $recurrence_pattern = '';
     private $loading              = false;
 
     /**
@@ -112,24 +112,10 @@ class CalendarEventData {
 
         if( $this->date_from >= $this->date_to ) {
             error_parameters( plugin_lang_get( 'date_event' ) );
-            trigger_error( ERROR_DATE, ERROR );
+            plugin_error( 'ERROR_DATE', ERROR );
         }
 
-
-//		if( 0 == $this->category_id && !config_get( 'allow_no_category' ) ) {
-//			error_parameters( lang_get( 'category' ) );
-//			trigger_error( ERROR_EMPTY_FIELD, ERROR );
-//		}
-//
-//		if( !is_blank( $this->duplicate_id ) && ( $this->duplicate_id != 0 ) && ( $this->id == $this->duplicate_id ) ) {
-//			trigger_error( ERROR_BUG_DUPLICATE_SELF, ERROR );
-//			# never returns
-//		}
     }
-
-//    function __construct( $parts, $dtstart = null ) {
-//        parent::__construct( $parts, $dtstart = null );
-//    }
 
     function create() {
 
@@ -254,7 +240,8 @@ $g_cache_calendar_event = array();
  */
 function event_ensure_exists( $p_event_id ) {
     if( !event_exists( $p_event_id ) ) {
-        plugin_error( "Event #$p_event_id not found" );
+        error_parameters( $p_event_id );
+        plugin_error( 'ERROR_EVENT_NOT_FOUND' );
     }
 }
 
@@ -282,7 +269,8 @@ function event_exists( $p_event_id ) {
 
 function event_occurrence_ensure_exist( $p_event_id, $p_date ) {
     if( !event_occurrence_exists( $p_event_id, $p_date ) ) {
-        plugin_error( "Event #$p_event_id in time period not found" );
+        error_parameters( $p_event_id );
+        plugin_error( 'ERROR_EVENT_TIME_PERIOD_NOT_FOUND' );
     }
 }
 
@@ -373,7 +361,7 @@ function event_cache_row( $p_event_id, $p_trigger_errors = true ) {
 
         if( $p_trigger_errors ) {
             error_parameters( $p_event_id );
-            trigger_error( ERROR_EVENT_NOT_FOUND, ERROR );
+            plugin_error( 'ERROR_EVENT_NOT_FOUND' );
         } else {
             return false;
         }
@@ -534,7 +522,7 @@ function event_member_delete( $p_event_id, $p_user_id = NULL ) {
  * @return array
  */
 function event_get_members( $p_event_id ) {
-    if( !access_has_event_level( config_get( 'show_member_list_threshold' ), $p_event_id ) ) {
+    if( !access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $p_event_id ) ) {
         return array();
     }
 
@@ -557,14 +545,14 @@ function event_get_members( $p_event_id ) {
     return $t_users;
 }
 
-function event_get_bugs_id( $event_id ) {
+function event_get_attached_bugs_id( $p_event_id ) {
     $p_table_calendar_relationship = plugin_table( "relationship" );
 
     if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
         $query  = "SELECT bug_id
 				  FROM $p_table_calendar_relationship
 				  WHERE event_id=" . db_param();
-        $result = db_query( $query, (array) $event_id );
+        $result = db_query( $query, (array) $p_event_id );
 
 
         $cResult     = array();
@@ -607,19 +595,29 @@ function get_events_id_from_bug_id( $p_bug_id ) {
     }
 }
 
-function event_bug_delete( $p_event_id ) {
+function event_detach_issue( $p_event_id, $p_bugs_id ) {
 
     $t_table_calendar_relationship = plugin_table( "relationship" );
 
     $query = "DELETE FROM $t_table_calendar_relationship
-			          WHERE event_id=" . db_param();
+			          WHERE event_id=" . db_param() . ' AND bug_id=' . db_param();
 
-    db_query( $query, array( $p_event_id ) );
+    foreach( $p_bugs_id as $t_bug_id ) {
+        if( !bug_exists( $t_bug_id ) ) {
+            continue;
+        }
+        db_query( $query, array( $p_event_id, $t_bug_id ) );
+        
+        plugin_history_log(
+                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_bug_detach" ) . ": " . event_get_field( $p_event_id, 'name' )
+        );
+        bug_update_date($t_bug_id);
+    }
 
     return TRUE;
 }
 
-function event_bugs_add( $p_event_id, $p_bugs_id ) {
+function event_attach_issue( $p_event_id, $p_bugs_id ) {
     $t_table_calendar_relationship = plugin_table( "relationship" );
 
     $query = "INSERT
@@ -633,7 +631,11 @@ function event_bugs_add( $p_event_id, $p_bugs_id ) {
             continue;
         }
         db_query( $query, Array( $p_event_id, $t_bug_id ) );
-        plugin_history_log( $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . $t_event_update_data->name );
+
+        plugin_history_log(
+                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . event_get_field( $p_event_id, 'name' )
+        );
+        bug_update_date( $t_bug_id );
     }
     return TRUE;
 }

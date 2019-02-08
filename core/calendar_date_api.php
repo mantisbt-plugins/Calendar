@@ -105,7 +105,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
 
     if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
 
-        $arDays = array();
+        $t_days = array();
         db_param_push();
 
         $p_query = "SELECT id FROM " . $t_table_calendar_events .
@@ -121,7 +121,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
             $t_result      = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $t_time_finish_day, $t_time_start_day ) );
             $t_event_count = db_num_rows( $t_result );
             if( $t_event_count > 0 ) {
-                $arDays[$t_day] = [];
+                $t_days[$t_day] = [];
                 for( $i = 0; $i < $t_event_count; $i++ ) {
                     $t_row = db_fetch_array( $t_result );
 
@@ -136,15 +136,15 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
                             $t_recurrenci_rule = RRule\RRule::createFromRfcString( $t_rrule_raw );
                             $t_is              = $t_recurrenci_rule->getOccurrencesBetween( $t_time_start_day, $t_time_finish_day );
                             if( $t_is != NULL ) {
-                                $arDays[$t_day][date_timestamp_get( $t_is[0] )][] = $t_row["id"];
+                                $t_days[$t_day][date_timestamp_get( $t_is[0] )][] = $t_row["id"];
                             }
                         } else {
-                            $arDays[$t_day][$t_time_event_start][] = $t_row["id"];
+                            $t_days[$t_day][$t_time_event_start][] = $t_row["id"];
                         }
                     }
                 }
             } else {
-                $arDays[$t_day] = [];
+                $t_days[$t_day] = [];
             }
         }
 //        foreach( $arDays as $arDay => $keys ) {
@@ -181,7 +181,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
 //            }
 //        }
 //        return $t_events_in_days;
-        return $arDays;
+        return $t_days;
     }
     return false;
 }

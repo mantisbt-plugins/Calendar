@@ -33,7 +33,7 @@ try {
     $client->setApprovalPrompt( 'force' );
 
     $accessToken = $client->fetchAccessTokenWithAuthCode( $f_oauth_key );
-    if( $accessToken['error'] ) {
+    if( array_key_exists('error', $accessToken) ) {
         throw new InvalidArgumentException( $accessToken['error_description'] );
     }
     plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );

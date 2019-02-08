@@ -19,7 +19,12 @@ access_ensure_global_level( plugin_config_get( 'manage_calendar_threshold' ) );
 
 form_security_validate( 'event_add' );
 
-$f_bugs = gpc_get_int_array( 'bugs_add', array( 0 ) );
+$f_bugs     = gpc_get_int_array( 'bugs_add', array() );
+$f_from_bug = gpc_get_int( 'from_bug_id', 0 );
+
+if($f_from_bug != 0) {
+    bug_ensure_exists($f_from_bug);
+}
 
 $f_event_time_start       = gpc_get_int( 'event_time_start' );
 $f_event_time_finish      = gpc_get_int( 'event_time_finish' );
@@ -56,26 +61,8 @@ switch( $f_selected_freq ) {
 
 $t_event_id = $t_event_data->create();
 
-$f_bugs = gpc_get_int_array( 'bugs_add', array( 0 ) );
-
-
-if( $f_bugs[0] !== 0 && !is_blank( $t_event_id ) ) {
-
-    $t_table_calendar_relationship = plugin_table( "relationship" );
-
-    $query = "INSERT
-                                              INTO $t_table_calendar_relationship
-                                                  ( event_id, bug_id )
-                                              VALUES
-                                                  ( " . db_param() . ', ' . db_param() . ')';
-
-    foreach( $f_bugs as $t_bug_id ) {
-        if( !bug_exists( $t_bug_id ) ) {
-            continue;
-        }
-        db_query( $query, Array( $t_event_id, $t_bug_id ) );
-        plugin_history_log( $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . $t_event_data->name );
-    }
+if( count( $f_bugs ) > 0 ) {
+    event_attach_issue( $t_event_id, $f_bugs );
 }
 
 $f_owner_is_members = gpc_get_bool( 'owner_is_members' );
@@ -100,26 +87,15 @@ layout_page_header_end();
 layout_page_begin( plugin_page( 'event_add_page' ) );
 
 
-if( $f_bugs[0] == 0 ) {
-    $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
-                              array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
-    );
-    html_meta_redirect( plugin_page( 'calendar_user_page', TRUE ) );
-} else if( $f_bugs[0] != 0 || count( $f_bugs ) == 1 ) {
-    $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
-                              array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
-    );
-    html_meta_redirect( string_get_bug_view_url( $f_bugs[0] ) );
+if( $f_from_bug != 0 ) {
+    print_successful_redirect_to_bug( $f_from_bug );
 } else {
     $t_buttons = array(
-                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),
+                              array( plugin_page( 'view' ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from, sprintf( plugin_lang_get( 'view_submitted_event_link' ), $t_event_id ) ),
     );
-    html_meta_redirect( plugin_page( 'view', TRUE ) . "&event_id=" . $t_event_id . "&date=" . $t_event_data->date_from );
+    html_meta_redirect( plugin_page( 'calendar_user_page', TRUE ) );
+    html_operation_confirmation( $t_buttons, '', CONFIRMATION_TYPE_SUCCESS );
+
+    layout_page_end();
 }
-
-html_operation_confirmation( $t_buttons, '', CONFIRMATION_TYPE_SUCCESS );
-
-layout_page_end();

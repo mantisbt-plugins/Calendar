@@ -1,5 +1,5 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, 
@@ -15,8 +15,18 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 $f_event_id = gpc_get_int( 'event_id' );
+$f_date     = gpc_get_int( 'date' );
 
-$f_date = gpc_get_int( 'date' );
+$t_referer_page = array_key_exists( 'HTTP_REFERER', $_SERVER ) ? parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_QUERY ) : 0;
+
+$f_referer_page_array = array();
+parse_str( $t_referer_page, $f_referer_page_array );
+
+if( array_key_exists( 'id', $f_referer_page_array ) && bug_exists( $f_referer_page_array['id'] ) ) {
+    $f_from_bug_id = $f_referer_page_array['id'];
+} else {
+    $f_from_bug_id = 0;
+}
 
 event_ensure_exists( $f_event_id );
 
@@ -25,7 +35,6 @@ $t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
 if( $t_event_is_rerecurrences ) {
     event_occurrence_ensure_exist( $f_event_id, $f_date );
 }
-
 
 $g_project_override = event_get_field( $f_event_id, 'project_id' );
 
@@ -78,7 +87,7 @@ if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'cale
     echo '<tr class="noprint"><td colspan="2">';
 
     print_small_button( plugin_page( 'event_update_page' ) . "&event_id=" . $f_event_id . "&date=" . $f_date, lang_get( 'update_bug_button' ) );
-    print_small_button( plugin_page( 'event_delete' ) . "&event_id=" . $f_event_id . "&date=" . $f_date . form_security_param( 'event_delete' ), lang_get( 'delete_bug_button' ) );
+    print_small_button( plugin_page( 'event_delete' ) . "&from_bug_id=" . $f_from_bug_id . "&event_id=" . $f_event_id . "&date=" . $f_date . form_security_param( 'event_delete' ), lang_get( 'delete_bug_button' ) );
 
     echo '</tr>';
     echo '</tfoot>';
@@ -115,8 +124,8 @@ echo '</tr>';
 
 #Date last sync from google calendar
 if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'calendar_edit_threshold' ) ) ) {
-    $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
-    if( $t_oauth['error'] != NULL || $t_oauth != NULL ) {
+    $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, auth_get_current_user_id() );
+    if( !array_key_exists('error', $t_oauth) && count($t_oauth) > 0 ) {
         $t_event_google_id        = event_google_get_id( $t_event_id );
         $t_event_google_last_sync = event_google_get_last_sync( $t_event_google_id );
 
@@ -312,7 +321,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
 
                     echo "<ul class=\"tasks-list\">";
 
-                    $t_bugs_id = event_get_bugs_id( $t_event_id ); // получим массив задач для текущего события
+                    $t_bugs_id = event_get_attached_bugs_id( $t_event_id ); // получим массив задач для текущего события
                     if( $t_bugs_id ) {
 
                         foreach( $t_bugs_id as $t_bug_id ) {

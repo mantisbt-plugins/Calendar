@@ -60,7 +60,7 @@ if( $f_bug_id == 0 ) {
 # don't index bug report page
 html_robots_noindex();
 
-layout_page_header( PLUGIN_lang_get( 'add_new_event' ) );
+layout_page_header( plugin_lang_get( 'add_new_event' ) );
 
 layout_page_begin();
 
@@ -72,6 +72,7 @@ $t_form_encoding   = '';
           action="<?php echo plugin_page( 'event_add' ); ?>">
               <?php echo form_security_field( 'event_add' ) ?>
         <input type="hidden" name="project_id" value="<?php echo $t_project_id ?>" />
+        <input type="hidden" name="from_bug_id" value="<?php echo $f_bug_id ?>" />
         <div class="widget-box widget-color-blue2">
             <div class="widget-header widget-header-small">
                 <h4 class="widget-title lighter">

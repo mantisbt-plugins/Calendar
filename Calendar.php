@@ -103,6 +103,32 @@ function install_calculate_duration() { //version 2.4.0 (schema 12)
     return TRUE;
 }
 
+function install_recurrence_pattern_set_notnull() { //version 2.4.8 (schema 14)
+    $t_table_calendar_events = plugin_table( 'events' );
+
+    if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
+
+        $t_query = "SELECT id, recurrence_pattern FROM " . $t_table_calendar_events;
+        $arRes   = db_query( $t_query, NULL, -1, -1 );
+
+        foreach( $arRes as $key => $t_event ) {
+
+            if( $t_event['recurrence_pattern'] !== NULL ) {
+                continue;
+            }
+
+            $query = "UPDATE $t_table_calendar_events
+                                            SET recurrence_pattern=''";
+            $query .= " WHERE id=" . db_param();
+
+            $t_fields = Array( $t_event['id'] );
+            
+            db_query( $query, $t_fields );
+        }
+    }
+    return TRUE;
+}
+
 class CalendarPlugin extends MantisPlugin {
 
     function register() {
@@ -111,7 +137,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.4.7';
+        $this->version = '2.4.8-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -198,6 +224,12 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'ChangeTableSQL', array( plugin_table( "events" ), "
                                         recurrence_pattern MEDIUMTEXT
                                 " ) ),
+                                  //version 2.4.8 (schema 14)
+                                  array( 'UpdateFunction', 'recurrence_pattern_set_notnull' ),
+                                  //version 2.4.8 (schema 15)
+                                  array( 'ChangeTableSQL', array( plugin_table( "events" ), "
+                                        recurrence_pattern MEDIUMTEXT NOTNULL
+                                " ) ),
         );
     }
 
@@ -228,13 +260,15 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_add_others_event_threshold'    => DEVELOPER,
                                   'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
-                                  'oauth_key'                            => NULL,
+                                  'oauth_key'                            => array(),
                                   'frequencies'                          => array(
                                                             'NO_REPEAT',
                                                             'DAILY',
                                                             'WEEKLY',
                                                             'MONTHLY',
-                                                            'YEARLY' )
+                                                            'YEARLY' ),
+                                  'google_calendar_sync_id'              => '',
+                                  'google_client_secret'                 => '',
         );
     }
 
@@ -243,30 +277,34 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'api/php-rrule-1.6.1/src/RRule.php';
         require_once 'api/php-rrule-1.6.1/src/RSet.php';
         require_once 'api/php-rrule-1.6.1/src/RfcParser.php';
-        require_once 'core/event_data_api.php';
+        require_once 'core/calendar_event_data_api.php';
         require_once 'core/calendar_date_api.php';
         require_once 'core/calendar_access_api.php';
         require_once 'core/calendar_print_api.php';
         require_once 'core/calendar_helper_api.php';
-        require_once 'core/Columns_api.php';
+        require_once 'core/calendar_columns_api.php';
         require_once 'core/calendar_user_api.php';
         require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
+    }
 
-        define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
-        define( 'ERROR_DATE', 'ERROR_DATE' );
-        define( 'ERROR_RANGE_TIME', 'ERROR_RANGE_TIME' );
-        define( 'ERROR_MIN_MEMBERS', 'ERROR_MIN_MEMBERS' );
+    function errors() {
+        return array(
+                                  'ERROR_EVENT_NOT_FOUND'             => plugin_lang_get( 'ERROR_EVENT_NOT_FOUND' ),
+                                  'ERROR_DATE'                        => plugin_lang_get( 'ERROR_DATE' ),
+                                  'ERROR_RANGE_TIME'                  => plugin_lang_get( 'ERROR_RANGE_TIME' ),
+                                  'ERROR_MIN_MEMBERS'                 => plugin_lang_get( 'ERROR_MIN_MEMBERS' ),
+                                  'ERROR_EVENT_TIME_PERIOD_NOT_FOUND' => plugin_lang_get( 'ERROR_EVENT_TIME_PERIOD_NOT_FOUND' ),
+        );
     }
 
     function hooks() {
-        $hooks = array(
+        return array(
                                   'EVENT_LAYOUT_RESOURCES' => 'resources',
                                   'EVENT_MENU_MAIN_FRONT'  => 'menu_main_front',
                                   'EVENT_VIEW_BUG_DETAILS' => 'html_print_calendar',
         );
-        return $hooks;
     }
 
     function resources() {
@@ -328,7 +366,7 @@ class CalendarPlugin extends MantisPlugin {
                                             foreach( $t_days_events as $t_day_and_events => $t_events_id ) {
                                                 $t_day_events                    = array();
                                                 $t_day_events[$t_day_and_events] = $t_events_id;
-                                                print_column_this_day( $t_day_events, count( $t_days_and_events ), $f_is_fulltime );
+                                                print_column_this_day( $t_day_events );
                                             }
                                             ?>
                                     </table>

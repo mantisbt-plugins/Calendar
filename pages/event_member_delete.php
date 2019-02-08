@@ -50,7 +50,7 @@ if( $t_logged_in_user_id == $t_user_id ) {
 }
 
 if( count( event_get_members( $f_event_id ) ) <= 1 ) {
-    trigger_error( 'ERROR_MIN_MEMBERS', ERROR );
+	plugin_error( 'ERROR_MIN_MEMBERS' );
 }
 
 event_member_delete( $f_event_id, $t_user_id );

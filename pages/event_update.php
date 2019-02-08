@@ -51,7 +51,7 @@ switch( $t_range ) {
     case 'THIS':
 
         $t_event_child_data->parent_id          = $t_event_parent_data->id;
-        $t_event_child_data->recurrence_pattern = NULL;
+        $t_event_child_data->recurrence_pattern = '';
         $t_event_child_data->author_id          = auth_get_current_user_id();
         $t_event_child_data->date_to            = $t_event_child_data->date_from + $t_event_child_data->duration;
 
@@ -64,7 +64,7 @@ switch( $t_range ) {
         $t_event_parent_data->update();
         event_google_update( $t_event_parent_data );
 
-        event_bugs_add( $t_event_child_id, $f_bugs );
+        event_attach_issue( $t_event_child_id, $f_bugs );
 
         $t_event_members_current = event_get_members( $t_event_parent_data->id );
         foreach( $t_event_members_current as $t_event_member ) {
@@ -107,7 +107,7 @@ switch( $t_range ) {
 
         $t_event_child_id = $t_event_child_data->create();
 
-        event_bugs_add( $t_event_child_id, $f_bugs );
+        event_attach_issue( $t_event_child_id, $f_bugs );
 
         $t_event_members_current = event_get_members( $t_event_parent_data->id );
         foreach( $t_event_members_current as $t_event_member ) {
@@ -178,13 +178,12 @@ switch( $t_range ) {
 
         sort( $f_bugs );
 
-        $t_current_bugs = event_get_bugs_id( $t_event_child_data->id );
+        $t_current_bugs = event_get_attached_bugs_id( $t_event_child_data->id );
 
         if( $f_bugs != $t_current_bugs ) {
-
-            event_bug_delete( $f_event_id );
-
-            event_bugs_add( $t_event_child_data->id, $f_bugs );
+            
+            event_detach_issue( $t_event_child_data->id, array_diff( $t_current_bugs, $f_bugs ));
+            event_attach_issue( $t_event_child_data->id, array_diff( $f_bugs, $t_current_bugs ) );
         }
         if( $t_event_child_data != $t_event_parent_data || $f_bugs != $t_current_bugs ) {
             event_google_update( $t_event_child_data );

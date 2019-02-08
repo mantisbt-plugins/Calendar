@@ -128,6 +128,7 @@ class RSet implements RRuleInterface {
     }
 
     public function rfcString() {
+        $t_rfc_string = '';
         foreach( $this->getRRules() as $t_rrule ) {
             $t_rfc_string .= $t_rrule->rfcString();
         }

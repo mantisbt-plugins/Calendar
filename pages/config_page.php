@@ -49,7 +49,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     <col style="width:25%" />
                                 </colgroup>
 
-                                <tr <?php echo helper_alternate_class() ?>>
+                                <tr>
                                     <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_days_week_display' ) ?>
 
@@ -68,7 +68,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
-                                <tr <?php echo helper_alternate_class() ?>>
+                                <tr>
                                     <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_time_day_range' ) ?>
 
@@ -99,7 +99,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                 if( $t_google_client_id['web']['client_id'] ) {
                                     ?>
 
-                                    <tr <?php echo helper_alternate_class() ?>>
+                                    <tr>
                                         <td class="category" width="50%">
                                             <?php echo plugin_lang_get( 'config_page_google_api_settings' ) ?>
                                         </td>
@@ -124,7 +124,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </tr>
                                 <?php } ?>
 
-                                <tr <?php echo helper_alternate_class() ?>>
+                                <tr>
                                     <td class="category" width="50%">
                                         <?php echo sprintf( plugin_lang_get( 'config_google_api_file' ), config_get_global( 'path' ) . plugin_page( 'user_config_google', TRUE ) ) ?>
                                     </td>

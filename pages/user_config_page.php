@@ -16,7 +16,7 @@
 
 auth_reauthenticate();
 
-access_ensure_global_level( config_get( 'calendar_edit_threshold' ) );
+access_ensure_global_level( plugin_config_get( 'calendar_edit_threshold' ) );
 
 layout_page_header( plugin_lang_get( 'name_plugin_description_page' ) );
 
@@ -48,7 +48,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     <col style="width:25%" />
                                 </colgroup>
 
-                                <tr <?php echo helper_alternate_class() ?>>
+                                <tr>
                                     <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_days_week_display' ) ?>
 
@@ -67,7 +67,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
-                                <tr <?php echo helper_alternate_class() ?>>
+                                <tr>
                                     <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_time_day_range' ) ?>
 
@@ -94,7 +94,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                 </tr>
 
                                 <?php if( plugin_config_get( 'google_client_secret' ) ) { ?>
-                                    <tr <?php echo helper_alternate_class() ?>>
+                                    <tr>
                                         <td class="category" width="50%">
                                             <?php echo plugin_lang_get( 'user_config_enable_google_calendar' ) ?>
 
@@ -102,8 +102,8 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 
                                         <td class="center" colspan="3">
                                             <?php
-                                            $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, auth_get_current_user_id() );
-                                            if( $t_oauth['error'] || $t_oauth == NULL ) {
+                                            $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, auth_get_current_user_id() );
+                                            if( count( $t_oauth ) == 0 || array_key_exists('error', $t_oauth) && $t_oauth['error']  ) {
                                                 print_small_button( get_response_google_url(), plugin_lang_get( 'user_config_enable_google_calendar_button' ) );
                                             } else {
                                                 echo '<select name="google_calendar_list">';
