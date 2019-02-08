@@ -68,6 +68,7 @@ $s_plugin_Calendar_add_user_to_member = 'Сделать пользователя
 $s_plugin_Calendar_select_all_users = 'Все пользователи';
 $s_plugin_Calendar_filter_text = 'Фильтровать по:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = 'Удалено из события';
 $s_plugin_Calendar_event_hystory_create = 'Добавлено в событие';
 $s_plugin_Calendar_add_new_event = 'Добавить новое событие';
 $s_plugin_Calendar_enter_report_details_title  = 'Введите данные события';
@@ -115,7 +116,8 @@ $s_plugin_Calendar_out_of_range = 'события вне диапазона';
 
 $s_plugin_Calendar_view_submitted_event_link = 'Просмотреть созданное событие %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'Дата/время начала события не должна быть равна или больше даты окончания события.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Событие %1$d не найдено.';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'ВРЕМЯ НАЧАЛА/ОКОНЧАНИЯ РАБОЧЕГО ДИАПАЗОНА ЗАДАНО НЕ ВЕРНО.';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'У СОБЫТИЯ ДОЛЖЕН БЫТЬ ХОТЯ БЫ ОДИН УЧАСТНИК';
+$s_plugin_Calendar_ERROR_DATE = 'Дата/время начала события не должна быть равна или больше даты окончания события.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Событие %1$d не найдено.';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'ВРЕМЯ НАЧАЛА/ОКОНЧАНИЯ РАБОЧЕГО ДИАПАЗОНА ЗАДАНО НЕ ВЕРНО.';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = 'У СОБЫТИЯ ДОЛЖЕН БЫТЬ ХОТЯ БЫ ОДИН УЧАСТНИК';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'СОБЫТИЕ #%1$s В УКАЗАННОМ ПЕРИОДЕ НЕ СУЩЕСТВУЕТ.';

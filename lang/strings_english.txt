@@ -68,6 +68,7 @@ $s_plugin_Calendar_add_user_to_member = 'Make user a member of the event';
 $s_plugin_Calendar_select_all_users = 'All users';
 $s_plugin_Calendar_filter_text = 'Filter by:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = 'Removed from event';
 $s_plugin_Calendar_event_hystory_create = 'Added to the event';
 $s_plugin_Calendar_add_new_event = 'Add new event';
 $s_plugin_Calendar_enter_report_details_title = 'Enter Event Data';
@@ -115,7 +116,8 @@ $s_plugin_Calendar_out_of_range = 'events out of range';
 
 $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Event %1$d was not found.';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'EVENT SHOULD BE ONE MEMBER';
+$s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Event %1$d was not found.';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EVENT SHOULD BE ONE MEMBER';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EVENT #%1$s DOES NOT EXIST IN THE SPECIFIED PERIOD.';

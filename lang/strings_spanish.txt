@@ -68,6 +68,7 @@ $s_plugin_Calendar_add_user_to_member = 'Hacer al usuario miembro del evento';
 $s_plugin_Calendar_select_all_users = 'Todos los usuarios';
 $s_plugin_Calendar_filter_text = 'Filtrar por:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = 'Eliminado del evento';
 $s_plugin_Calendar_event_hystory_create = 'Agregado al evento';
 $s_plugin_Calendar_add_new_event = 'Añadir nuevo evento';
 $s_plugin_Calendar_enter_report_details_title = 'Ingrese los datos del evento';
@@ -115,7 +116,8 @@ $s_plugin_Calendar_out_of_range = 'eventos fuera de rango';
 
 $s_plugin_Calendar_view_submitted_event_link = 'Ver el evento creado %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'La fecha / hora del comienzo del evento no debe ser igual o mayor que la fecha de finalización del evento.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Evento %1$d No encontrado.';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'EL RANGO de INICIO/FINALIZACION DEL TRABAJO NO SE ASIGNO CORRECTAMENTE ';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'EL EVENTO DEBE SER UN MIEMBRO';
+$s_plugin_Calendar_ERROR_DATE = 'La fecha / hora del comienzo del evento no debe ser igual o mayor que la fecha de finalización del evento.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Evento %1$d No encontrado.';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'EL RANGO de INICIO/FINALIZACION DEL TRABAJO NO SE ASIGNO CORRECTAMENTE ';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EL EVENTO DEBE SER UN MIEMBRO';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EL EVENTO #%1$s NO EXISTE EN EL PERÍODO ESPECIFICADO.';

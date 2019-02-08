@@ -69,6 +69,7 @@ $s_plugin_Calendar_add_user_to_member = '添加该成员到事件中';
 $s_plugin_Calendar_select_all_users = '所有成员';
 $s_plugin_Calendar_filter_text = '筛选方式:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = '从事件中删除';
 $s_plugin_Calendar_event_hystory_create = '加入此事件中';
 $s_plugin_Calendar_add_new_event = '添加新事件';
 $s_plugin_Calendar_enter_report_details_title = '填写事件资料';
@@ -116,7 +117,8 @@ $s_plugin_Calendar_out_of_range = '超出范围的事件';
 
 $s_plugin_Calendar_view_submitted_event_link = '查看已创建事件 %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = '无法找到事件 %1$d .';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = '事件至少需要一位成员';
+$s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = '无法找到事件 %1$d .';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = '事件至少需要一位成员';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = '事件 ＃％1$s 在指定期间内不存在。';
