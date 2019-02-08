@@ -246,7 +246,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                 for( $i = 0; $i < $t_num_users; $i++ ) {
                                     echo ($i > 0) ? ', ' : '';
                                     print_user( $t_users[$i] );
-                                    if( $t_can_delete_others ) {
+                                    if( $t_can_delete_others || $t_users[$i] == auth_get_current_user_id() || $t_event->author_id == auth_get_current_user_id() ) {
                                         echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '&event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . "&date=" . $f_date . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
                                     }
                                 }
