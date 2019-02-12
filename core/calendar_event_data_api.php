@@ -529,14 +529,13 @@ function event_get_members( $p_event_id ) {
     # get the eventnote data
     $t_event_member_table = plugin_table( 'event_member' );
     db_param_push();
-    $t_query              = "SELECT user_id, enabled
-			FROM $t_event_member_table m, {user} u
-			WHERE m.event_id=" . db_param() . " AND m.user_id = u.id
-			ORDER BY u.realname, u.username";
+    $t_query              = "SELECT user_id
+			FROM $t_event_member_table 
+			WHERE event_id=" . db_param();
     $t_result             = db_query( $t_query, array( $p_event_id ) );
 
     $t_users = array();
-    while( $t_row   = db_fetch_array( $t_result ) ) {
+    while( $t_row = db_fetch_array( $t_result ) ) {
         $t_users[] = $t_row['user_id'];
     }
 
@@ -547,7 +546,8 @@ function event_get_members( $p_event_id ) {
 
 function event_get_attached_bugs_id( $p_event_id ) {
     $p_table_calendar_relationship = plugin_table( "relationship" );
-
+    
+    $pResult     = Array();
     if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
         $query  = "SELECT bug_id
 				  FROM $p_table_calendar_relationship
@@ -557,16 +557,15 @@ function event_get_attached_bugs_id( $p_event_id ) {
 
         $cResult     = array();
         $t_row_count = db_num_rows( $result );
-        $pResult     = Array();
+        
         for( $i = 0; $i < $t_row_count; $i++ ) {
             array_push( $cResult, db_fetch_array( $result ) );
             $pResult[$i] = $cResult[$i]["bug_id"];
         }
 
         sort( $pResult );
-
-        return $pResult;
     }
+    return $pResult;
 }
 
 function get_events_id_from_bug_id( $p_bug_id ) {

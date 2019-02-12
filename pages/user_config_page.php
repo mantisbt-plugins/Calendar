@@ -1,5 +1,6 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
+# 
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, 
@@ -16,7 +17,7 @@
 
 auth_reauthenticate();
 
-access_ensure_global_level( plugin_config_get( 'calendar_edit_threshold' ) );
+access_ensure_global_level( plugin_config_get( 'manage_calendar_threshold' ) );
 
 layout_page_header( plugin_lang_get( 'name_plugin_description_page' ) );
 

@@ -40,13 +40,13 @@ if( $f_bug_id == 0 ) {
     if( ALL_PROJECTS == $t_current_project ) {
         print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
     }
-# Check for bug report threshold
-    if( !access_has_project_level( plugin_config_get( 'calendar_edit_threshold' ) ) ) {
+# Check for event report threshold
+    if( !access_has_project_level( plugin_config_get( 'report_event_threshold' ) ) ) {
         # If can't report on current project, show project selector if there is any other allowed project
-        access_ensure_any_project_level( plugin_config_get( 'calendar_edit_threshold' ) );
+        access_ensure_any_project_level( plugin_config_get( 'report_event_threshold' ) );
         print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
     }
-    access_ensure_project_level( plugin_config_get( 'calendar_edit_threshold' ) );
+    access_ensure_project_level( plugin_config_get( 'report_event_threshold' ) );
 } else {
     bug_ensure_exists( $f_bug_id );
 
@@ -238,12 +238,12 @@ $t_form_encoding   = '';
                                                 </th>
                                                 <td>
                                                     <?php
-                                                    $project_users    = project_get_all_user_rows( $t_project_id );
+                                                    $t_project_users    = project_get_all_user_rows( $t_project_id );
                                                     ?>
 
-                                                    <?php if( is_array( $project_users ) && count( $project_users ) > 0 ): ?>			
+                                                    <?php if( is_array( $t_project_users ) && count( $t_project_users ) > 0 ): ?>			
                                                         <select size="8" multiple name="user_ids[]">
-                                                            <?php foreach( $project_users as $project_user ): ?>
+                                                            <?php foreach( $t_project_users as $project_user ): ?>
                                                                 <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
                                                                     <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
                                                                 <?php endif; ?>

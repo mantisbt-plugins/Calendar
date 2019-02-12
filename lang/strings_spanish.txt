@@ -46,6 +46,18 @@ $s_plugin_Calendar_config_title = 'Configuración';
 $s_plugin_Calendar_config_days_week_display = 'Días de la semana para mostrar de manera predeterminada (la configuración del usuario anula la predeterminada)';
 $s_plugin_Calendar_config_time_day_range = 'Rango de horas de trabajo (la configuración del usuario anula la predeterminada)';
 
+$s_plugin_Calendar_manage_threshold_config = 'Límites del flujo de Trabajo';
+$s_plugin_Calendar_config_manage_calendar_threshold = 'Configuración del calendario';
+$s_plugin_Calendar_config_calendar_view_threshold = 'Ver calendario';
+$s_plugin_Calendar_config_bug_calendar_view_threshold = 'Ver eventos asignados';
+$s_plugin_Calendar_config_view_event_threshold = 'Ver evento';
+$s_plugin_Calendar_config_report_event_threshold = 'Añadir nuevos eventos';
+$s_plugin_Calendar_config_update_event_threshold = 'Actualizar eventos';
+$s_plugin_Calendar_config_show_member_list_threshold = 'Ver miembros del evento';
+$s_plugin_Calendar_config_member_event_threshold = 'Puede ser miembro en el evento';
+$s_plugin_Calendar_config_member_add_others_event_threshold = 'Puede agregar miembros a un evento.';
+$s_plugin_Calendar_config_member_delete_others_event_threshold = 'Puede eliminar miembros de un evento';
+
 $s_plugin_Calendar_config_google_api_file = 'Archivo JSON para acceder a google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Obtener acceso a Google API Calendar</a>)<br>
 En la configuración de "Redirección de URI permitida", deberá especificar la siguiente URL:<br>

@@ -46,6 +46,18 @@ $s_plugin_Calendar_config_title = 'Настройка';
 $s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в (Настройки пользователя перекрывают настройки по умолчанию)';
 $s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени (Настройки пользователя перекрывают настройки по умолчанию)';
 
+$s_plugin_Calendar_manage_threshold_config = 'Ограничения процесса';
+$s_plugin_Calendar_config_manage_calendar_threshold = 'Настройка календаря';
+$s_plugin_Calendar_config_calendar_view_threshold = 'Просмотр календаря';
+$s_plugin_Calendar_config_bug_calendar_view_threshold = 'Просмотр назначенных событий';
+$s_plugin_Calendar_config_view_event_threshold = 'Просмотр события';
+$s_plugin_Calendar_config_report_event_threshold = 'Добавлять новые события';
+$s_plugin_Calendar_config_update_event_threshold = 'Изменять события';
+$s_plugin_Calendar_config_show_member_list_threshold = 'Просмотр участников события';
+$s_plugin_Calendar_config_member_event_threshold = 'Кто может участвовать в событии';
+$s_plugin_Calendar_config_member_add_others_event_threshold = 'Кто может добавлять участников в событие';
+$s_plugin_Calendar_config_member_delete_others_event_threshold = 'Кто может удалять участников из события';
+
 $s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными данными для доступа к google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Получить доступ к Google API Calendar</a>)<br>
 В настройках в пункте "Разрешенные URI перенаправления" нужно будет указать сдедующий URL:<br>

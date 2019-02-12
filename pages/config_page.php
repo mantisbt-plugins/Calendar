@@ -22,6 +22,7 @@ layout_page_header( plugin_lang_get( 'name_plugin_description_page' ) );
 layout_page_begin( 'manage_overview_page.php' );
 
 print_manage_menu( 'manage_plugin_page.php' );
+calendar_print_manage_config_menu( plugin_page( 'config_page' ) );
 
 $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 ?>

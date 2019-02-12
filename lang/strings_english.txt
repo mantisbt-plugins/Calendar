@@ -46,6 +46,18 @@ $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
 $s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';
 
+$s_plugin_Calendar_manage_threshold_config = 'Workflow Thresholds';
+$s_plugin_Calendar_config_manage_calendar_threshold = 'Calendar setting';
+$s_plugin_Calendar_config_calendar_view_threshold = 'View calendar';
+$s_plugin_Calendar_config_bug_calendar_view_threshold = 'View assigned events';
+$s_plugin_Calendar_config_view_event_threshold = 'View event';
+$s_plugin_Calendar_config_report_event_threshold = 'Add new events';
+$s_plugin_Calendar_config_update_event_threshold = 'Update events';
+$s_plugin_Calendar_config_show_member_list_threshold = 'View event members';
+$s_plugin_Calendar_config_member_event_threshold = 'Can member in event';
+$s_plugin_Calendar_config_member_add_others_event_threshold = 'Can add members to an event.';
+$s_plugin_Calendar_config_member_delete_others_event_threshold = 'Can remove members from an event';
+
 $s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for access to google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>

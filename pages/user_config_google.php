@@ -1,6 +1,6 @@
 <?php
-
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
+# 
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, 
@@ -14,11 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
-//form_security_validate_google( 'calendar_config_edit' );
-//auth_reauthenticate();
-//access_ensure_global_level( config_get( 'update_event_threshold' ) );
-//form_security_purge( plugin_page( 'config', true ) );
-
 
 $f_oauth_key = gpc_get_string( 'code', NULL );
 $f_state     = json_decode( gpc_get_string( 'state', NULL ), TRUE );

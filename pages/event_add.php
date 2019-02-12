@@ -15,7 +15,7 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-access_ensure_global_level( plugin_config_get( 'manage_calendar_threshold' ) );
+access_ensure_global_level( plugin_config_get( 'report_event_threshold' ) );
 
 form_security_validate( 'event_add' );
 

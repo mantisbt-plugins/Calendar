@@ -17,9 +17,9 @@
 $f_event_id = gpc_get_int( 'event_id' );
 $f_date     = gpc_get_int( 'date' );
 
-access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
-
 event_ensure_exists( $f_event_id );
+
+access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 $t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
 

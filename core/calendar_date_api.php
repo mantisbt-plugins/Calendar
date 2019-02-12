@@ -59,8 +59,12 @@ function get_dates_event_from_events_id( $p_events_id ) {
     $t_dates = array();
 
     foreach( $p_events_id as $t_event_id ) {
+        
+        if( !event_exists( $t_event_id ) || !access_has_event_level( plugin_config_get( 'view_event_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
+            continue;
+        }
 
-        if( event_get_field( $t_event_id, 'recurrence_pattern' ) != NULL ) {
+        if( event_get_field( $t_event_id, 'recurrence_pattern' ) != '' ) {
             $t_rset          = new RRule\RSet( event_get_field( $t_event_id, 'recurrence_pattern' ) );
             $t_previous_days = $t_rset->getOccurrencesBetween( (int) event_get_field( $t_event_id, 'date_from' ), strtotime( 'tomorrow' ) );
             $t_next_days     = $t_rset->getOccurrencesBetween( strtotime( 'tomorrow' ), (int) event_get_field( $t_event_id, 'date_to' ), 1 );
@@ -100,46 +104,64 @@ function group_events_by_time( $p_events_id ) {
 function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS ) {
 
     $t_table_calendar_events = plugin_table( 'events' );
+    $t_table_calendar_members = plugin_table( 'event_member' );
 
     $t_project_all = project_hierarchy_get_all_subprojects( $p_project_id );
+    $t_project_all = array_merge($t_project_all, array($p_project_id));
 
-    if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
+    if( db_table_exists( $t_table_calendar_events ) && db_table_exists( $t_table_calendar_members ) && db_is_connected() ) {
 
         $t_days = array();
         db_param_push();
 
-        $p_query = "SELECT id FROM " . $t_table_calendar_events .
-                " WHERE activity = 'Y' "
-                . "AND date_from BETWEEN " . db_param() . " AND " . db_param() . " "
-                . "OR ( activity = 'Y' AND date_from < " . db_param() . " AND date_to > " . db_param() . " AND recurrence_pattern IS NOT NULL )";
+        if( $p_user_id == ALL_USERS ) {
+            $p_query = "SELECT id,date_from,recurrence_pattern FROM " . $t_table_calendar_events .
+                    " WHERE "
+                    . "activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from BETWEEN " . db_param() . " AND " . db_param() . " "
+                    . "OR "
+                    . "( activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from < " . db_param() . " AND date_to > " . db_param() . " AND recurrence_pattern > '' )";
+        } else {
+            $p_query = "SELECT id,project_id,date_from,recurrence_pattern FROM " . $t_table_calendar_events . " AS et" . 
+                    " INNER JOIN " . $t_table_calendar_members . " AS mt" .
+                    " ON et.id = mt.event_id" .
+                    " WHERE "
+                    . "activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from BETWEEN " . db_param() . " AND " . db_param() . " AND mt.user_id = " . db_param() . " "
+                    . "OR "
+                    . "( activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from < " . db_param() . " AND date_to > " . db_param() . " AND recurrence_pattern > '' AND mt.user_id = " . db_param() . " )";
+        }
+
 
         foreach( $p_ar_all_days as $t_day ) {
 
             $t_time_start_day  = (int) $t_day;
             $t_time_finish_day = $t_day + 86399;
 
-            $t_result      = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $t_time_finish_day, $t_time_start_day ) );
+            if( $p_user_id == ALL_USERS ) {
+                $t_result = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $t_time_finish_day, $t_time_start_day ) );
+            } else {
+                $t_result = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $p_user_id, $t_time_finish_day, $t_time_start_day, $p_user_id ) );
+            }
             $t_event_count = db_num_rows( $t_result );
             if( $t_event_count > 0 ) {
                 $t_days[$t_day] = [];
                 for( $i = 0; $i < $t_event_count; $i++ ) {
                     $t_row = db_fetch_array( $t_result );
 
-                    $t_user_is_member = $p_user_id == ALL_USERS ? TRUE : in_array( $p_user_id, event_get_members( $t_row["id"] ) );
+                    $t_access_show_current_user = access_has_event_level( plugin_config_get( 'view_event_threshold' ), (int)$t_row["id"] );
+//
+                    if( $t_access_show_current_user == TRUE ) {
 
-                    if( in_array( event_get_field( $t_row["id"], 'project_id' ), $t_project_all ) && $t_user_is_member == TRUE || event_get_field( $t_row["id"], 'project_id' ) == $p_project_id && $t_user_is_member == TRUE ) {
-
-                        $t_time_event_start = event_get_field( $t_row["id"], 'date_from' );
-                        $t_rrule_raw        = event_get_field( $t_row['id'], 'recurrence_pattern' );
+                        $t_time_event_start = (int)$t_row['date_from'];
+                        $t_rrule_raw        = $t_row['recurrence_pattern'];
                         if( $t_time_event_start < $t_day || $t_rrule_raw != NULL ) {
 //                            $t_rrule_raw       = event_get_field( $t_row['id'], 'recurrence_pattern' );
                             $t_recurrenci_rule = RRule\RRule::createFromRfcString( $t_rrule_raw );
                             $t_is              = $t_recurrenci_rule->getOccurrencesBetween( $t_time_start_day, $t_time_finish_day );
                             if( $t_is != NULL ) {
-                                $t_days[$t_day][date_timestamp_get( $t_is[0] )][] = $t_row["id"];
+                                $t_days[$t_day][date_timestamp_get( $t_is[0] )][] = (int)$t_row["id"];
                             }
                         } else {
-                            $t_days[$t_day][$t_time_event_start][] = $t_row["id"];
+                            $t_days[$t_day][$t_time_event_start][] = (int)$t_row["id"];
                         }
                     }
                 }
