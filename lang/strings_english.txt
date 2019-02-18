@@ -46,6 +46,18 @@ $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
 $s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';
 
+$s_plugin_Calendar_manage_threshold_config = 'Workflow Thresholds';
+$s_plugin_Calendar_config_manage_calendar_threshold = 'Calendar setting';
+$s_plugin_Calendar_config_calendar_view_threshold = 'View calendar';
+$s_plugin_Calendar_config_bug_calendar_view_threshold = 'View assigned events';
+$s_plugin_Calendar_config_view_event_threshold = 'View event';
+$s_plugin_Calendar_config_report_event_threshold = 'Add new events';
+$s_plugin_Calendar_config_update_event_threshold = 'Update events';
+$s_plugin_Calendar_config_show_member_list_threshold = 'View event members';
+$s_plugin_Calendar_config_member_event_threshold = 'Can member in event';
+$s_plugin_Calendar_config_member_add_others_event_threshold = 'Can add members to an event.';
+$s_plugin_Calendar_config_member_delete_others_event_threshold = 'Can remove members from an event';
+
 $s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for access to google api
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
@@ -68,6 +80,7 @@ $s_plugin_Calendar_add_user_to_member = 'Make user a member of the event';
 $s_plugin_Calendar_select_all_users = 'All users';
 $s_plugin_Calendar_filter_text = 'Filter by:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = 'Removed from event';
 $s_plugin_Calendar_event_hystory_create = 'Added to the event';
 $s_plugin_Calendar_add_new_event = 'Add new event';
 $s_plugin_Calendar_enter_report_details_title = 'Enter Event Data';
@@ -115,7 +128,8 @@ $s_plugin_Calendar_out_of_range = 'events out of range';
 
 $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = 'Event %1$d was not found.';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = 'EVENT SHOULD BE ONE MEMBER';
+$s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Event %1$d was not found.';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EVENT SHOULD BE ONE MEMBER';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EVENT #%1$s DOES NOT EXIST IN THE SPECIFIED PERIOD.';

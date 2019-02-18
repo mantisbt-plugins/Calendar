@@ -1,5 +1,6 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
+# 
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, 
@@ -103,6 +104,32 @@ function install_calculate_duration() { //version 2.4.0 (schema 12)
     return TRUE;
 }
 
+function install_recurrence_pattern_set_notnull() { //version 2.4.8 (schema 14)
+    $t_table_calendar_events = plugin_table( 'events' );
+
+    if( db_table_exists( $t_table_calendar_events ) && db_is_connected() ) {
+
+        $t_query = "SELECT id, recurrence_pattern FROM " . $t_table_calendar_events;
+        $arRes   = db_query( $t_query, NULL, -1, -1 );
+
+        foreach( $arRes as $key => $t_event ) {
+
+            if( $t_event['recurrence_pattern'] !== NULL ) {
+                continue;
+            }
+
+            $query = "UPDATE $t_table_calendar_events
+                                            SET recurrence_pattern=''";
+            $query .= " WHERE id=" . db_param();
+
+            $t_fields = Array( $t_event['id'] );
+
+            db_query( $query, $t_fields );
+        }
+    }
+    return TRUE;
+}
+
 class CalendarPlugin extends MantisPlugin {
 
     function register() {
@@ -111,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.4.7';
+        $this->version = '2.5.0-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -194,21 +221,28 @@ class CalendarPlugin extends MantisPlugin {
                                 " ) ),
                                   //version 2.4.0 (schema 12)
                                   array( 'UpdateFunction', 'calculate_duration' ),
-				  //version 2.4.7 (schema 13)
+                                  //version 2.4.7 (schema 13)
                                   array( 'ChangeTableSQL', array( plugin_table( "events" ), "
                                         recurrence_pattern MEDIUMTEXT
+                                " ) ),
+                                  //version 2.4.8 (schema 14)
+                                  array( 'UpdateFunction', 'recurrence_pattern_set_notnull' ),
+                                  //version 2.4.8 (schema 15)
+                                  array( 'ChangeTableSQL', array( plugin_table( "events" ), "
+                                        recurrence_pattern MEDIUMTEXT NOTNULL
                                 " ) ),
         );
     }
 
     function config() {
-        return array(
-                                  'datetime_picker_format'               => 'DD-MM-Y',
-                                  'short_date_format'                    => 'd-m-Y',
-                                  'event_time_start_stop_picker_format'  => 'HH:mm',
-                                  'startStepDays'                        => 0,
-                                  'countStepDays'                        => 7,
-                                  'arWeekdaysName'                       => array(
+        return array( //Default settings. Some of the settings are available for override via the plugin configuration page.
+                                  //Time settings
+                                  'datetime_picker_format'              => 'DD-MM-Y',
+                                  'short_date_format'                   => 'd-m-Y',
+                                  'event_time_start_stop_picker_format' => 'HH:mm',
+                                  'startStepDays'                       => 0,
+                                  'countStepDays'                       => 7,
+                                  'arWeekdaysName'                      => array(
                                                             'Mon' => ON,
                                                             'Tue' => ON,
                                                             'Wed' => ON,
@@ -216,25 +250,33 @@ class CalendarPlugin extends MantisPlugin {
                                                             'Fri' => ON,
                                                             'Sat' => ON,
                                                             'Sun' => ON ),
-                                  'time_day_start'                       => 32400,
-                                  'time_day_finish'                      => 64800,
-                                  'stepDayMinutesCount'                  => 2,
-                                  'manage_calendar_threshold'            => DEVELOPER,
-                                  'calendar_view_threshold'              => DEVELOPER,
-                                  'calendar_edit_threshold'              => DEVELOPER,
-                                  'report_event_threshold'               => DEVELOPER,
-                                  'update_event_threshold'               => DEVELOPER,
-                                  'show_member_list_threshold'           => REPORTER,
-                                  'member_add_others_event_threshold'    => DEVELOPER,
-                                  'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
-                                  'member_delete_others_event_threshold' => MANAGER, //Access level needed to delete other users from the list of users member a event.
-                                  'oauth_key'                            => NULL,
-                                  'frequencies'                          => array(
+                                  'time_day_start'                      => 32400,
+                                  'time_day_finish'                     => 64800,
+                                  'stepDayMinutesCount'                 => 2,
+                                  'frequencies'                         => array(
                                                             'NO_REPEAT',
                                                             'DAILY',
                                                             'WEEKLY',
                                                             'MONTHLY',
-                                                            'YEARLY' )
+                                                            'YEARLY' ),
+                                  //Calendar access rights.
+                                  'manage_calendar_threshold'           => DEVELOPER,
+                                  'calendar_view_threshold'             => DEVELOPER,
+                                  'bug_calendar_view_threshold'         => REPORTER,
+//                                  'calendar_edit_threshold'              => DEVELOPER,
+                                  //Event access rights.
+                                  'view_event_threshold'                 => REPORTER,
+                                  'report_event_threshold'               => DEVELOPER,
+                                  'update_event_threshold'               => DEVELOPER,
+                                  //Member event access rights. 
+                                  'show_member_list_threshold'           => REPORTER,
+                                  'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
+                                  'member_add_others_event_threshold'    => DEVELOPER,
+                                  'member_delete_others_event_threshold' => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
+                                  //Google settings
+                                  'oauth_key'                            => array(),
+                                  'google_calendar_sync_id'              => '',
+                                  'google_client_secret'                 => '',
         );
     }
 
@@ -243,30 +285,35 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'api/php-rrule-1.6.1/src/RRule.php';
         require_once 'api/php-rrule-1.6.1/src/RSet.php';
         require_once 'api/php-rrule-1.6.1/src/RfcParser.php';
-        require_once 'core/event_data_api.php';
+        require_once 'core/calendar_event_data_api.php';
         require_once 'core/calendar_date_api.php';
         require_once 'core/calendar_access_api.php';
         require_once 'core/calendar_print_api.php';
         require_once 'core/calendar_helper_api.php';
-        require_once 'core/Columns_api.php';
+        require_once 'core/calendar_columns_api.php';
         require_once 'core/calendar_user_api.php';
         require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
+        require_once 'core/calendar_menu_api.php';
+    }
 
-        define( 'ERROR_EVENT_NOT_FOUND', 'ERROR_EVENT_NOT_FOUND' );
-        define( 'ERROR_DATE', 'ERROR_DATE' );
-        define( 'ERROR_RANGE_TIME', 'ERROR_RANGE_TIME' );
-        define( 'ERROR_MIN_MEMBERS', 'ERROR_MIN_MEMBERS' );
+    function errors() {
+        return array(
+                                  'ERROR_EVENT_NOT_FOUND'             => plugin_lang_get( 'ERROR_EVENT_NOT_FOUND' ),
+                                  'ERROR_DATE'                        => plugin_lang_get( 'ERROR_DATE' ),
+                                  'ERROR_RANGE_TIME'                  => plugin_lang_get( 'ERROR_RANGE_TIME' ),
+                                  'ERROR_MIN_MEMBERS'                 => plugin_lang_get( 'ERROR_MIN_MEMBERS' ),
+                                  'ERROR_EVENT_TIME_PERIOD_NOT_FOUND' => plugin_lang_get( 'ERROR_EVENT_TIME_PERIOD_NOT_FOUND' ),
+        );
     }
 
     function hooks() {
-        $hooks = array(
+        return array(
                                   'EVENT_LAYOUT_RESOURCES' => 'resources',
                                   'EVENT_MENU_MAIN_FRONT'  => 'menu_main_front',
                                   'EVENT_VIEW_BUG_DETAILS' => 'html_print_calendar',
         );
-        return $hooks;
     }
 
     function resources() {
@@ -275,89 +322,90 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     function menu_main_front() {
-        if( access_has_project_level( plugin_config_get( 'manage_calendar_threshold' ) ) ) {
-            return array(
-                                      array(
-                                                                'url'          => plugin_page( 'calendar_user_page' ),
-                                                                'title'        => plugin_lang_get( 'menu_main_front' ),
-                                                                'access_level' => DEVELOPER,
-                                                                'icon'         => 'fa-random'
-                                      ),
-            );
-        }
+        return array(
+                                  array(
+                                                            'url'          => plugin_page( 'calendar_user_page' ),
+                                                            'title'        => plugin_lang_get( 'menu_main_front' ),
+                                                            'access_level' => plugin_config_get( 'calendar_view_threshold' ),
+                                                            'icon'         => 'fa-random'
+                                  ),
+        );
     }
 
     function html_print_calendar( $p_first_option, $p_bug_id ) {
-        $t_events_id      = get_events_id_from_bug_id( $p_bug_id );
-        $t_days_events    = get_dates_event_from_events_id( $t_events_id );
-        ?>
+
+        if( access_has_project_level( plugin_config_get( 'bug_calendar_view_threshold' ) ) ) {
+            $t_events_id      = get_events_id_from_bug_id( $p_bug_id );
+            $t_days_events    = get_dates_event_from_events_id( $t_events_id );
+            ?>
 
 
-        <tr class=calendar-area align="center">
-            <td class=calendar-area-in-bugs align="center" colspan="6">
+            <tr class=calendar-area align="center">
+                <td class=calendar-area-in-bugs align="center" colspan="6">
 
-                <div class="col-md-12 col-xs-12">
-                    <?php
-                    $t_collapse_block = count( $t_days_events ) == 0 ? TRUE : FALSE;
-                    $t_block_css      = $t_collapse_block ? 'collapsed' : '';
+                    <div class="col-md-12 col-xs-12">
+                        <?php
+                        $t_collapse_block = count( $t_days_events ) == 0 ? TRUE : FALSE;
+                        $t_block_css      = $t_collapse_block ? 'collapsed' : '';
 //                    $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
-                    ?>
-                    <div class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
-                        <div class="widget-header widget-header-small">
-                            <h4 class="widget-title lighter">
-                                <i class="ace-icon fa fa-list-alt"></i>
-                                <?php
-                                if( $t_collapse_block ) {
-                                    echo plugin_lang_get( 'not_assigned_event' );
-                                } else {
-                                    echo plugin_lang_get( 'assigned_event' );
-                                }
-                                ?>
-                            </h4>
-                        </div>
-                        <div class="widget-body">
-
-
-                            <div class="widget-main no-padding">
-
-                                <div class="table-responsive">
-                                    <table class="calendar-user week">
-                                        <tr class="row-day">
-                                            <?php print_column_time(); ?>
-                                            <?php
-                                            foreach( $t_days_events as $t_day_and_events => $t_events_id ) {
-                                                $t_day_events                    = array();
-                                                $t_day_events[$t_day_and_events] = $t_events_id;
-                                                print_column_this_day( $t_day_events, count( $t_days_and_events ), $f_is_fulltime );
-                                            }
-                                            ?>
-                                    </table>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <?php
-                    $t_access_level_current_user = access_get_global_level( auth_get_current_user_id() );
-
-                    if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'calendar_edit_threshold' ) ) ) {
                         ?>
-                        <div class="widget-toolbox padding-8 clearfix">
-                            <div class="form-inline pull-left">
-                                <?php
-//                                print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'insert_event' ) );
-                                print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'add_new_event' ) );
-                                ?>
+                        <div class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="widget-title lighter">
+                                    <i class="ace-icon fa fa-list-alt"></i>
+                                    <?php
+                                    if( $t_collapse_block ) {
+                                        echo plugin_lang_get( 'not_assigned_event' );
+                                    } else {
+                                        echo plugin_lang_get( 'assigned_event' );
+                                    }
+                                    ?>
+                                </h4>
+                            </div>
+                            <div class="widget-body">
+
+
+                                <div class="widget-main no-padding">
+
+                                    <div class="table-responsive">
+                                        <table class="calendar-user week">
+                                            <tr class="row-day">
+                                                <?php print_column_time(); ?>
+                                                <?php
+                                                foreach( $t_days_events as $t_date => $t_time_events_id ) {
+                                                    $t_day_events          = array();
+                                                    $t_day_events[$t_date] = $t_time_events_id;
+                                                    print_column_this_day( $t_day_events );
+                                                }
+                                                ?>
+                                        </table>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                         <?php
-                    }
-                    ?>
-                </div>
-            </td>
-        </tr>
+                        $t_access_level_current_user = access_get_project_level();
 
-        <?php
+                        if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'report_event_threshold' ) ) && !bug_is_readonly( $p_bug_id ) ) {
+                            ?>
+                            <div class="widget-toolbox padding-8 clearfix">
+                                <div class="form-inline pull-left">
+                                    <?php
+//                                print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'insert_event' ) );
+                                    print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'add_new_event' ) );
+                                    ?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </td>
+            </tr>
+
+            <?php
+        }
     }
 
 }

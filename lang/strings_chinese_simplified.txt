@@ -47,6 +47,18 @@ $s_plugin_Calendar_config_title = '设置';
 $s_plugin_Calendar_config_days_week_display = '设置一周需显示的天数 (用户设置将覆盖默认设置)';
 $s_plugin_Calendar_config_time_day_range = '设置工作开始与结束时间 (用户设置将覆盖默认设置)';
 
+$s_plugin_Calendar_manage_threshold_config = '工作流阀值';
+$s_plugin_Calendar_config_manage_calendar_threshold = '日历设置';
+$s_plugin_Calendar_config_calendar_view_threshold = '查看日历';
+$s_plugin_Calendar_config_bug_calendar_view_threshold = '查看分配的事件';
+$s_plugin_Calendar_config_view_event_threshold = '查看活动';
+$s_plugin_Calendar_config_report_event_threshold = '添加新活动';
+$s_plugin_Calendar_config_update_event_threshold = '更新活动';
+$s_plugin_Calendar_config_show_member_list_threshold = '查看活动成员';
+$s_plugin_Calendar_config_member_event_threshold = '会员可以参加活动';
+$s_plugin_Calendar_config_member_add_others_event_threshold = '可以向活动添加成员';
+$s_plugin_Calendar_config_member_delete_others_event_threshold = '可以从活动中删除成员';
+
 $s_plugin_Calendar_config_google_api_file = '用于访问google api凭证的JSON文件
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>获取Google 日历的API</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
@@ -69,6 +81,7 @@ $s_plugin_Calendar_add_user_to_member = '添加该成员到事件中';
 $s_plugin_Calendar_select_all_users = '所有成员';
 $s_plugin_Calendar_filter_text = '筛选方式:';
 
+$s_plugin_Calendar_event_hystory_bug_detach = '从事件中删除';
 $s_plugin_Calendar_event_hystory_create = '加入此事件中';
 $s_plugin_Calendar_add_new_event = '添加新事件';
 $s_plugin_Calendar_enter_report_details_title = '填写事件资料';
@@ -116,7 +129,8 @@ $s_plugin_Calendar_out_of_range = '超出范围的事件';
 
 $s_plugin_Calendar_view_submitted_event_link = '查看已创建事件 %1$s';
 
-$MANTIS_ERROR[ERROR_DATE] = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
-$MANTIS_ERROR[ERROR_EVENT_NOT_FOUND] = '无法找到事件 %1$d .';
-$MANTIS_ERROR[ERROR_RANGE_TIME] = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
-$MANTIS_ERROR[ERROR_MIN_MEMBERS] = '事件至少需要一位成员';
+$s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = '无法找到事件 %1$d .';
+$s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$s_plugin_Calendar_ERROR_MIN_MEMBERS = '事件至少需要一位成员';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = '事件 ＃％1$s 在指定期间内不存在。';

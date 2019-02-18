@@ -168,7 +168,7 @@ function event_google_update( CalendarEventData $p_update_event ) {
                                   'organizer'      => plugin_config_get( 'google_calendar_sync_id', NULL, FALSE, $t_creator_id ) );
     }
 
-    if( $t_google_calendar_id == NULL || $t_google_event_id == NULL ) {
+    if( is_blank( $t_google_calendar_id ) || $t_google_event_id == NULL ) {
         return;
     }
 
@@ -272,7 +272,9 @@ function event_is_synchronized_with_google( $p_event_id ) {
 }
 
 function string_get_google_description( $p_event_id ) {
-    $t_bugs_id = event_get_bugs_id( $p_event_id );
+    $t_description = '';
+
+    $t_bugs_id = event_get_attached_bugs_id( $p_event_id );
 
     foreach( $t_bugs_id as $t_bug_id ) {
         $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . bug_get_field( $t_bug_id, 'summary' ) . '</a><br><br>';

@@ -42,6 +42,8 @@ html_robots_noindex();
 $f_week        = gpc_get_int( "week", date( "W" ) );
 $f_is_fulltime = gpc_get_bool( "full_time" );
 $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
+$t_access_level_current_user = access_get_project_level();
+$t_access_level_global_current_user = access_get_global_level();
 ?>
 
 <div class="col-md-12 col-xs-12">
@@ -52,11 +54,14 @@ $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
                 <i class="ace-icon fa fa-list-alt"></i>
                 <?php echo plugin_lang_get( 'menu_main_front' ) . " ( GMT " . date( "P" ) . " )"; ?>
             </h4>
-            <div class="widget-toolbar no-border">
-                <div class="widget-menu">
-                    <?php print_small_button( plugin_page( 'user_config_page' ), plugin_lang_get( 'config_title' ) ); ?>
+            <?php if( access_compare_level( $t_access_level_global_current_user, plugin_config_get( 'manage_calendar_threshold' ) ) ) { ?>
+                <div class="widget-toolbar no-border">
+                    <div class="widget-menu">
+                        <?php print_small_button( plugin_page( 'user_config_page' ), plugin_lang_get( 'config_title' ) ); ?>
+                    </div>
                 </div>
-            </div>
+            <?php } ?>
+    
         </div>
 
         <div class="widget-body">
@@ -119,9 +124,8 @@ $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
                 </div>
             </div>
             <?php
-            $t_access_level_current_user = access_get_global_level( auth_get_current_user_id() );
 
-            if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'calendar_edit_threshold' ) ) ) {
+            if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'report_event_threshold' ) ) ) {
                 ?>
                 <div class="widget-toolbox padding-8 clearfix">
                     <div class="form-inline pull-left">

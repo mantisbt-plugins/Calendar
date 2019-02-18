@@ -43,14 +43,14 @@ if( $t_event->project_id != helper_get_current_project() ) {
     $g_project_override = $t_event->project_id;
 }
 
-if( $t_logged_in_user_id == $t_user_id ) {
+if( $t_logged_in_user_id == $t_user_id || $t_event->author_id == $t_logged_in_user_id ) {
     access_ensure_event_level( plugin_config_get( 'member_event_threshold' ), $f_event_id );
 } else {
     access_ensure_event_level( plugin_config_get( 'member_delete_others_event_threshold' ), $f_event_id );
 }
 
 if( count( event_get_members( $f_event_id ) ) <= 1 ) {
-    trigger_error( 'ERROR_MIN_MEMBERS', ERROR );
+	plugin_error( 'ERROR_MIN_MEMBERS' );
 }
 
 event_member_delete( $f_event_id, $t_user_id );

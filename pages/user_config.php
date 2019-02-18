@@ -19,7 +19,7 @@ form_security_validate( 'calendar_user_config_edit' );
 
 $t_current_user_id = auth_get_current_user_id();
 
-$t_days_week_config = plugin_config_get( 'arWeekdaysName', plugin_config_get( 'arWeekdaysName' ), $p_global, $t_current_user_id );
+$t_days_week_config = plugin_config_get( 'arWeekdaysName', plugin_config_get( 'arWeekdaysName' ), FALSE, $t_current_user_id );
 $f_days_week_cheked = gpc_get_string_array( 'days_week' );
 
 $f_time_start  = gpc_get_int( 'time_day_start' );
@@ -37,7 +37,7 @@ foreach( $t_days_week_config as $t_name_day => $t_status ) {
 
 if( $f_time_start >= $f_time_finish ) {
     error_parameters( plugin_lang_get( 'date_event' ) );
-    trigger_error( ERROR_RANGE_TIME, ERROR );
+    plugin_error( 'ERROR_RANGE_TIME', ERROR );
 }
 
 

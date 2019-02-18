@@ -80,13 +80,5 @@ function access_has_event_level( $p_access_level, $p_event_id, $p_user_id = null
 		}
 	}
 
-	# If the bug is private and the user is not the reporter, then
-	# they must also have higher access than private_bug_threshold
-	if( !$t_event_is_user_reporter && event_get_field( $p_event_id, 'view_state' ) == VS_PRIVATE ) {
-		$t_private_bug_threshold = config_get( 'private_bug_threshold', null, $p_user_id, $t_project_id );
-		return access_compare_level( $t_access_level, $t_private_bug_threshold )
-			&& access_compare_level( $t_access_level, $p_access_level );
-	}
-
 	return access_compare_level( $t_access_level, $p_access_level );
 }

@@ -17,9 +17,9 @@
 $f_event_id = gpc_get_int( 'event_id' );
 $f_date     = gpc_get_int( 'date' );
 
-access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
-
 event_ensure_exists( $f_event_id );
+
+access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 $t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
 
@@ -43,7 +43,7 @@ if( $t_event->project_id != $t_current_project ) {
     $g_project_override = $t_event->project_id;
 }
 
-$t_bugs_id = event_get_bugs_id( $f_event_id );
+$t_bugs_id = event_get_attached_bugs_id( $f_event_id );
 
 layout_page_header();
 
@@ -146,13 +146,14 @@ layout_page_begin();
                                     <td>
                                         <?php
                                         $t_rrule_string    = event_get_field( $t_event->id, 'recurrence_pattern' );
+                                        $t_rule = array();
                                         if( !is_blank( $t_rrule_string ) ) {
                                             $t_rset   = new \RRule\RSet( $t_rrule_string );
                                             $t_rrules = $t_rset->getRRules();
                                             $t_rule   = $t_rrules[0]->getRule();
                                         }
 
-                                        if( $t_rule['INTERVAL'] ) {
+                                        if( array_key_exists('INTERVAL', $t_rule) ) {
                                             ?>
                                             <input style="width: 50px;" type="number" id="interval_value" name="interval_value" min="1" value="<?php echo $t_rule['INTERVAL'] ?>" step="1"/>
                                         <?php } else { ?>
@@ -166,7 +167,7 @@ layout_page_begin();
 
 
                                             foreach( $t_frequency_list as $key => $t_type_freq ) {
-                                                if( $t_rule['FREQ'] == $t_type_freq ) {
+                                                if( array_key_exists('FREQ', $t_rule) && $t_rule['FREQ'] == $t_type_freq ) {
                                                     ?>
                                                     <option selected="selected" value="<?php echo $t_type_freq; ?>"><?php echo plugin_lang_get( $t_type_freq ) ?></option>
                                                     <?php
@@ -183,7 +184,7 @@ layout_page_begin();
                                         <label for="event_is_repeated"><?php echo plugin_lang_get( 'ending_repetition' ) ?></label>
 
                                         <?php
-                                        if( $t_rule['UNTIL'] ) {
+                                        if( array_key_exists( 'UNTIL', $t_rule ) ) {
                                             $t_time_until = $t_rule['UNTIL']->format( config_get( 'short_date_format' ) );
                                         } else {
                                             $t_time_until = plugin_lang_get( 'never_ending_repetition' );

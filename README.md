@@ -10,6 +10,7 @@ Screenshots
 ![alt text](doc/view_event_layers_in_bug_view.png)
 ![alt text](doc/add_event_view.png)
 ![alt text](doc/plugin_config_view.png)
+![alt text](doc/workflow_thresholds_page.png)
 
 Features
 --------
@@ -24,7 +25,7 @@ Features
 Download
 --------
 Please download the stable version.
-(https://github.com/brlumen/Calendar/releases)
+(https://github.com/mantisbt-plugins/Calendar/releases/latest)
 
 
 How to install

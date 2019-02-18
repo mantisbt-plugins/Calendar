@@ -24,6 +24,7 @@ $f_date      = gpc_get_int( 'date' );
 event_ensure_exists( $f_event_id );
 
 foreach( $f_usernames as $t_user_id ) {
+    access_ensure_event_level(plugin_config_get( 'member_event_threshold' ), $f_event_id, $t_user_id );
     event_member_add( $f_event_id, $t_user_id );
 }
 
