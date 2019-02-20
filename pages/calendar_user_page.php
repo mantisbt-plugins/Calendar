@@ -39,133 +39,14 @@ compress_enable();
 html_robots_noindex();
 
 
-$f_week        = gpc_get_int( "week", date( "W" ) );
-$f_is_fulltime = gpc_get_bool( "full_time" );
-$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
-$t_access_level_current_user = access_get_project_level();
+$f_week                             = gpc_get_int( "week", date( "W" ) );
+$f_is_fulltime                      = gpc_get_bool( "full_time" );
+$f_for_user                         = gpc_get_int( "for_user", auth_get_current_user_id() );
+$t_access_level_current_user        = access_get_project_level();
 $t_access_level_global_current_user = access_get_global_level();
-?>
 
-<div class="col-md-12 col-xs-12">
-    <div class="space-10"></div>
-    <div class="widget-box widget-color-blue2">
-        <div class="widget-header widget-header-small">
-            <h4 class="widget-title lighter">
-                <i class="ace-icon fa fa-list-alt"></i>
-                <?php echo plugin_lang_get( 'menu_main_front' ) . " ( GMT " . date( "P" ) . " )"; ?>
-            </h4>
-            <?php if( access_compare_level( $t_access_level_global_current_user, plugin_config_get( 'manage_calendar_threshold' ) ) ) { ?>
-                <div class="widget-toolbar no-border">
-                    <div class="widget-menu">
-                        <?php print_small_button( plugin_page( 'user_config_page' ), plugin_lang_get( 'config_title' ) ); ?>
-                    </div>
-                </div>
-            <?php } ?>
-    
-        </div>
+$t_calendar_week = new ViewWeek( $f_week, $f_for_user, $f_is_fulltime );
 
-        <div class="widget-body">
+$t_calendar_week->print_html();
 
-            <div class="widget-toolbox padding-8 clearfix">
-                <div class="btn-toolbar">
-                    <div class="btn-group pull-left">
-                        <?php
-                        if( $f_is_fulltime == FALSE ) {
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . $f_week . "&full_time=TRUE", "0-24" );
-                        } else {
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . $f_week, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
-                        }
-                        ?>
-                    </div>
-
-                    <div class="btn-group pull-right">
-                        <?php
-                        if( $f_is_fulltime == FALSE ) {
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week - 1), plugin_lang_get( 'previous_period' ) );
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . (int) date( "W" ), plugin_lang_get( 'week' ) );
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week + 1), plugin_lang_get( 'next_period' ) );
-                        } else {
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week - 1) . "&full_time=TRUE", plugin_lang_get( 'previous_period' ) );
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . (int) date( "W" ) . "&full_time=TRUE", plugin_lang_get( 'week' ) );
-                            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $f_for_user . "&week=" . ($f_week + 1) . "&full_time=TRUE", plugin_lang_get( 'next_period' ) );
-                        }
-                        ?>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="widget-main no-padding">
-                <div class="table-responsive" style="overflow-y: hidden;">
-                    <!--<div class="table-responsive">-->
-                    <table class="calendar-user week">
-                        <tr class="row-day">
-                            <?php
-                            print_column_time( $f_is_fulltime );
-
-                            $p_project_id = helper_get_current_project();
-
-                            $t_start_day_of_the_week = plugin_config_get( "startStepDays" );
-                            $t_step_days_count       = plugin_config_get( "countStepDays" );
-                            $t_arWeekdaysName        = plugin_config_get( "arWeekdaysName" );
-
-                            $t_days = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week );
-
-                            $t_days_times_events = get_events_id_inside_days( $t_days, $p_project_id, $f_for_user );
-
-                            foreach( $t_days_times_events as $t_day_and_events => $t_events_id ) {
-//                                print_column_this_day( $t_day_and_events, $t_events_id, count( $t_days_and_events ), $f_full_time );
-                                $t_day_events                    = array();
-                                $t_day_events[$t_day_and_events] = $t_events_id;
-                                print_column_this_day( $t_day_events, count( $t_days_times_events ), $f_is_fulltime );
-                            }
-                            ?>
-                    </table>
-                </div>
-            </div>
-            <?php
-
-            if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'report_event_threshold' ) ) ) {
-                ?>
-                <div class="widget-toolbox padding-8 clearfix">
-                    <div class="form-inline pull-left">
-                        <?php
-                        if( $f_is_fulltime == TRUE ) {
-                            print_small_button( plugin_page( 'event_add_page' ) . "&full_time=TRUE", plugin_lang_get( 'add_new_event' ) );
-                        } else {
-                            print_small_button( plugin_page( 'event_add_page' ), plugin_lang_get( 'add_new_event' ) );
-                        }
-                        ?>
-                    </div>
-                    <div class="form-inline pull-right">
-                        <form id="filter-queries-form" class="form-inline pull-left padding-left-8"  method="get" name="list_queries" action="<?php echo plugin_page( 'calendar_user_page' ); ?>">
-                            <?php # CSRF protection not required here - form does not result in modifications?>
-                            <input type="hidden" name="page" value="Calendar/calendar_user_page" />
-                            <input type="hidden" name="week" value="<?php echo $f_week; ?>" />
-                            <input type="hidden" name="full_time" value="<?php echo $f_is_fulltime == TRUE ? '1' : '0'; ?>" />
-
-
-                            <label class="inline"><?php echo plugin_lang_get( 'filter_text' ); ?></label>
-                            <select name="for_user">
-                                <option value="<?php echo auth_get_current_user_id(); ?>"><?php echo '[' . lang_get( 'reset_query' ) . ']' ?></option>
-                                <?php if( $f_for_user == 0 ) { ?>
-                                    <option selected="selected" value="0"><?php echo '[' . plugin_lang_get( 'select_all_users' ) . ']' ?></option>
-                                <?php } else { ?>
-                                    <option value="0"><?php echo '[' . plugin_lang_get( 'select_all_users' ) . ']' ?></option>
-                                <?php } ?>
-                                <?php
-                                print_user_option_list( $f_for_user, $p_project_id, plugin_config_get( 'report_event_threshold' ) );
-                                ?>
-                            </select>
-                        </form>
-                    </div>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-    </div>
-</div>
-
-<?php
 layout_page_end();

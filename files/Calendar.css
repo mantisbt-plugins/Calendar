@@ -36,6 +36,7 @@
     padding: 0;
     /*width: calc(10px);*/
     height: 140px;
+    position: relative;
 }
 
 td.column-time-td{
@@ -59,6 +60,8 @@ ul.column-header-day{
     margin: 0;
     font-weight: bold;
     text-align: center;
+    /*z-index: 9999;*/
+    position: relative;
 }
 
 ul.hour{
@@ -71,8 +74,8 @@ ul.hour{
 
 ul.hour li{
     /*background: #fff;*/
-    height: 20px;
-    line-height: 22px;
+    height: 19.5px;
+    /*line-height: 22px;*/
     text-align: center;
     font-weight: bold;
     color: #80808B;
@@ -83,7 +86,8 @@ ul.hour li{
     color: #80808B;
 }*/
 ul.hour li:last-child{
-    border-bottom: none;
+    border-top: 1px solid #F1EFDE;
+    border-top-style: dashed;
 }
 
 .hour.last-row,
@@ -94,7 +98,13 @@ ul.hour li:last-child{
 }
 
 
-.hour .event_week_expired{
+/*.hour .event_week_expired:hover{
+    background: #daec98;
+    box-shadow: 0 0 6px rgb(132, 148, 65);
+    z-index: 999999 !important;
+}*/
+
+/*a#event_week .event_week{
     overflow: hidden;
     position: absolute;
     left: -1px;
@@ -106,15 +116,14 @@ ul.hour li:last-child{
     font-size: 12px;
     background: rgba(232, 232, 226, 0.82);
     box-shadow: 0 0 4px #90A53B;
-}
-
-.hour .event_week_expired:hover{
+}*/
+/*.hour .event_week:hover{
     background: #daec98;
     box-shadow: 0 0 6px rgb(132, 148, 65);
     z-index: 999999 !important;
-}
+}*/
 
-.hour .event_week{
+a#event_week{
     overflow: hidden;
     position: absolute;
     left: -1px;
@@ -125,21 +134,43 @@ ul.hour li:last-child{
     border: 1px solid rgb(206, 230, 105);
     border-radius: 2px;
     font-size: 12px;
-    background: rgba(215, 232, 143, 0.82);
+    background: rgba(215, 232, 143, 1);
     box-shadow: 0 0 4px #90A53B;
-    /*margin-right: auto;*/
+    /*text*/
+    text-decoration: none;
+    color: #535c69;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-top: 1px;
 }
-.hour .event_week:hover{
-    background: #daec98;
-    box-shadow: 0 0 6px rgb(132, 148, 65);
+a#event_week:hover{
     z-index: 999999 !important;
 }
 
-a#event_week{
+a#event_week_expired{
+    overflow: hidden;
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid rgb(206, 230, 105);
+    border-radius: 2px;
+    font-size: 12px;
+    background: rgba(232, 232, 226, 1);
+    box-shadow: 0 0 4px #90A53B;
+    /*text*/
+    text-align: left;
     text-decoration: none;
     color: #535c69;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-top: 1px;
 }
 
+a#event_week_expired:hover{
+    z-index: 999999 !important;
+}
 
 .tasks-list{
     /*padding: 0 5px 0 0;*/
