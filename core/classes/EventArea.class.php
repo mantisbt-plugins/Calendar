@@ -24,6 +24,14 @@ class EventArea {
         $this->total_event_in_group    = $p_total_event_in_group;
         $this->current_number_in_group = $p_current_number_in_group;
     }
+    
+    protected function get_page_link() {
+        $t_result = '';
+        
+        $t_result .= plugin_page( 'view' );
+        
+        return $t_result;
+    }
 
     public function html() {
         $t_result = '';
@@ -52,7 +60,7 @@ class EventArea {
 
         $t_id = $this->is_in_past ? 'event_week_expired' : 'event_week';
 
-        $t_result .= '<a href=' . plugin_page( 'view' )
+        $t_result .= '<a href=' . $this->get_page_link()
                 . '&event_id=' . $this->event['id']
                 . '&date=' . $this->event['date_from']
                 . ' id="' . $t_id . '"'

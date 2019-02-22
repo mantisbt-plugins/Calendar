@@ -13,6 +13,7 @@
 class ViewWeek extends Calendar {
     private $week;
     private $for_user;
+    protected $day_colums = array();
 
     //put your code here
     public function __construct( $p_week, $p_user, $p_is_full_time ) {
@@ -78,6 +79,26 @@ class ViewWeek extends Calendar {
         }
         echo '</div>';
 
+        echo '</div>';
+        echo '</div>';
+    }
+
+    protected function print_body() {
+        $t_css_collapsed = count( $this->day_colums ) == 0 ? 'style="display: none"' : '';
+        echo '<div class="widget-main no-padding"' . $t_css_collapsed . '>';
+        echo '<div class="table-responsive" style="overflow-y: hidden;">';
+        echo '<table class="calendar-user week">';
+        echo '<tr class="row-day">';
+
+        $t_time_column = new TimeColumn();
+        echo $t_time_column->html();
+
+        foreach( $this->day_colums as $t_column ) {
+            echo $t_column->html();
+        }
+
+        echo '</tr>';
+        echo '</table>';
         echo '</div>';
         echo '</div>';
     }

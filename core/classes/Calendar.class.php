@@ -12,7 +12,10 @@
  */
 abstract class Calendar {
     static public $full_time_is = false;
-    protected $day_colums       = array();
+
+    protected function print_spacer() {
+        echo '';
+    }
 
     abstract protected function print_headline();
 
@@ -20,28 +23,7 @@ abstract class Calendar {
         echo '';
     }
 
-    protected function print_spacer() {
-        echo '';
-    }
-
-    private function print_columns() {
-        echo '<div class="widget-main no-padding">';
-        echo '<div class="table-responsive" style="overflow-y: hidden;">';
-        echo '<table class="calendar-user week">';
-        echo '<tr class="row-day">';
-
-        $t_time_column = new TimeColumn();
-        echo $t_time_column->html();
-
-        foreach( $this->day_colums as $t_column ) {
-            echo $t_column->html();
-        }
-
-        echo '</tr>';
-        echo '</table>';
-        echo '</div>';
-        echo '</div>';
-    }
+    abstract protected function print_body();
 
     protected function print_menu_bottom() {
         echo '';
@@ -52,16 +34,14 @@ abstract class Calendar {
         echo '<div class="col-md-12 col-xs-12">';
         $this->print_spacer();
 
-
-        $t_css_collapsed = count( $this->day_colums ) == 0 ? ' collapsed' : '';
-        echo '<div class="widget-box widget-color-blue2' . $t_css_collapsed . '">';
+        echo '<div class="widget-box widget-color-blue2">';
 
         echo $this->print_headline();
 
         echo '<div class="widget-body">';
 
         $this->print_menu_top();
-        $this->print_columns();
+        $this->print_body();
         $this->print_menu_bottom();
 
         echo '</div>';

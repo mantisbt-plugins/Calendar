@@ -322,7 +322,6 @@ function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS 
                         $t_time_event_start = (int)$t_event_row['date_from'];
                         $t_rrule_raw        = $t_event_row['recurrence_pattern'];
                         if( $t_time_event_start < $t_day || $t_rrule_raw != NULL ) {
-//                            $t_rrule_raw       = event_get_field( $t_row['id'], 'recurrence_pattern' );
                             $t_recurrenci_rule = RRule\RRule::createFromRfcString( $t_rrule_raw );
                             $t_is              = $t_recurrenci_rule->getOccurrencesBetween( $t_time_start_day, $t_time_finish_day );
                             if( $t_is != NULL ) {

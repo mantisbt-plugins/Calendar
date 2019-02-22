@@ -10,7 +10,7 @@
  *
  * @author ermolaev
  */
-class ViewIssue extends Calendar {
+class ViewIssue extends ViewWeek {
     private $bug_id;
 
     //put your code here
@@ -25,7 +25,6 @@ class ViewIssue extends Calendar {
     protected function print_spacer() {
         echo '';
     }
-
     
     protected function print_headline() {
         echo '<div class="widget-header widget-header-small">';
@@ -41,15 +40,23 @@ class ViewIssue extends Calendar {
         echo '</h4>';
         echo '</div>';
     }
+    
+    protected function print_menu_top() {
+        echo '';
+    }
 
     protected function print_menu_bottom() {
         if( access_compare_level( access_get_project_level(), plugin_config_get( 'report_event_threshold' ) ) && !bug_is_readonly( $this->bug_id ) ) {
             echo '<div class="widget-toolbox padding-8 clearfix">';
-            echo '<div class="form-inline pull-left">';
-//                                print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'insert_event' ) );
-            print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $this->bug_id, plugin_lang_get( 'add_new_event' ) );
 
+            echo '<div class="form-inline pull-left padding-2">';
+            print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $this->bug_id, plugin_lang_get( 'insert_event' ) );
             echo '</div>';
+            
+            echo '<div class="form-inline pull-left padding-2">';
+            print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $this->bug_id, plugin_lang_get( 'add_new_event' ) );
+            echo '</div>';
+            
             echo '</div>';
         }
     }

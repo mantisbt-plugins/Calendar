@@ -60,7 +60,6 @@ class DayColumn extends Column {
     protected function html_body() {
         $t_result = '';
 
-
         foreach( $this->events_area_group as $t_events_area ) {
             foreach( $t_events_area as $t_event_area ) {
                 $t_result .= $t_event_area->html();

@@ -138,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.4.8';
+        $this->version = '2.5.0-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -297,12 +297,12 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_google_api.php';
         require_once 'core/calendar_menu_api.php';
         require_once 'core/classes/Calendar.class.php';
+        require_once 'core/classes/ViewWeek.class.php';
+        require_once 'core/classes/ViewIssue.class.php';
         require_once 'core/classes/Column.class.php';
         require_once 'core/classes/TimeColumn.class.php';
         require_once 'core/classes/DayColumn.class.php';
         require_once 'core/classes/EventArea.class.php';
-        require_once 'core/classes/ViewIssue.class.php';
-        require_once 'core/classes/ViewWeek.class.php';
     }
 
     function errors() {
@@ -349,10 +349,8 @@ class CalendarPlugin extends MantisPlugin {
             $t_calendar_issue_view = new ViewIssue( $p_bug_id );
             $t_calendar_issue_view->print_html();
 
-           
             echo '</td>';
             echo '</tr>';
-            
         }
     }
 
