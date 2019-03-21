@@ -14,7 +14,7 @@ class ViewWeekSelect extends ViewWeekCalendar {
     private $bug_id;
 
     public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_bug_id ) {
-        parent::__construct( $p_week, $p_user, $p_is_full_time, $p_days_events, plugin_page( 'event_insert' ) . '&bug_id=' . $p_bug_id );
+        parent::__construct( $p_week, $p_user, $p_is_full_time, $p_days_events, plugin_page( 'event_insert' ) . '&bug_id=' . $p_bug_id . htmlspecialchars( form_security_param( 'event_insert' ) ) );
         $this->bug_id = (int)$p_bug_id;
     }
 

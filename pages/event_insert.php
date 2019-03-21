@@ -16,7 +16,7 @@
 
 access_ensure_global_level( plugin_config_get( 'update_event_threshold' ) );
 
-//form_security_validate( 'event_update' );
+form_security_validate( 'event_insert' );
 
 $f_event_id = gpc_get_int( 'event_id' );
 $f_date     = gpc_get_int( 'date' );
@@ -158,6 +158,6 @@ layout_page_begin( plugin_page( 'event_insert_page' ) );
 
 print_successful_redirect_to_bug( $f_bug );
 
-//form_security_purge( 'event_update' );
+form_security_purge( 'event_insert' );
 
 layout_page_end();
