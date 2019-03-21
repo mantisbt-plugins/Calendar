@@ -8,7 +8,6 @@
 # Calendar plugin for for MantisBT is distributed in the hope 
 # that it will be useful, but WITHOUT ANY WARRANTY; without even the 
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -85,7 +84,7 @@ $s_plugin_Calendar_event_hystory_bug_detach = '从事件中删除';
 $s_plugin_Calendar_event_hystory_create = '加入此事件中';
 $s_plugin_Calendar_add_new_event = '添加新事件';
 $s_plugin_Calendar_enter_report_details_title = '填写事件资料';
-$s_plugin_Calendar_insert_event = '加入已存在事件中';
+$s_plugin_Calendar_insert_event = '添加到活动';
 $s_plugin_Calendar_delete_event_sure_msg = '是否确认删除此事件?';
 $s_plugin_Calendar_delete_event_button = '删除';
 $s_plugin_Calendar_not_update = '未更新';
