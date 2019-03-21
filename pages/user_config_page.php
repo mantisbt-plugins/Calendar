@@ -93,7 +93,37 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                         </select>
                                     </td>
                                 </tr>
+                                
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_step_day_minutes_count' ) ?>
+                                    </td>
 
+                                    <td class="center" width="25%" colspan="2">
+                                        <input style="width: 50px;" type="number" id="step_day_minutes_count" name="step_day_minutes_count" min="1" max="6" value="<?php echo plugin_config_get( 'stepDayMinutesCount' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+                                
+                                 <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_start_step_days' ) ?>
+                                    </td>
+
+                                    <td class="center" width="25%" colspan="2">
+                                        <input style="width: 50px;" type="number" id="start_step_days" name="start_step_days" min="0" value="<?php echo plugin_config_get( 'startStepDays' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_count_step_days' ) ?>
+                                    </td>
+
+                                    <td class="center" width="25%" colspan="2">
+                                        <input style="width: 50px;" type="number" id="count_step_days" name="count_step_days" min="1" value="<?php echo plugin_config_get( 'countStepDays' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+                                
                                 <?php if( plugin_config_get( 'google_client_secret' ) ) { ?>
                                     <tr>
                                         <td class="category" width="50%">

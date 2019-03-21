@@ -237,48 +237,50 @@ class CalendarPlugin extends MantisPlugin {
     function config() {
         return array( //Default settings. Some of the settings are available for override via the plugin configuration page.
                                   //Time settings
-                                  'datetime_picker_format'               => 'DD-MM-Y',
-                                  'short_date_format'                    => 'd-m-Y',
-                                  'event_time_start_stop_picker_format'  => 'HH:mm',
-                                  'startStepDays'                        => 0,
+                                  'datetime_picker_format'                              => 'DD-MM-Y',
+                                  'short_date_format'                                   => 'd-m-Y',
+                                  'event_time_start_stop_picker_format'                 => 'HH:mm',
+                                  'startStepDays'                                       => 0,
 //                                  'startStepDays'                        => date( 'w' )-1,
-                                  'countStepDays'                        => 7,
-                                  'show_count_future_recurring_events_in_bug_view_page'   => 1,
-                                  'arWeekdaysName'                       => array(
-                                                            'Mon' => ON,
-                                                            'Tue' => ON,
-                                                            'Wed' => ON,
-                                                            'Thu' => ON,
-                                                            'Fri' => ON,
-                                                            'Sat' => ON,
-                                                            'Sun' => ON ),
-                                  'time_day_start'                       => 32400,
-                                  'time_day_finish'                      => 64800,
-                                  'stepDayMinutesCount'                  => 2,
-                                  'frequencies'                          => array(
-                                                            'NO_REPEAT',
-                                                            'DAILY',
-                                                            'WEEKLY',
-                                                            'MONTHLY',
-                                                            'YEARLY' ),
+                                  'countStepDays'                                       => 7,
+                                  'show_count_future_recurring_events_in_bug_view_page' => 1,
+                                  'arWeekdaysName'                                      => array(
+                                                                                            'Mon' => ON,
+                                                                                            'Tue' => ON,
+                                                                                            'Wed' => ON,
+                                                                                            'Thu' => ON,
+                                                                                            'Fri' => ON,
+                                                                                            'Sat' => ON,
+                                                                                            'Sun' => ON 
+                                                                                            ),
+                                  'time_day_start'                                      => 32400,
+                                  'time_day_finish'                                     => 64800,
+                                  'stepDayMinutesCount'                                 => 2,
+                                  'frequencies'                                         => array(
+                                                                                            'NO_REPEAT',
+                                                                                            'DAILY',
+                                                                                            'WEEKLY',
+                                                                                            'MONTHLY',
+                                                                                            'YEARLY'
+                                                                                            ),
                                   //Calendar access rights.
-                                  'manage_calendar_threshold'            => DEVELOPER,
-                                  'calendar_view_threshold'              => DEVELOPER,
-                                  'bug_calendar_view_threshold'          => REPORTER,
+                                  'manage_calendar_threshold'                           => DEVELOPER,
+                                  'calendar_view_threshold'                             => DEVELOPER,
+                                  'bug_calendar_view_threshold'                         => REPORTER,
 //                                  'calendar_edit_threshold'              => DEVELOPER,
                                   //Event access rights.
-                                  'view_event_threshold'                 => REPORTER,
-                                  'report_event_threshold'               => DEVELOPER,
-                                  'update_event_threshold'               => DEVELOPER,
+                                  'view_event_threshold'                                => REPORTER,
+                                  'report_event_threshold'                              => DEVELOPER,
+                                  'update_event_threshold'                              => DEVELOPER,
                                   //Member event access rights. 
-                                  'show_member_list_threshold'           => REPORTER,
-                                  'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
-                                  'member_add_others_event_threshold'    => DEVELOPER,
-                                  'member_delete_others_event_threshold' => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
+                                  'show_member_list_threshold'                          => REPORTER,
+                                  'member_event_threshold'                              => DEVELOPER, //The level of access necessary to become a member of the event.
+                                  'member_add_others_event_threshold'                   => DEVELOPER,
+                                  'member_delete_others_event_threshold'                => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
                                   //Google settings
-                                  'oauth_key'                            => array(),
-                                  'google_calendar_sync_id'              => '',
-                                  'google_client_secret'                 => '',
+                                  'oauth_key'                                           => array(),
+                                  'google_calendar_sync_id'                             => '',
+                                  'google_client_secret'                                => '',
         );
     }
 
