@@ -306,7 +306,6 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/classes/TimeColumn.class.php';
         require_once 'core/classes/DayColumn.class.php';
         require_once 'core/classes/EventArea.class.php';
-        require_once 'core/classes/ServiceLocator.php';
 
         global $g_calendar_show_menu_bottom;
         $g_calendar_show_menu_bottom = TRUE;
