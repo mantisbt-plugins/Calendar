@@ -68,7 +68,8 @@ $t_force_readonly            = true;
 $t_fields_config_option      = 'bug_change_status_page_fields';
 global $g_calendar_show_menu_bottom;
 $g_calendar_show_menu_bottom = FALSE;
-
+$t_file = __FILE__;
+$t_mantis_dir = __DIR__ . '/../../../';
 
 define( 'BUG_VIEW_INC_ALLOW', true );
 include( __DIR__ . '/../../../bug_view_inc.php' );
