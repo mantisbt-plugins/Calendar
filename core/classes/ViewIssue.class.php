@@ -10,22 +10,21 @@
  *
  * @author ermolaev
  */
-class ViewIssue extends ViewWeek {
+class ViewIssue extends WeekCalendar {
     private $bug_id;
 
     //put your code here
 
-    public function __construct( $p_bug_id ) {
-        $this->bug_id  = $p_bug_id;
-        
-        $t_events_id   = get_events_id_from_bug_id( $p_bug_id );
-        $this->day_colums = calendar_column_objects_get_from_event_ids( $t_events_id );
+    public function __construct( $p_days_events, $p_bug_id ) {
+        parent::__construct($p_days_events, plugin_page( 'view' ));
+        $this->bug_id       = $p_bug_id;
+
     }
 
-    protected function print_spacer() {
+    protected function print_spacer_top() {
         echo '';
     }
-    
+
     protected function print_headline() {
         echo '<div class="widget-header widget-header-small">';
         echo '<h4 class="widget-title lighter">';
@@ -40,7 +39,7 @@ class ViewIssue extends ViewWeek {
         echo '</h4>';
         echo '</div>';
     }
-    
+
     protected function print_menu_top() {
         echo '';
     }
@@ -50,14 +49,15 @@ class ViewIssue extends ViewWeek {
             echo '<div class="widget-toolbox padding-8 clearfix">';
 
             echo '<div class="form-inline pull-left padding-2">';
-            print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $this->bug_id, plugin_lang_get( 'insert_event' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&id=" . $this->bug_id, plugin_lang_get( 'insert_event' ) );
             echo '</div>';
-            
-            echo '<div class="form-inline pull-left padding-2">';
-            print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $this->bug_id, plugin_lang_get( 'add_new_event' ) );
-            echo '</div>';
-            
+
+//            echo '<div class="form-inline pull-left padding-2">';
+//            print_small_button( plugin_page( 'event_add_page' ) . "&id=" . $this->bug_id, plugin_lang_get( 'add_new_event' ) );
+//            echo '</div>';
+
             echo '</div>';
         }
     }
+
 }

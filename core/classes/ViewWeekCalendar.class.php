@@ -10,27 +10,19 @@
  *
  * @author ermolaev
  */
-class ViewWeek extends Calendar {
-    private $week;
-    private $for_user;
-    protected $day_colums = array();
+class ViewWeekCalendar extends WeekCalendar {
+    protected $week;
+    protected $for_user;
 
     //put your code here
-    public function __construct( $p_week, $p_user, $p_is_full_time ) {
+    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_link_options ) {
+        parent::__construct($p_days_events, $p_link_options, $p_is_full_time);
+
         $this->week         = $p_week;
         $this->for_user     = (int)$p_user;
-        self::$full_time_is = (bool)$p_is_full_time;
-
-        $t_start_day_of_the_week = plugin_config_get( "startStepDays" );
-        $t_step_days_count       = plugin_config_get( "countStepDays" );
-        $t_arWeekdaysName        = plugin_config_get( "arWeekdaysName" );
-
-        $t_days = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $this->week );
-
-        $this->day_colums = get_days_object( $t_days, helper_get_current_project(), $this->for_user );
     }
 
-    protected function print_spacer() {
+    protected function print_spacer_top() {
         echo '<div class="space-10">';
         echo '</div>';
     }
@@ -60,7 +52,7 @@ class ViewWeek extends Calendar {
         echo '<div class="btn-toolbar">';
 
         echo '<div class="btn-group pull-left">';
-        if( Calendar::$full_time_is == FALSE ) {
+        if( self::$full_time_is == FALSE ) {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&full_time=TRUE", "0-24" );
         } else {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
@@ -68,7 +60,7 @@ class ViewWeek extends Calendar {
         echo '</div>';
 
         echo '<div class="btn-group pull-right">';
-        if( Calendar::$full_time_is == FALSE ) {
+        if( self::$full_time_is == FALSE ) {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week - 1), plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ), plugin_lang_get( 'week' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week + 1), plugin_lang_get( 'next_period' ) );
@@ -79,26 +71,6 @@ class ViewWeek extends Calendar {
         }
         echo '</div>';
 
-        echo '</div>';
-        echo '</div>';
-    }
-
-    protected function print_body() {
-        $t_css_collapsed = count( $this->day_colums ) == 0 ? 'style="display: none"' : '';
-        echo '<div class="widget-main no-padding"' . $t_css_collapsed . '>';
-        echo '<div class="table-responsive" style="overflow-y: hidden;">';
-        echo '<table class="calendar-user week">';
-        echo '<tr class="row-day">';
-
-        $t_time_column = new TimeColumn();
-        echo $t_time_column->html();
-
-        foreach( $this->day_colums as $t_column ) {
-            echo $t_column->html();
-        }
-
-        echo '</tr>';
-        echo '</table>';
         echo '</div>';
         echo '</div>';
     }

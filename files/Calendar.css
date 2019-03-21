@@ -132,7 +132,7 @@ a#event_week{
     box-sizing: border-box;
     /*cursor: pointer;*/
     border: 1px solid rgb(206, 230, 105);
-    border-radius: 2px;
+    border-radius: 6px;
     font-size: 12px;
     background: rgba(215, 232, 143, 1);
     box-shadow: 0 0 4px #90A53B;
@@ -155,7 +155,7 @@ a#event_week_expired{
     box-sizing: border-box;
     cursor: pointer;
     border: 1px solid rgb(206, 230, 105);
-    border-radius: 2px;
+    border-radius: 6px;
     font-size: 12px;
     background: rgba(232, 232, 226, 1);
     box-shadow: 0 0 4px #90A53B;

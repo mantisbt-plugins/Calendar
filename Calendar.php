@@ -241,7 +241,9 @@ class CalendarPlugin extends MantisPlugin {
                                   'short_date_format'                    => 'd-m-Y',
                                   'event_time_start_stop_picker_format'  => 'HH:mm',
                                   'startStepDays'                        => 0,
+//                                  'startStepDays'                        => date( 'w' )-1,
                                   'countStepDays'                        => 7,
+                                  'show_count_future_recurring_events_in_bug_view_page'   => 1,
                                   'arWeekdaysName'                       => array(
                                                             'Mon' => ON,
                                                             'Tue' => ON,
@@ -296,13 +298,18 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
         require_once 'core/calendar_menu_api.php';
-        require_once 'core/classes/Calendar.class.php';
-        require_once 'core/classes/ViewWeek.class.php';
+        require_once 'core/classes/WeekCalendar.class.php';
+        require_once 'core/classes/ViewWeekCalendar.class.php';
         require_once 'core/classes/ViewIssue.class.php';
-        require_once 'core/classes/Column.class.php';
+        require_once 'core/classes/ViewWeekSelect.class.php';
+        require_once 'core/classes/ColumnForm.class.php';
         require_once 'core/classes/TimeColumn.class.php';
         require_once 'core/classes/DayColumn.class.php';
         require_once 'core/classes/EventArea.class.php';
+        require_once 'core/classes/ServiceLocator.php';
+
+        global $g_calendar_show_menu_bottom;
+        $g_calendar_show_menu_bottom = TRUE;
     }
 
     function errors() {
@@ -346,7 +353,10 @@ class CalendarPlugin extends MantisPlugin {
             echo '<tr class=calendar-area align="center">';
             echo '<td class=calendar-area-in-bugs align="center" colspan="6">';
 
-            $t_calendar_issue_view = new ViewIssue( $p_bug_id );
+            $t_events_id = get_events_id_from_bug_id( $p_bug_id );
+            $t_dates     = calendar_column_objects_get_from_event_ids( $t_events_id );
+
+            $t_calendar_issue_view = new ViewIssue( $t_dates, $p_bug_id );
             $t_calendar_issue_view->print_html();
 
             echo '</td>';

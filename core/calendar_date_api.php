@@ -84,6 +84,7 @@ function get_dates_event_from_events_id( $p_events_id ) {
     ksort( $t_dates );
     return $t_dates;
 }
+
 function calendar_column_objects_get_from_event_ids( $p_events_id ) {
 
     $t_dates = array();
@@ -98,7 +99,7 @@ function calendar_column_objects_get_from_event_ids( $p_events_id ) {
         if( event_get_field( $t_event_id, 'recurrence_pattern' ) != '' ) {
             $t_rset          = new RRule\RSet( event_get_field( $t_event_id, 'recurrence_pattern' ) );
             $t_previous_days = $t_rset->getOccurrencesBetween( (int) event_get_field( $t_event_id, 'date_from' ), strtotime( 'tomorrow' ) );
-            $t_next_days     = $t_rset->getOccurrencesBetween( strtotime( 'tomorrow' ), (int) event_get_field( $t_event_id, 'date_to' ), 1 );
+            $t_next_days     = $t_rset->getOccurrencesBetween( strtotime( 'tomorrow' ), (int) event_get_field( $t_event_id, 'date_to' ), plugin_config_get( 'show_count_future_recurring_events_in_bug_view_page' ) );
             foreach( $t_previous_days as $t_previous_day ) {
                 $t_time_start_day                                              = strtotime( date( "j.n.Y", $t_previous_day->getTimestamp() ) );
 //                $t_dates[$t_time_start_day][$t_previous_day->getTimestamp()][] = $t_event_id;
@@ -133,12 +134,8 @@ function calendar_column_objects_get_from_event_ids( $p_events_id ) {
     }
     
     ksort( $t_dates );
-    
-    foreach( $t_dates as $date => $t_events_row ) {
-        $t_day_objects[] = new DayColumn( $date, $t_events_row );
-    }
 
-    return $t_day_objects;
+    return $t_dates;
 }
 
 function group_events_by_time( $p_events_id ) {
@@ -264,7 +261,7 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
     return false;
 }
 
-function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS ) {
+function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS, $p_excluded_events = array() ) {
 
     $t_table_calendar_events = plugin_table( 'events' );
     $t_table_calendar_members = plugin_table( 'event_member' );
@@ -317,7 +314,7 @@ function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS 
 
                     $t_access_show_current_user = access_has_event_level( plugin_config_get( 'view_event_threshold' ), (int)$t_event_row["id"] );
 //
-                    if( $t_access_show_current_user == TRUE ) {
+                    if( $t_access_show_current_user == TRUE && !in_array( $t_event_row['id'], $p_excluded_events )) {
 
                         $t_time_event_start = (int)$t_event_row['date_from'];
                         $t_rrule_raw        = $t_event_row['recurrence_pattern'];
@@ -335,13 +332,15 @@ function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS 
                         }
                     }
                 }
-                $t_days_object[] = new DayColumn( $t_day, $t_events_row );
+//                $t_days_object[] = new DayColumn( $t_day, $t_events_row );
+                $t_days[$t_day] = $t_events_row;
             } else {
-                $t_days_object[] = new DayColumn( $t_day );
-//                $t_days[$t_day] = [];
+//                $t_days_object[] = new DayColumn( $t_day );
+                $t_days[$t_day] = [];
             }
         }
         
     }
-    return $t_days_object;
+//    return $t_days_object;
+    return $t_days;
 }

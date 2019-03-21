@@ -42,7 +42,7 @@ class CalendarEventData {
             case 'project_id':
             case 'author_id':
             case 'changed_user_id':
-                $value = (int) $value;
+                $value = (int)$value;
                 break;
 
             case 'name':
@@ -55,7 +55,7 @@ class CalendarEventData {
                 if( !is_numeric( $value ) ) {
                     $value = strtotime( $value, 0 );
                 }
-                $value = (int) $value;
+                $value = (int)$value;
                 break;
         }
         $this->$name = $value;
@@ -114,7 +114,6 @@ class CalendarEventData {
             error_parameters( plugin_lang_get( 'date_event' ) );
             plugin_error( 'ERROR_DATE', ERROR );
         }
-
     }
 
     function create() {
@@ -228,6 +227,10 @@ class CalendarEventData {
         return true;
     }
 
+    function get_hm_start() {
+        return strtotime( date( "H:i", $this->date_from ), 0 );
+    }
+
 }
 
 $g_cache_calendar_event = array();
@@ -252,7 +255,7 @@ function event_ensure_exists( $p_event_id ) {
  * @access public
  */
 function event_exists( $p_event_id ) {
-    $c_event_id = (int) $p_event_id;
+    $c_event_id = (int)$p_event_id;
 
     # Check for invalid id values
     if( $c_event_id <= 0 || $c_event_id > DB_MAX_INT ) {
@@ -348,7 +351,7 @@ function event_cache_row( $p_event_id, $p_trigger_errors = true ) {
         return $g_cache_calendar_event[$p_event_id];
     }
 
-    $c_event_id    = (int) $p_event_id;
+    $c_event_id    = (int)$p_event_id;
     $t_event_table = plugin_table( 'events' );
 
     $query  = "SELECT *
@@ -382,13 +385,13 @@ function event_cache_row( $p_event_id, $p_trigger_errors = true ) {
 function event_add_to_cache( $p_event_row, $p_stats = null ) {
     global $g_cache_calendar_event;
 
-    $g_cache_calendar_event[(int) $p_event_row['id']] = $p_event_row;
+    $g_cache_calendar_event[(int)$p_event_row['id']] = $p_event_row;
 
     if( !is_null( $p_stats ) ) {
-        $g_cache_calendar_event[(int) $p_event_row['id']]['_stats'] = $p_stats;
+        $g_cache_calendar_event[(int)$p_event_row['id']]['_stats'] = $p_stats;
     }
 
-    return $g_cache_calendar_event[(int) $p_event_row['id']];
+    return $g_cache_calendar_event[(int)$p_event_row['id']];
 }
 
 /**
@@ -403,7 +406,7 @@ function event_clear_cache( $p_event_id = null ) {
     if( null === $p_event_id ) {
         $g_cache_calendar_event = array();
     } else {
-        unset( $g_cache_calendar_event[(int) $p_event_id] );
+        unset( $g_cache_calendar_event[(int)$p_event_id] );
     }
 
     return true;
@@ -417,7 +420,7 @@ function event_clear_cache( $p_event_id = null ) {
  * @uses database_api.php
  */
 function event_update_date( $p_event_id ) {
-    $c_event_id = (int) $p_event_id;
+    $c_event_id = (int)$p_event_id;
 
     $t_event_table = plugin_table( 'events' );
 
@@ -454,8 +457,8 @@ function event_is_user_reporter( $p_event_id, $p_user_id ) {
  * @access public
  */
 function event_member_add( $p_event_id, $p_user_id ) {
-    $c_event_id = (int) $p_event_id;
-    $c_user_id  = (int) $p_user_id;
+    $c_event_id = (int)$p_event_id;
+    $c_user_id  = (int)$p_user_id;
 
     # Make sure we aren't already monitoring this event
     if( user_is_member_event( $c_user_id, $c_event_id ) ) {
@@ -535,7 +538,7 @@ function event_get_members( $p_event_id ) {
     $t_result             = db_query( $t_query, array( $p_event_id ) );
 
     $t_users = array();
-    while( $t_row = db_fetch_array( $t_result ) ) {
+    while( $t_row   = db_fetch_array( $t_result ) ) {
         $t_users[] = $t_row['user_id'];
     }
 
@@ -546,18 +549,18 @@ function event_get_members( $p_event_id ) {
 
 function event_get_attached_bugs_id( $p_event_id ) {
     $p_table_calendar_relationship = plugin_table( "relationship" );
-    
-    $pResult     = Array();
+
+    $pResult = Array();
     if( db_table_exists( $p_table_calendar_relationship ) && db_is_connected() ) {
         $query  = "SELECT bug_id
 				  FROM $p_table_calendar_relationship
 				  WHERE event_id=" . db_param();
-        $result = db_query( $query, (array) $p_event_id );
+        $result = db_query( $query, (array)$p_event_id );
 
 
         $cResult     = array();
         $t_row_count = db_num_rows( $result );
-        
+
         for( $i = 0; $i < $t_row_count; $i++ ) {
             array_push( $cResult, db_fetch_array( $result ) );
             $pResult[$i] = $cResult[$i]["bug_id"];
@@ -606,17 +609,17 @@ function event_detach_issue( $p_event_id, $p_bugs_id ) {
             continue;
         }
         db_query( $query, array( $p_event_id, $t_bug_id ) );
-        
+
         plugin_history_log(
                 $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_bug_detach" ) . ": " . event_get_field( $p_event_id, 'name' )
         );
-        bug_update_date($t_bug_id);
+        bug_update_date( $t_bug_id );
     }
 
     return TRUE;
 }
 
-function event_attach_issue( $p_event_id, $p_bugs_id ) {
+function event_attach_issue( $p_event_id, array $p_bugs_id ) {
     $t_table_calendar_relationship = plugin_table( "relationship" );
 
     $query = "INSERT

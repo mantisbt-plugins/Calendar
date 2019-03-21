@@ -1,13 +1,12 @@
 <?php
 
-class DayColumn extends Column {
-    protected $timestamp                 = 1;
-    protected $events_area_group         = array();
+class DayColumn extends ColumnForm {
+    protected $timestamp          = 1;
+    protected $events_area_group  = array();
     protected $is_today;
-    static protected $total_days_counter = 0;
-    protected $out_of_range_event        = 0;
+    protected $out_of_range_event = 0;
 
-    public function __construct( $p_timestamp, $p_events_row = array() ) {
+    public function __construct( $p_timestamp, $p_events_row ) {
         parent::__construct();
 
         $this->timestamp = $p_timestamp;
@@ -37,6 +36,7 @@ class DayColumn extends Column {
         foreach( $t_group_events_row as $key => $t_events_row ) {
             foreach( $t_events_row as $key_in_group => $t_event_row ) {
                 $this->events_area_group[$key][] = new EventArea( $t_event_row, count( $t_events_row ), $key_in_group );
+//                $this->events_area_group[$key][] = CalendarServiceLocator::get( 'EventArea', array( $t_event_row, count( $t_events_row ), $key_in_group ));
             }
         }
 
@@ -48,6 +48,10 @@ class DayColumn extends Column {
         $this->is_today = date( "U", strtotime( date( "j.n.Y" ) ) ) == $this->timestamp ? TRUE : FALSE;
         self::$total_days_counter++;
     }
+
+//    public static function get_event_area( $p_event_row, $p_total_event_in_group, $p_current_number_in_group ) {
+//        return new EventArea( $p_event_row, $p_total_event_in_group, $p_current_number_in_group );
+//    }
 
     protected function html_column_param() {
         if( $this->is_today ) {
@@ -69,15 +73,15 @@ class DayColumn extends Column {
         return $t_result;
     }
 
-    private function group_event( $p_event_first, &$p_events, &$p_arr ) {
-        foreach( $p_events as $key => $t_event ) {
-            if( $p_event_first['date_from'] > $t_event['date_from'] && $p_event_first['date_from'] < $t_event['date_from'] + $t_event['duration'] || $p_event_first['date_from'] + $p_event_first['duration'] > $t_event['date_from'] && $p_event_first['date_from'] + $p_event_first['duration'] < $t_event['date_from'] + $t_event['duration'] || $p_event_first['date_from'] < $t_event['date_from'] && $p_event_first['date_from'] + $p_event_first['duration'] > $t_event['date_from'] + $t_event['duration']
+    protected function group_event( $p_event_first, &$p_events, &$p_result ) {
+        foreach( $p_events as $key => &$t_event ) {
+            if( $p_event_first['date_from'] >= $t_event['date_from'] && $p_event_first['date_from'] < $t_event['date_from'] + $t_event['duration'] || $p_event_first['date_from'] + $p_event_first['duration'] > $t_event['date_from'] && $p_event_first['date_from'] + $p_event_first['duration'] < $t_event['date_from'] + $t_event['duration'] || $p_event_first['date_from'] < $t_event['date_from'] && $p_event_first['date_from'] + $p_event_first['duration'] >= $t_event['date_from'] + $t_event['duration']
             ) {
                 unset( $p_events[$key] );
-                $this->group_event( $t_event, $p_events, $p_arr );
+                $this->group_event( $t_event, $p_events, $p_result );
             }
         }
-        $p_arr[] = $p_event_first;
+        $p_result[] = $p_event_first;
     }
 
 }

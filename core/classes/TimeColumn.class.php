@@ -10,7 +10,7 @@
  *
  * @author ermolaev
  */
-class TimeColumn extends Column {
+class TimeColumn extends ColumnForm {
 
     function __construct() {
         parent::__construct();

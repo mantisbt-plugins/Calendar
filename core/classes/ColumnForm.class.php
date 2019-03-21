@@ -5,24 +5,25 @@
  * and open the template in the editor.
  */
 
-abstract class Column {
+abstract class ColumnForm {
     const HEIGHT_MULTIPLIER = 3;
     const HOUR              = 3600;
     const DAY_MIN_TIME      = 0;
     const DAY_MAX_TIME      = 86400;
 
-    protected $title_text             = '';
-    protected $last_row_text          = '';
-
-    static public $time_period_list   = array();
-    static public $intervals_per_hour = 0;
-    static private $is_initialized    = false;
-    static public $html_interval_height;
-    static public $min_segment_time_in_hour;
-    static public $ratio_height;
+    protected $title_text    = '';
+    protected $last_row_text = '';
+    public static $time_period_list   = array();
+    public static $intervals_per_hour = 0;
+    public static $is_initialized    = false;
+    public static $html_interval_height;
+    public static $min_segment_time_in_hour;
+    public static $ratio_height;
+    public static $total_days_counter;
 
     function __construct() {
         if( !self::$is_initialized ) {
+            self::$total_days_counter = 0;
             self::$intervals_per_hour = plugin_config_get( 'stepDayMinutesCount' );
             self::$ratio_height       = self::HEIGHT_MULTIPLIER / self::$intervals_per_hour;
 
@@ -30,7 +31,7 @@ abstract class Column {
 
             self::$min_segment_time_in_hour = self::HOUR / self::$intervals_per_hour;
 
-            if( Calendar::$full_time_is ) {
+            if( WeekCalendar::$full_time_is ) {
                 self::$time_period_list = range( self::DAY_MIN_TIME, self::DAY_MAX_TIME, self::$min_segment_time_in_hour );
             } else {
                 $t_time_day_start       = plugin_config_get( 'time_day_start', plugin_config_get( 'time_day_start' ), FALSE, auth_get_current_user_id() );
@@ -40,6 +41,8 @@ abstract class Column {
             self::$is_initialized = TRUE;
         }
     }
+
+//    abstract static function get_event_area($p_event_row, $p_total_event_in_group, $p_current_number_in_group);
 
     abstract protected function html_column_param();
 

@@ -22,9 +22,9 @@ layout_page_header( plugin_lang_get( 'week' ) );
 
 layout_page_begin( plugin_page( 'calendar_user_page' ) );
 
-$f_bug_id      = gpc_get_int( 'bug_id' );
+$f_bug_id = gpc_get_int( 'id' );
 
-bug_ensure_exists($f_bug_id);
+bug_ensure_exists( $f_bug_id );
 
 # Get Project Id and set it as current
 $t_project_id = bug_get_field( $f_bug_id, 'project_id' );
@@ -44,12 +44,31 @@ html_robots_noindex();
 
 
 
-$f_week                             = gpc_get_int( "week", date( "W" ) );
-$f_is_fulltime                      = gpc_get_bool( "full_time" );
-$f_for_user                         = gpc_get_int( "for_user", auth_get_current_user_id() );
+$f_week        = gpc_get_int( "week", date( "W" ) );
+$f_is_fulltime = gpc_get_bool( "full_time" );
+$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
 
-$t_calendar_week = new ViewWeek( $f_week, $f_for_user, $f_is_fulltime, $f_bug_id );
+$t_start_day_of_the_week = plugin_config_get( "startStepDays" );
+$t_step_days_count       = plugin_config_get( "countStepDays" );
+$t_arWeekdaysName        = plugin_config_get( "arWeekdaysName" );
+
+$t_excluded_events = get_events_id_from_bug_id( $f_bug_id );
+$t_days            = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week );
+$t_days_events     = get_days_object( $t_days, helper_get_current_project(), $f_for_user, $t_excluded_events );
+
+$t_calendar_week = new ViewWeekSelect( $f_week, $f_for_user, $f_is_fulltime, $t_days_events, $f_bug_id );
 
 $t_calendar_week->print_html();
 
-layout_page_end();
+unset( $t_calendar_week );
+
+//layout_page_end();
+$t_show_page_header          = false;
+$t_force_readonly            = true;
+$t_fields_config_option      = 'bug_change_status_page_fields';
+global $g_calendar_show_menu_bottom;
+$g_calendar_show_menu_bottom = FALSE;
+
+
+define( 'BUG_VIEW_INC_ALLOW', true );
+include( __DIR__ . '/../../../bug_view_inc.php' );
