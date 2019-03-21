@@ -45,6 +45,9 @@ $s_plugin_Calendar_not_repeat = "Нет";
 $s_plugin_Calendar_config_title = 'Настройка';
 $s_plugin_Calendar_config_days_week_display = 'Дни недели для отображения в (Настройки пользователя перекрывают настройки по умолчанию)';
 $s_plugin_Calendar_config_time_day_range = 'Начало и конец рабочего диапазона времени (Настройки пользователя перекрывают настройки по умолчанию)';
+$s_plugin_Calendar_config_step_day_minutes_count = 'Количество интервалов в часе';
+$s_plugin_Calendar_config_start_step_days = 'Сдвиг в днях относительно выбранной недели';
+$s_plugin_Calendar_config_count_step_days = 'Количество дней для отображения';
 
 $s_plugin_Calendar_manage_threshold_config = 'Ограничения процесса';
 $s_plugin_Calendar_config_manage_calendar_threshold = 'Настройка календаря';

@@ -45,6 +45,9 @@ $s_plugin_Calendar_not_repeat = "无需重复";
 $s_plugin_Calendar_config_title = '设置';
 $s_plugin_Calendar_config_days_week_display = '设置一周需显示的天数 (用户设置将覆盖默认设置)';
 $s_plugin_Calendar_config_time_day_range = '设置工作开始与结束时间 (用户设置将覆盖默认设置)';
+$s_plugin_Calendar_config_step_day_minutes_count = '每小时的间隔数';
+$s_plugin_Calendar_config_start_step_days = '相对于所选周的天数变化';
+$s_plugin_Calendar_config_count_step_days = '显示的天数';
 
 $s_plugin_Calendar_manage_threshold_config = '工作流阀值';
 $s_plugin_Calendar_config_manage_calendar_threshold = '日历设置';

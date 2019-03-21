@@ -45,6 +45,9 @@ $s_plugin_Calendar_not_repeat = "Not";
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
 $s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';
+$s_plugin_Calendar_config_step_day_minutes_count = 'Number of intervals per hour';
+$s_plugin_Calendar_config_start_step_days = 'Shift in days relative to the selected week';
+$s_plugin_Calendar_config_count_step_days = 'Number of days to display';
 
 $s_plugin_Calendar_manage_threshold_config = 'Workflow Thresholds';
 $s_plugin_Calendar_config_manage_calendar_threshold = 'Calendar setting';
