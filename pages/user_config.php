@@ -1,5 +1,4 @@
 <?php
-
 # Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -25,6 +24,10 @@ $f_days_week_cheked = gpc_get_string_array( 'days_week' );
 $f_time_start  = gpc_get_int( 'time_day_start' );
 $f_time_finish = gpc_get_int( 'time_day_finish' );
 
+$f_step_day_minutes_count = gpc_get_int( 'step_day_minutes_count' );
+$f_start_step_days        = gpc_get_int( 'start_step_days' );
+$f_count_step_days        = gpc_get_int( 'count_step_days' );
+
 $f_google_calendar_list = gpc_get_string( 'google_calendar_list', NULL );
 
 foreach( $t_days_week_config as $t_name_day => $t_status ) {
@@ -36,6 +39,11 @@ foreach( $t_days_week_config as $t_name_day => $t_status ) {
 }
 
 if( $f_time_start >= $f_time_finish ) {
+    error_parameters( plugin_lang_get( 'date_event' ) );
+    plugin_error( 'ERROR_RANGE_TIME', ERROR );
+}
+
+if( $f_step_day_minutes_count < 1 || $f_step_day_minutes_count > 6 || $f_start_step_days < 0 || $f_count_step_days < 1 ) {
     error_parameters( plugin_lang_get( 'date_event' ) );
     plugin_error( 'ERROR_RANGE_TIME', ERROR );
 }
@@ -53,6 +61,11 @@ if( plugin_config_get( 'time_day_finish', plugin_config_get( 'time_day_finish' )
     plugin_config_set( 'time_day_finish', $f_time_finish, $t_current_user_id );
 }
 
+plugin_config_set( 'stepDayMinutesCount', $f_step_day_minutes_count, $t_current_user_id );
+plugin_config_set( 'startStepDays', $f_start_step_days, $t_current_user_id );
+plugin_config_set( 'countStepDays', $f_count_step_days, $t_current_user_id );
+
+
 $t_google_calendar_sync_id = plugin_config_get( 'google_calendar_sync_id', "0", FALSE, $t_current_user_id );
 
 if( $t_google_calendar_sync_id !== $f_google_calendar_list ) {
@@ -63,9 +76,9 @@ if( $t_google_calendar_sync_id !== $f_google_calendar_list ) {
     }
 }
 
-form_security_purge( plugin_page( 'config', TRUE ) );
+form_security_purge( 'calendar_user_config_edit' );
 
-$t_redirect_url = plugin_page( 'user_config_page', TRUE );
+$t_redirect_url = plugin_page( 'calendar_user_page', TRUE );
 
 layout_page_header( null, $t_redirect_url );
 

@@ -138,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.4.8';
+        $this->version = '2.5.0-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -237,46 +237,50 @@ class CalendarPlugin extends MantisPlugin {
     function config() {
         return array( //Default settings. Some of the settings are available for override via the plugin configuration page.
                                   //Time settings
-                                  'datetime_picker_format'              => 'DD-MM-Y',
-                                  'short_date_format'                   => 'd-m-Y',
-                                  'event_time_start_stop_picker_format' => 'HH:mm',
-                                  'startStepDays'                       => 0,
-                                  'countStepDays'                       => 7,
-                                  'arWeekdaysName'                      => array(
-                                                            'Mon' => ON,
-                                                            'Tue' => ON,
-                                                            'Wed' => ON,
-                                                            'Thu' => ON,
-                                                            'Fri' => ON,
-                                                            'Sat' => ON,
-                                                            'Sun' => ON ),
-                                  'time_day_start'                      => 32400,
-                                  'time_day_finish'                     => 64800,
-                                  'stepDayMinutesCount'                 => 2,
-                                  'frequencies'                         => array(
-                                                            'NO_REPEAT',
-                                                            'DAILY',
-                                                            'WEEKLY',
-                                                            'MONTHLY',
-                                                            'YEARLY' ),
+                                  'datetime_picker_format'                              => 'DD-MM-Y',
+                                  'short_date_format'                                   => 'd-m-Y',
+                                  'event_time_start_stop_picker_format'                 => 'HH:mm',
+                                  'startStepDays'                                       => 0,
+//                                  'startStepDays'                        => date( 'w' )-1,
+                                  'countStepDays'                                       => 7,
+                                  'show_count_future_recurring_events_in_bug_view_page' => 1,
+                                  'arWeekdaysName'                                      => array(
+                                                                                            'Mon' => ON,
+                                                                                            'Tue' => ON,
+                                                                                            'Wed' => ON,
+                                                                                            'Thu' => ON,
+                                                                                            'Fri' => ON,
+                                                                                            'Sat' => ON,
+                                                                                            'Sun' => ON 
+                                                                                            ),
+                                  'time_day_start'                                      => 32400,
+                                  'time_day_finish'                                     => 64800,
+                                  'stepDayMinutesCount'                                 => 2,
+                                  'frequencies'                                         => array(
+                                                                                            'NO_REPEAT',
+                                                                                            'DAILY',
+                                                                                            'WEEKLY',
+                                                                                            'MONTHLY',
+                                                                                            'YEARLY'
+                                                                                            ),
                                   //Calendar access rights.
-                                  'manage_calendar_threshold'           => DEVELOPER,
-                                  'calendar_view_threshold'             => DEVELOPER,
-                                  'bug_calendar_view_threshold'         => REPORTER,
+                                  'manage_calendar_threshold'                           => DEVELOPER,
+                                  'calendar_view_threshold'                             => DEVELOPER,
+                                  'bug_calendar_view_threshold'                         => REPORTER,
 //                                  'calendar_edit_threshold'              => DEVELOPER,
                                   //Event access rights.
-                                  'view_event_threshold'                 => REPORTER,
-                                  'report_event_threshold'               => DEVELOPER,
-                                  'update_event_threshold'               => DEVELOPER,
+                                  'view_event_threshold'                                => REPORTER,
+                                  'report_event_threshold'                              => DEVELOPER,
+                                  'update_event_threshold'                              => DEVELOPER,
                                   //Member event access rights. 
-                                  'show_member_list_threshold'           => REPORTER,
-                                  'member_event_threshold'               => DEVELOPER, //The level of access necessary to become a member of the event.
-                                  'member_add_others_event_threshold'    => DEVELOPER,
-                                  'member_delete_others_event_threshold' => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
+                                  'show_member_list_threshold'                          => REPORTER,
+                                  'member_event_threshold'                              => DEVELOPER, //The level of access necessary to become a member of the event.
+                                  'member_add_others_event_threshold'                   => DEVELOPER,
+                                  'member_delete_others_event_threshold'                => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
                                   //Google settings
-                                  'oauth_key'                            => array(),
-                                  'google_calendar_sync_id'              => '',
-                                  'google_client_secret'                 => '',
+                                  'oauth_key'                                           => array(),
+                                  'google_calendar_sync_id'                             => '',
+                                  'google_client_secret'                                => '',
         );
     }
 
@@ -296,6 +300,17 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
         require_once 'core/calendar_menu_api.php';
+        require_once 'core/classes/WeekCalendar.class.php';
+        require_once 'core/classes/ViewWeekCalendar.class.php';
+        require_once 'core/classes/ViewIssue.class.php';
+        require_once 'core/classes/ViewWeekSelect.class.php';
+        require_once 'core/classes/ColumnForm.class.php';
+        require_once 'core/classes/TimeColumn.class.php';
+        require_once 'core/classes/DayColumn.class.php';
+        require_once 'core/classes/EventArea.class.php';
+
+        global $g_calendar_show_menu_bottom;
+        $g_calendar_show_menu_bottom = TRUE;
     }
 
     function errors() {
@@ -335,76 +350,18 @@ class CalendarPlugin extends MantisPlugin {
     function html_print_calendar( $p_first_option, $p_bug_id ) {
 
         if( access_has_project_level( plugin_config_get( 'bug_calendar_view_threshold' ) ) ) {
-            $t_events_id      = get_events_id_from_bug_id( $p_bug_id );
-            $t_days_events    = get_dates_event_from_events_id( $t_events_id );
-            ?>
 
+            echo '<tr class=calendar-area align="center">';
+            echo '<td class=calendar-area-in-bugs align="center" colspan="6">';
 
-            <tr class=calendar-area align="center">
-                <td class=calendar-area-in-bugs align="center" colspan="6">
+            $t_events_id = get_events_id_from_bug_id( $p_bug_id );
+            $t_dates     = calendar_column_objects_get_from_event_ids( $t_events_id );
 
-                    <div class="col-md-12 col-xs-12">
-                        <?php
-                        $t_collapse_block = count( $t_days_events ) == 0 ? TRUE : FALSE;
-                        $t_block_css      = $t_collapse_block ? 'collapsed' : '';
-//                    $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
-                        ?>
-                        <div class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
-                            <div class="widget-header widget-header-small">
-                                <h4 class="widget-title lighter">
-                                    <i class="ace-icon fa fa-list-alt"></i>
-                                    <?php
-                                    if( $t_collapse_block ) {
-                                        echo plugin_lang_get( 'not_assigned_event' );
-                                    } else {
-                                        echo plugin_lang_get( 'assigned_event' );
-                                    }
-                                    ?>
-                                </h4>
-                            </div>
-                            <div class="widget-body">
+            $t_calendar_issue_view = new ViewIssue( $t_dates, $p_bug_id );
+            $t_calendar_issue_view->print_html();
 
-
-                                <div class="widget-main no-padding">
-
-                                    <div class="table-responsive">
-                                        <table class="calendar-user week">
-                                            <tr class="row-day">
-                                                <?php print_column_time(); ?>
-                                                <?php
-                                                foreach( $t_days_events as $t_date => $t_time_events_id ) {
-                                                    $t_day_events          = array();
-                                                    $t_day_events[$t_date] = $t_time_events_id;
-                                                    print_column_this_day( $t_day_events );
-                                                }
-                                                ?>
-                                        </table>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                        $t_access_level_current_user = access_get_project_level();
-
-                        if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'report_event_threshold' ) ) && !bug_is_readonly( $p_bug_id ) ) {
-                            ?>
-                            <div class="widget-toolbox padding-8 clearfix">
-                                <div class="form-inline pull-left">
-                                    <?php
-//                                print_small_button( plugin_page( 'calendar_event_insert_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'insert_event' ) );
-                                    print_small_button( plugin_page( 'event_add_page' ) . "&bug_id=" . $p_bug_id, plugin_lang_get( 'add_new_event' ) );
-                                    ?>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                        ?>
-                    </div>
-                </td>
-            </tr>
-
-            <?php
+            echo '</td>';
+            echo '</tr>';
         }
     }
 

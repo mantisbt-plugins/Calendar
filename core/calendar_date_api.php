@@ -85,6 +85,59 @@ function get_dates_event_from_events_id( $p_events_id ) {
     return $t_dates;
 }
 
+function calendar_column_objects_get_from_event_ids( $p_events_id ) {
+
+    $t_dates = array();
+    $t_day_objects = array();
+
+    foreach( $p_events_id as $t_event_id ) {
+        
+        if( !event_exists( $t_event_id ) || !access_has_event_level( plugin_config_get( 'view_event_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
+            continue;
+        }
+
+        if( event_get_field( $t_event_id, 'recurrence_pattern' ) != '' ) {
+            $t_rset          = new RRule\RSet( event_get_field( $t_event_id, 'recurrence_pattern' ) );
+            $t_previous_days = $t_rset->getOccurrencesBetween( (int) event_get_field( $t_event_id, 'date_from' ), strtotime( 'tomorrow' ) );
+            $t_next_days     = $t_rset->getOccurrencesBetween( strtotime( 'tomorrow' ), (int) event_get_field( $t_event_id, 'date_to' ), plugin_config_get( 'show_count_future_recurring_events_in_bug_view_page' ) );
+            foreach( $t_previous_days as $t_previous_day ) {
+                $t_time_start_day                                              = strtotime( date( "j.n.Y", $t_previous_day->getTimestamp() ) );
+//                $t_dates[$t_time_start_day][$t_previous_day->getTimestamp()][] = $t_event_id;
+                $t_event_row                                                   = array();
+                $t_event_row['id']                                             = $t_event_id;
+                $t_event_row['date_from']                                      = $t_previous_day->getTimestamp();
+                $t_event_row['duration']                                       = event_get_field( $t_event_id, "duration" );
+
+                 $t_dates[$t_time_start_day][] = $t_event_row;
+            }
+            foreach( $t_next_days as $t_next_day ) {
+                $t_time_start_day                                          = strtotime( date( "j.n.Y", $t_next_day->getTimestamp() ) );
+//                $t_dates[$t_time_start_day][$t_next_day->getTimestamp()][] = $t_event_id;
+                $t_event_row                                               = array();
+                $t_event_row['id']                                         = $t_event_id;
+                $t_event_row['date_from']                                  = $t_next_day->getTimestamp();
+                $t_event_row['duration']                                   = event_get_field( $t_event_id, "duration" );
+
+                 $t_dates[$t_time_start_day][] = $t_event_row;
+            }
+        } else {
+            $t_time_start_day                                                          = strtotime( date( "j.n.Y", event_get_field( $t_event_id, "date_from" ) ) );
+//            $t_dates[$t_time_start_day][event_get_field( $t_event_id, "date_from" )][] = $t_event_id;
+            
+            $t_event_row = array();
+            $t_event_row['id'] = $t_event_id;
+            $t_event_row['date_from'] = event_get_field( $t_event_id, "date_from" );
+            $t_event_row['duration'] = event_get_field( $t_event_id, "duration" );
+                                              
+            $t_dates[$t_time_start_day][] = $t_event_row;
+        }
+    }
+    
+    ksort( $t_dates );
+
+    return $t_dates;
+}
+
 function group_events_by_time( $p_events_id ) {
     if( $p_events_id == false || $p_events_id == 0 )
         return 0;
@@ -206,4 +259,88 @@ function get_events_id_inside_days( $p_ar_all_days, $p_project_id, $p_user_id = 
         return $t_days;
     }
     return false;
+}
+
+function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS, $p_excluded_events = array() ) {
+
+    $t_table_calendar_events = plugin_table( 'events' );
+    $t_table_calendar_members = plugin_table( 'event_member' );
+
+    $t_project_all = project_hierarchy_get_all_subprojects( $p_project_id );
+    $t_project_all = array_merge($t_project_all, array($p_project_id));
+    
+    $t_days_object = array();
+
+    if( db_table_exists( $t_table_calendar_events ) && db_table_exists( $t_table_calendar_members ) && db_is_connected() ) {
+
+        $t_days = array();
+        db_param_push();
+
+        if( $p_user_id == ALL_USERS ) {
+            $p_query = "SELECT id,date_from,duration,recurrence_pattern FROM " . $t_table_calendar_events .
+                    " WHERE "
+                    . "activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from BETWEEN " . db_param() . " AND " . db_param() . " "
+                    . "OR "
+                    . "( activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from < " . db_param() . " AND date_to > " . db_param() . " AND recurrence_pattern > '' )";
+        } else {
+            $p_query = "SELECT id,project_id,date_from,duration,recurrence_pattern FROM " . $t_table_calendar_events . " AS et" . 
+                    " INNER JOIN " . $t_table_calendar_members . " AS mt" .
+                    " ON et.id = mt.event_id" .
+                    " WHERE "
+                    . "activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from BETWEEN " . db_param() . " AND " . db_param() . " AND mt.user_id = " . db_param() . " "
+                    . "OR "
+                    . "( activity = 'Y' AND project_id IN (" . implode( ',', $t_project_all ) . ") AND date_from < " . db_param() . " AND date_to > " . db_param() . " AND recurrence_pattern > '' AND mt.user_id = " . db_param() . " )";
+        }
+
+
+        
+        
+        foreach( $p_ar_all_days as $t_day ) {
+
+            $t_time_start_day  = (int) $t_day;
+            $t_time_finish_day = $t_day + 86399;
+
+            if( $p_user_id == ALL_USERS ) {
+                $t_result = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $t_time_finish_day, $t_time_start_day ) );
+            } else {
+                $t_result = db_query( $p_query, array( $t_time_start_day, $t_time_finish_day, $p_user_id, $t_time_finish_day, $t_time_start_day, $p_user_id ) );
+            }
+            $t_event_count = db_num_rows( $t_result );
+            if( $t_event_count > 0 ) {
+                $t_events_row = array();
+                $t_days[$t_day] = [];
+                for( $i = 0; $i < $t_event_count; $i++ ) {
+                    $t_event_row = db_fetch_array( $t_result );
+
+                    $t_access_show_current_user = access_has_event_level( plugin_config_get( 'view_event_threshold' ), (int)$t_event_row["id"] );
+//
+                    if( $t_access_show_current_user == TRUE && !in_array( $t_event_row['id'], $p_excluded_events )) {
+
+                        $t_time_event_start = (int)$t_event_row['date_from'];
+                        $t_rrule_raw        = $t_event_row['recurrence_pattern'];
+                        if( $t_time_event_start < $t_day || $t_rrule_raw != NULL ) {
+                            $t_recurrenci_rule = RRule\RRule::createFromRfcString( $t_rrule_raw );
+                            $t_is              = $t_recurrenci_rule->getOccurrencesBetween( $t_time_start_day, $t_time_finish_day );
+                            if( $t_is != NULL ) {
+                                $t_event_row['date_from'] = date_timestamp_get( $t_is[0] );
+                                $t_events_row[] = $t_event_row;
+//                                $t_days[$t_day][date_timestamp_get( $t_is[0] )][] = (int)$t_row["id"];
+                            }
+                        } else {
+                            $t_events_row[] = $t_event_row;
+//                            $t_days[$t_day][$t_time_event_start][] = (int)$t_event_row["id"];
+                        }
+                    }
+                }
+//                $t_days_object[] = new DayColumn( $t_day, $t_events_row );
+                $t_days[$t_day] = $t_events_row;
+            } else {
+//                $t_days_object[] = new DayColumn( $t_day );
+                $t_days[$t_day] = [];
+            }
+        }
+        
+    }
+//    return $t_days_object;
+    return $t_days;
 }
