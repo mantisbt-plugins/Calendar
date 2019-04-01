@@ -138,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.5.0';
+        $this->version = '2.5.1-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -332,7 +332,7 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     function resources() {
-        return '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'Calendar.css' ) . '"></link>'
+        return '<link rel="stylesheet" type="text/css" href="' . plugin_file( 'Calendar_1553843497.css' ) . '"></link>'
                 . '<script type="text/javascript" src="' . plugin_file( 'calendar_filter.js' ) . '"></script>';
     }
 
