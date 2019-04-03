@@ -138,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.5.1';
+        $this->version = '2.6.0-dev';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0',
@@ -308,6 +308,7 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/classes/TimeColumn.class.php';
         require_once 'core/classes/DayColumn.class.php';
         require_once 'core/classes/EventArea.class.php';
+        require_once 'core/classes/ColumnViewIssuePage.class.php';
 
         global $g_calendar_show_menu_bottom;
         $g_calendar_show_menu_bottom = TRUE;
@@ -328,6 +329,8 @@ class CalendarPlugin extends MantisPlugin {
                                   'EVENT_LAYOUT_RESOURCES' => 'resources',
                                   'EVENT_MENU_MAIN_FRONT'  => 'menu_main_front',
                                   'EVENT_VIEW_BUG_DETAILS' => 'html_print_calendar',
+                                  'EVENT_FILTER_COLUMNS'    => 'column_add_in_view_all_bug_page',
+                                  'EVENT_DISPLAY_TEXT'      => 'column_title_formating',
         );
     }
 
@@ -363,6 +366,23 @@ class CalendarPlugin extends MantisPlugin {
             echo '</td>';
             echo '</tr>';
         }
+    }
+    
+    function column_add_in_view_all_bug_page( $p_type_event, $p_param ){
+      
+        $t_column = new ColumnViewIssuePage();
+        
+        return array( $t_column );
+    }
+    
+    function column_title_formating( $p_type_event, $p_param ) {
+
+        if( $p_param == 'callback_calendar_event_title_format' ) {
+            $t_event_count_text      = plugin_lang_get( 'column_view_issue_page_title' );
+            return '<i class="fa fa-calendar blue" title="' . $t_event_count_text . '"></i>';
+        }
+        
+        return $p_param;
     }
 
 }

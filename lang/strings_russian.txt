@@ -131,6 +131,8 @@ $s_plugin_Calendar_out_of_range = 'события вне диапазона';
 
 $s_plugin_Calendar_view_submitted_event_link = 'Просмотреть созданное событие %1$s';
 
+$s_plugin_Calendar_column_view_issue_page_title = 'Количество событий в календаре';
+
 $s_plugin_Calendar_ERROR_DATE = 'Дата/время начала события не должна быть равна или больше даты окончания события.';
 $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Событие %1$d не найдено.';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'ВРЕМЯ НАЧАЛА/ОКОНЧАНИЯ РАБОЧЕГО ДИАПАЗОНА ЗАДАНО НЕ ВЕРНО.';

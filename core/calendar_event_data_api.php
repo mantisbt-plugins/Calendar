@@ -641,3 +641,65 @@ function event_attach_issue( $p_event_id, array $p_bugs_id ) {
     }
     return TRUE;
 }
+
+/**
+ * Check the number of attachments a bug has (if any)
+ * @param integer $p_bug_id A bug identifier.
+ * @return integer
+ */
+function calendar_event_issue_attachment_count( $p_bug_id ) {
+	global $g_cache_calendar_event_count;
+
+	# If it's not in cache, load the value
+	if( !isset( $g_cache_calendar_event_count[$p_bug_id] ) ) {
+		calendar_event_issue_attachment_count_cache( array( (int)$p_bug_id ) );
+	}
+
+	return $g_cache_calendar_event_count[$p_bug_id];
+}
+
+/**
+ * Fills the cache with the attachment count from a list of bugs
+ * If the bug doesn't have attachments, cache its value as 0.
+ * @global array $g_cache_calendar_event_count
+ * @param array $p_bug_ids Array of bug ids
+ * @return void
+ */
+function calendar_event_issue_attachment_count_cache( array $p_bug_ids ) {
+	global $g_cache_calendar_event_count;
+
+	if( empty( $p_bug_ids ) ) {
+		return;
+	}
+
+	$t_ids_to_search = array();
+	foreach( $p_bug_ids as $t_id ) {
+		$c_id = (int)$t_id;
+		$t_ids_to_search[$c_id] = $c_id;
+	}
+
+	db_param_push();
+	$t_params = array();
+	$t_in_values = array();
+	foreach( $t_ids_to_search as $t_id ) {
+		$t_params[] = (int)$t_id;
+		$t_in_values[] = db_param();
+	}
+
+	$t_query = 'SELECT E.bug_id AS bug_id, COUNT(E.event_id) AS attachments'
+			. ' FROM ' . plugin_table( 'relationship' ) . ' E'
+			. ' WHERE E.bug_id IN (' . implode( ',', $t_in_values ) . ')'
+			. ' GROUP BY E.bug_id';
+
+	$t_result = db_query( $t_query, $t_params );
+	while( $t_row = db_fetch_array( $t_result ) ) {
+		$c_bug_id = (int)$t_row['bug_id'];
+		$g_cache_calendar_event_count[$c_bug_id] = (int)$t_row['attachments'];
+		unset( $t_ids_to_search[$c_bug_id] );
+	}
+
+	# set bugs without result to 0
+	foreach( $t_ids_to_search as $t_id ) {
+		$g_cache_calendar_event_count[$t_id] = 0;
+	}
+}

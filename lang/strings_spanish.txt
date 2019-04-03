@@ -131,6 +131,8 @@ $s_plugin_Calendar_out_of_range = 'eventos fuera de rango';
 
 $s_plugin_Calendar_view_submitted_event_link = 'Ver el evento creado %1$s';
 
+$s_plugin_Calendar_column_view_issue_page_title = 'Número de eventos en el calendario.';
+
 $s_plugin_Calendar_ERROR_DATE = 'La fecha / hora del comienzo del evento no debe ser igual o mayor que la fecha de finalización del evento.';
 $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Evento %1$d No encontrado.';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'EL RANGO de INICIO/FINALIZACION DEL TRABAJO NO SE ASIGNO CORRECTAMENTE ';

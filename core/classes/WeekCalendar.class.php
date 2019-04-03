@@ -68,6 +68,7 @@ abstract class WeekCalendar {
         global $g_calendar_show_menu_bottom;
 
         echo '<div class="col-md-12 col-xs-12">';
+        echo '<a id="calendar_event_attachments"></a>';
         $this->print_spacer_top();
 
         echo '<div class="widget-box widget-color-blue2">';

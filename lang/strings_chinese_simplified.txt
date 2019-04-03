@@ -131,6 +131,8 @@ $s_plugin_Calendar_out_of_range = '超出范围的事件';
 
 $s_plugin_Calendar_view_submitted_event_link = '查看已创建事件 %1$s';
 
+$s_plugin_Calendar_column_view_issue_page_title = '日历中的事件数';
+
 $s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
 $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = '无法找到事件 %1$d .';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
