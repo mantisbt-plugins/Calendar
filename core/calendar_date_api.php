@@ -92,7 +92,7 @@ function calendar_column_objects_get_from_event_ids( $p_events_id ) {
 
     foreach( $p_events_id as $t_event_id ) {
         
-        if( !event_exists( $t_event_id ) || !access_has_event_level( plugin_config_get( 'view_event_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
+        if( !event_exists( $t_event_id ) || !access_has_event_level( plugin_config_get( 'bug_calendar_view_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
             continue;
         }
 
