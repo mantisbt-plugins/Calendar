@@ -377,7 +377,7 @@ class CalendarPlugin extends MantisPlugin {
     
     function column_title_formating( $p_type_event, $p_param ) {
 
-        if( $p_param == 'callback_calendar_event_title_format' ) {
+        if( $p_param == plugin_lang_get( 'column_view_issue_page_title' ) ) {
             $t_event_count_text      = plugin_lang_get( 'column_view_issue_page_title' );
             return '<i class="fa fa-calendar blue" title="' . $t_event_count_text . '"></i>';
         }
