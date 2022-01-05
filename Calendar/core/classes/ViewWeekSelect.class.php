@@ -13,8 +13,8 @@
 class ViewWeekSelect extends ViewWeekCalendar {
     private $bug_id;
 
-    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_bug_id ) {
-        parent::__construct( $p_week, $p_user, $p_is_full_time, $p_days_events, plugin_page( 'event_insert' ) . '&bug_id=' . $p_bug_id . htmlspecialchars( form_security_param( 'event_insert' ) ) );
+    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_bug_id, $p_year ) {
+        parent::__construct( $p_week, $p_user, $p_is_full_time, $p_days_events, plugin_page( 'event_insert' ) . '&bug_id=' . $p_bug_id . htmlspecialchars( form_security_param( 'event_insert' ) ), $p_year );
         $this->bug_id = (int)$p_bug_id;
     }
 
@@ -45,21 +45,21 @@ class ViewWeekSelect extends ViewWeekCalendar {
 
         echo '<div class="btn-group pull-left">';
         if( WeekCalendar::$full_time_is == FALSE ) {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&full_time=TRUE" . '&id=' . $this->bug_id, "0-24" );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&full_time=TRUE" . '&id=' . $this->bug_id, "0-24" );
         } else {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . '&id=' . $this->bug_id, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . '&id=' . $this->bug_id, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
         }
         echo '</div>';
 
         echo '<div class="btn-group pull-right">';
         if( WeekCalendar::$full_time_is == FALSE ) {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week - 1) . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ) . '&id=' . $this->bug_id, plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week + 1) . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
         } else {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week - 1) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week + 1) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
         }
         echo '</div>';
 
@@ -88,6 +88,7 @@ class ViewWeekSelect extends ViewWeekCalendar {
         # CSRF protection not required here - form does not result in modifications
         echo '<input type="hidden" name="page" value="Calendar/event_insert_page" />';
         echo '<input type="hidden" name="week" value="' . $this->week . '" />';
+        echo '<input type="hidden" name="year" value="' . $this->year . '" />';
         echo '<input type="hidden" name="full_time" value="' . (int)self::$full_time_is . '" />';
         echo '<input type="hidden" name="id" value="' . $this->bug_id . '" />';
 

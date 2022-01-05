@@ -13,13 +13,15 @@
 class ViewWeekCalendar extends WeekCalendar {
     protected $week;
     protected $for_user;
+    protected $year;
 
     //put your code here
-    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_link_options ) {
+    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_link_options, $p_year ) {
         parent::__construct($p_days_events, $p_link_options, $p_is_full_time);
 
         $this->week         = $p_week;
         $this->for_user     = (int)$p_user;
+        $this->year         = $p_year;
     }
 
     protected function print_spacer_top() {
@@ -53,21 +55,21 @@ class ViewWeekCalendar extends WeekCalendar {
 
         echo '<div class="btn-group pull-left">';
         if( self::$full_time_is == FALSE ) {
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&full_time=TRUE", "0-24" );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&full_time=TRUE", "0-24" );
         } else {
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
         }
         echo '</div>';
 
         echo '<div class="btn-group pull-right">';
         if( self::$full_time_is == FALSE ) {
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week - 1), plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ), plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ), plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week + 1), plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ), plugin_lang_get( 'next_period' ) );
         } else {
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week - 1) . "&full_time=TRUE", plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ) . "&full_time=TRUE", plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ) . "&full_time=TRUE", plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . ($this->week + 1) . "&full_time=TRUE", plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE", plugin_lang_get( 'next_period' ) );
         }
         echo '</div>';
 
@@ -96,6 +98,7 @@ class ViewWeekCalendar extends WeekCalendar {
         # CSRF protection not required here - form does not result in modifications
         echo '<input type="hidden" name="page" value="Calendar/calendar_user_page" />';
         echo '<input type="hidden" name="week" value="' . $this->week . '" />';
+        echo '<input type="hidden" name="year" value="' . $this->year . '" />';
         echo '<input type="hidden" name="full_time" value="' . (int)self::$full_time_is . '" />';
 
         echo '<label class="inline">' . plugin_lang_get( 'filter_text' ) . '</label>';

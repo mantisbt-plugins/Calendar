@@ -15,22 +15,35 @@
 # along with Customer management plugin for MantisBT.  
 # If not, see <http://www.gnu.org/licenses/>.
 
-function days_of_number_week( $p_start_step_days, $p_count_step_days, $t_week_days_name, $p_week = null ) {
+function timestamp_next_week_get( $p_week, $p_year ) {
+    return strtotime( $p_year . 'W' . str_pad( $p_week, 2, 0, STR_PAD_LEFT ) . ' + 1 weeks' );
+}
+
+function timestamp_previous_week_get( $p_week, $p_year ) {
+    return strtotime( $p_year . 'W' . str_pad( $p_week, 2, 0, STR_PAD_LEFT ) . ' - 1 weeks' );
+}
+
+function days_of_number_week( $p_start_step_days, $p_count_step_days, $t_week_days_name, $p_week = null, $p_year = null ) {
 
     if( $p_week == null ) {
-        $t_week = date( "e" );
+        $t_week = date( "W" );
     }
+    
+    $t_week = str_pad( $p_week, 2, 0, STR_PAD_LEFT );
+  
+    if( $p_year == null ) {
+            $p_year = date( "Y" );
+        }
 
-    $t_week         = $p_week - 1;
-    $t_curent_years = date( "Y" );
     $t_days_week    = array();
 
     for( $i = $p_start_step_days; $i < $p_start_step_days + $p_count_step_days; $i++ ) {
 
-        $t_day_cheks = date( "D", strtotime( 'last monday + ' . $i . ' days 1/1/' . $t_curent_years . ' + ' . $t_week . ' weeks' ) );
+        $t_process_time = strtotime( $p_year . 'W' . $t_week . ' + ' . $i . ' days' );
+        $t_day_cheks = date( "D", $t_process_time );
 
         if( $t_week_days_name[$t_day_cheks] == ON ) {
-            $t_days_week[$i] = date( strtotime( 'last monday + ' . $i . ' days 1/1/' . $t_curent_years . ' + ' . $t_week . ' weeks' ) );
+            $t_days_week[$i] = date( $t_process_time );
         }
     }
     return $t_days_week;
