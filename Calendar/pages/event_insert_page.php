@@ -42,21 +42,33 @@ compress_enable();
 # don't index view issues pages
 html_robots_noindex();
 
+$t_current_week = date( "W" );
+$t_current_year = date( "Y" );
+$t_year_start_of_current_week = date( "Y", strtotime( 'this week' ) );
 
+if( $t_current_year != $t_year_start_of_current_week ) {
+    $t_current_year = $t_year_start_of_current_week;
+}
 
-$f_week        = gpc_get_int( "week", date( "W" ) );
+$f_week        = gpc_get_int( "week", $t_current_week );
+$f_year        = gpc_get_int( "year", $t_current_year );
 $f_is_fulltime = gpc_get_bool( "full_time" );
 $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
+
+if( strtotime( $f_year . 'W' . str_pad( $f_week, 2, 0, STR_PAD_LEFT ) ) == false ) {
+    error_parameters( plugin_lang_get( 'date_event' ) );
+    plugin_error( 'ERROR_RANGE_TIME', ERROR );
+}
 
 $t_start_day_of_the_week = plugin_config_get( "startStepDays" );
 $t_step_days_count       = plugin_config_get( "countStepDays" );
 $t_arWeekdaysName        = plugin_config_get( "arWeekdaysName" );
 
 $t_excluded_events = get_events_id_from_bug_id( $f_bug_id );
-$t_days            = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week );
+$t_days            = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week, $f_year );
 $t_days_events     = get_days_object( $t_days, helper_get_current_project(), $f_for_user, $t_excluded_events );
 
-$t_calendar_week = new ViewWeekSelect( $f_week, $f_for_user, $f_is_fulltime, $t_days_events, $f_bug_id );
+$t_calendar_week = new ViewWeekSelect( $f_week, $f_for_user, $f_is_fulltime, $t_days_events, $f_bug_id, $f_year );
 
 $t_calendar_week->print_html();
 
