@@ -150,34 +150,58 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     function schema() {
+        
+         /**
+         * Standard table creation options
+         * Array key is the ADOdb datadict driver's name
+         */
+        $t_table_options = array(
+                                  'mysql' => 'DEFAULT CHARSET=utf8',
+                                  'pgsql' => 'WITHOUT OIDS',
+        );
+
+        # Special handling for Oracle (oci8):
+        # - Field cannot be null with oci because empty string equals NULL
+        # - Oci uses a different date literal syntax
+        # - Default BLOBs to empty_blob() function
+        if( db_is_oracle() ) {
+            $t_notnull      = '';
+            $t_blob_default = 'DEFAULT " empty_blob() "';
+        } else {
+            $t_notnull      = 'NOTNULL';
+            $t_blob_default = '';
+        }
 
         return array(
                                   // version 0.0.1(schema 0)
                                   array( "CreateTableSQL", array( plugin_table( "events" ), "
-					id INT(10) NOTNULL AUTOINCREMENT PRIMARY,
-                                        project_id INT(10) NOTNULL,
-                                        name VARCHAR(255) NOTNULL,
-                                        tasks VARCHAR(2000) NOTNULL,
-                                        date_event INT(10) UNSIGNED NOTNULL DEFAULT 1,
-                                        hour_start INT(2) NOTNULL,
-                                        minutes_start INT(2) NOTNULL,
-                                        hour_finish INT(2) NOTNULL,
-                                        minutes_finish INT(2) NOTNULL,
-                                        activity CHAR(1) NOTNULL,
-                                        author_id INT(10),
-                                        date_changed INT(2),
-                                        changed_user_id INT(10)
-				" ) ),
+					id I $t_notnull AUTOINCREMENT PRIMARY,
+                                        project_id I $t_notnull,
+                                        name C(255) $t_notnull,
+                                        tasks C(2000) $t_notnull,
+                                        date_event I UNSIGNED $t_notnull DEFAULT 1,
+                                        hour_start I $t_notnull,
+                                        minutes_start I $t_notnull,
+                                        hour_finish I $t_notnull,
+                                        minutes_finish I $t_notnull,
+                                        activity C(1) $t_notnull,
+                                        author_id I,
+                                        date_changed I,
+                                        changed_user_id I
+				",
+                                      $t_table_options ) ),
                                   //version 0.0.1(schema 1)
                                   array( "CreateTableSQL", array( plugin_table( "relationship" ), "
-                                        event_id INT(10) NOTNULL,
-                                        bug_id INT(10) NOTNULL)
-                                " ) ),
+                                        event_id I $t_notnull,
+                                        bug_id I $t_notnull
+                                " ,
+                                      $t_table_options ) ),
                                   //version 0.9(schema 2)
                                   array( 'AddColumnSQL', array( plugin_table( "events" ), "
-                                        date_from INT(10) UNSIGNED NOTNULL DEFAULT 1,
-                                        date_to INT(10) UNSIGNED NOTNULL DEFAULT 1
-                                " ) ),
+                                        date_from I UNSIGNED $t_notnull DEFAULT 1,
+                                        date_to I UNSIGNED $t_notnull DEFAULT 1
+                                " ,
+                                      $t_table_options ) ),
                                   //version 0.9(schema 3)
                                   array( 'UpdateFunction', 'date_from_date_to' ),
                                   //version 0.9(schema 4)
@@ -191,9 +215,10 @@ class CalendarPlugin extends MantisPlugin {
                                 " ) ),
                                   //version 2.2.0 (schema 5)
                                   array( "CreateTableSQL", array( plugin_table( "event_member" ), "
-                                        user_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0',
-                                        event_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0')
-                                " ) ),
+                                        user_id I UNSIGNED $t_notnull PRIMARY DEFAULT '0',
+                                        event_id I UNSIGNED $t_notnull PRIMARY DEFAULT '0')
+                                " ,
+                                      $t_table_options ) ),
                                   //version 2.2.0 (schema 6)
                                   array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "event_member" ), "
                                       event_id
@@ -202,34 +227,35 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'UpdateFunction', 'turn_user_owner_to_user_member' ),
                                   //version 2.3.0 (schema 8)
                                   array( "CreateTableSQL", array( plugin_table( "google_sync" ), "
-                                      event_id INT(10) UNSIGNED NOTNULL PRIMARY DEFAULT '0',                                        
-                                      google_id VARCHAR(255) NOTNULL
-                                " ) ),
+                                      event_id I UNSIGNED $t_notnull PRIMARY DEFAULT '0',                                        
+                                      google_id C(255) $t_notnull
+                                " ,
+                                      $t_table_options ) ),
                                   //version 2.3.0 (schema 9)
-                                  array( 'CreateIndexSQL', array( 'idx_event_id', plugin_table( "google_sync" ), "
+                                  array( 'CreateIndexSQL', array( 'idx_goole_sync_event_id', plugin_table( "google_sync" ), "
                                       event_id
                                       " ) ),
                                   //version 2.3.1 (schema 10)
                                   array( 'AddColumnSQL', array( plugin_table( "google_sync" ), "
-                                        last_sync INT(10) UNSIGNED NOTNULL DEFAULT 0
+                                        last_sync I UNSIGNED $t_notnull DEFAULT 0
                                 " ) ),
                                   //version 2.4.0 (schema 11)
                                   array( 'AddColumnSQL', array( plugin_table( "events" ), "
-                                        duration INT(10) UNSIGNED NOTNULL,
-                                        recurrence_pattern VARCHAR(255) DEFAULT NULL,
-                                        parent_id INT(10) NOTNULL
+                                        duration I UNSIGNED $t_notnull,
+                                        recurrence_pattern C(255) DEFAULT NULL,
+                                        parent_id I $t_notnull
                                 " ) ),
                                   //version 2.4.0 (schema 12)
                                   array( 'UpdateFunction', 'calculate_duration' ),
                                   //version 2.4.7 (schema 13)
-                                  array( 'ChangeTableSQL', array( plugin_table( "events" ), "
-                                        recurrence_pattern MEDIUMTEXT
+                                  array( 'AlterColumnSQL', array( plugin_table( "events" ), "
+                                        recurrence_pattern X
                                 " ) ),
                                   //version 2.4.8 (schema 14)
                                   array( 'UpdateFunction', 'recurrence_pattern_set_notnull' ),
                                   //version 2.4.8 (schema 15)
-                                  array( 'ChangeTableSQL', array( plugin_table( "events" ), "
-                                        recurrence_pattern MEDIUMTEXT NOTNULL
+                                  array( 'AlterColumnSQL', array( plugin_table( "events" ), "
+                                        recurrence_pattern X $t_notnull
                                 " ) ),
         );
     }
