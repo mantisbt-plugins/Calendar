@@ -25,8 +25,7 @@ class ViewWeekCalendar extends WeekCalendar {
     }
 
     protected function print_spacer_top() {
-        echo '<div class="space-10">';
-        echo '</div>';
+        echo '';
     }
 
     protected function print_headline() {

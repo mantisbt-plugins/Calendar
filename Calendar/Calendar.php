@@ -328,7 +328,7 @@ class CalendarPlugin extends MantisPlugin {
         return array(
                                   'EVENT_LAYOUT_RESOURCES' => 'resources',
                                   'EVENT_MENU_MAIN_FRONT'  => 'menu_main_front',
-                                  'EVENT_VIEW_BUG_DETAILS' => 'html_print_calendar',
+                                  'EVENT_VIEW_BUG_EXTRA'   => 'html_print_calendar',
                                   'EVENT_FILTER_COLUMNS'    => 'column_add_in_view_all_bug_page',
                                   'EVENT_DISPLAY_TEXT'      => 'column_title_formating',
         );

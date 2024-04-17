@@ -22,7 +22,8 @@ class ViewIssue extends WeekCalendar {
     }
 
     protected function print_spacer_top() {
-        echo '';
+        echo '<div class="space-10">';
+        echo '</div>';
     }
 
     protected function print_headline() {
