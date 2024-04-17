@@ -345,7 +345,7 @@ class CalendarPlugin extends MantisPlugin {
                                                             'url'          => plugin_page( 'calendar_user_page' ),
                                                             'title'        => plugin_lang_get( 'menu_main_front' ),
                                                             'access_level' => plugin_config_get( 'calendar_view_threshold' ),
-                                                            'icon'         => 'fa-random'
+                                                            'icon'         => 'fa-calendar'
                                   ),
         );
     }
