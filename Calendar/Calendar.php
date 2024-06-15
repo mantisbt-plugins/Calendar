@@ -285,10 +285,7 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     function init() {
-        require_once 'api/php-rrule-1.6.1/src/RRuleInterface.php';
-        require_once 'api/php-rrule-1.6.1/src/RRule.php';
-        require_once 'api/php-rrule-1.6.1/src/RSet.php';
-        require_once 'api/php-rrule-1.6.1/src/RfcParser.php';
+        require_once 'api/vendor/autoload.php';
         require_once 'core/calendar_event_data_api.php';
         require_once 'core/calendar_date_api.php';
         require_once 'core/calendar_access_api.php';
@@ -296,7 +293,6 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_helper_api.php';
         require_once 'core/calendar_columns_api.php';
         require_once 'core/calendar_user_api.php';
-        require_once 'api/google-api-php-client-2.2.1/vendor/autoload.php';
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
         require_once 'core/calendar_menu_api.php';

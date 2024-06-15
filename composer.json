@@ -1,0 +1,29 @@
+{
+    "name": "brlumen/mantisbt-plugin-calendar",
+    "description": "Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar",
+    "authors": [
+        {
+            "name": "Grigoriy Ermolaev",
+            "email": "igflocal@gmail.com"
+        }
+    ],
+    "require": {
+        "google/apiclient": "* 2.14.0",
+        "rlanvin/php-rrule": "v1.6.1"
+    },
+    "replace": {
+        "guzzlehttp/guzzle": "*",
+        "guzzlehttp/psr7": "*"
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Calendar"
+        ]
+    },
+    "config": {
+        "vendor-dir": "Calendar/api/vendor"
+    }
+}
