@@ -31,6 +31,13 @@ try {
     if( array_key_exists('error', $accessToken) ) {
         throw new InvalidArgumentException( $accessToken['error_description'] );
     }
+    if(!array_key_exists('refresh_token', $accessToken)) {
+        $t_revocation_result = $client->revokeToken();
+        if( !$t_revocation_result ) {
+            throw new InvalidArgumentException( "SERVER NOT RETURN REFRESH TOKEN AND FAILED TO REVOKE ACCESS TO THE CURRENT USER'S CALENDAR. PLEASE CONTACT YOUR ADMINISTRATOR." );
+        }
+        throw new InvalidArgumentException( 'SERVER NOT RETURN REFRESH TOKEN. ALL RIGHTS FOR THE CURRENT USER ARE REVOKED. REPEAT YOUR REQUEST.' );
+    }
     plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );
 
     foreach( $f_state as $key => $t_value ) {
