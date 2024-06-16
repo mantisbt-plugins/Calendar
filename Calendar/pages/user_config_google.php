@@ -1,5 +1,5 @@
 <?php
-# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2024 Grigoriy Ermolaev (igflocal@gmail.com)
 # 
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -30,6 +30,13 @@ try {
     $accessToken = $client->fetchAccessTokenWithAuthCode( $f_oauth_key );
     if( array_key_exists('error', $accessToken) ) {
         throw new InvalidArgumentException( $accessToken['error_description'] );
+    }
+    if(!array_key_exists('refresh_token', $accessToken)) {
+        $t_revocation_result = $client->revokeToken();
+        if( !$t_revocation_result ) {
+            throw new InvalidArgumentException( "SERVER NOT RETURN REFRESH TOKEN AND FAILED TO REVOKE ACCESS TO THE CURRENT USER'S CALENDAR. PLEASE CONTACT YOUR ADMINISTRATOR." );
+        }
+        throw new InvalidArgumentException( 'SERVER NOT RETURN REFRESH TOKEN. ALL RIGHTS FOR THE CURRENT USER ARE REVOKED. REPEAT YOUR REQUEST.' );
     }
     plugin_config_set( 'oauth_key', $accessToken, auth_get_current_user_id() );
 
