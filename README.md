@@ -25,6 +25,11 @@ Features
 - Support for different time zones.
 - Recurring events(v. >= 2.4.0-dev).
 
+Supported Versions
+------------------
+- MantisBT 2.14 to 2.25.x - supported in release up to 2.6.x
+- MantisBT 2.26.0 and higher - supported in release 2.7.0 and higher
+
 Download
 --------
 Please download the stable version.
@@ -55,8 +60,3 @@ How to enabled Google Calendar Sync (for Calendar version >= 2.3.0 )
 
 Detailed instructions are provided in the project wiki.
 https://github.com/mantisbt-plugins/Calendar/wiki#how-to-enabled-google-calendar-sync
-
-Supported Versions
-------------------
-
-- MantisBT 2.14 and higher - supported
