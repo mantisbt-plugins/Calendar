@@ -97,8 +97,8 @@ if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'upda
     echo '<tfoot>';
     echo '<tr class="noprint"><td colspan="2">';
 
-    print_small_button( plugin_page( 'event_update_page' ) . "&event_id=" . $f_event_id . "&date=" . $f_date, lang_get( 'update_bug_button' ) );
-    print_small_button( plugin_page( 'event_delete' ) . "&from_bug_id=" . $f_from_bug_id . "&event_id=" . $f_event_id . "&date=" . $f_date . form_security_param( 'event_delete' ), lang_get( 'delete_bug_button' ) );
+    print_small_button( plugin_page( 'event_update_page' ) . "&event_id=" . $f_event_id . "&date=" . $f_date, lang_get( 'edit' ) );
+    print_small_button( plugin_page( 'event_delete' ) . "&from_bug_id=" . $f_from_bug_id . "&event_id=" . $f_event_id . "&date=" . $f_date . form_security_param( 'event_delete' ), lang_get( 'delete' ) );
 
     echo '</tr>';
     echo '</tfoot>';
