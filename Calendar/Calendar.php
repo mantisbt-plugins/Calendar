@@ -141,7 +141,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->version = '2.6.1';
 
         $this->requires = array(
-                                  'MantisCore' => '2.14.0',
+                                  'MantisCore' => '2.14.0, < 2.26.0',
         );
 
         $this->author  = 'Grigoriy Ermolaev';
