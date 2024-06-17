@@ -60,3 +60,17 @@ How to enabled Google Calendar Sync (for Calendar version >= 2.3.0 )
 
 Detailed instructions are provided in the project wiki.
 https://github.com/mantisbt-plugins/Calendar/wiki#how-to-enabled-google-calendar-sync
+
+Donate
+--------------
+All work on this plugin consists of many hours of coding during our free time, to provide you with a TelegramBot 
+that is easy to use. If you enjoy using this plugin and would like to say thank you, donations are a great 
+way to show your support.
+
+Donations are invested back into the project 👍
+
+Thank you for keeping this project alive 🙏
+
+Available methods:
+1. TGFFBC28Wo27aQ24L4ku6y3Egbe12Jhv1k (USDT TRC20)
+2. 1PxyVPeYhRUtt5Mg1t3xSmFtHSYf2CabLR (BTC)
