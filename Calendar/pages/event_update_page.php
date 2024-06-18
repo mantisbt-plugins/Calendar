@@ -1,5 +1,5 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2024 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, 
@@ -65,7 +65,7 @@ layout_page_begin();
                     </h4>
                     <div class="widget-toolbar no-border">
                         <div class="widget-menu">
-                            <?php print_small_button( plugin_page( 'view' ) . "&event_id=" . $f_event_id, plugin_lang_get( 'back_to_event_link' ) ); ?>
+                            <?php print_small_button( plugin_page( 'view' ) . "&event_id=" . $f_event_id . '&date=' . $f_date, plugin_lang_get( 'back_to_event_link' ) ); ?>
                         </div>
                     </div>
                 </div>
