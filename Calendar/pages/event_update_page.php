@@ -185,7 +185,7 @@ layout_page_begin();
 
                                         <?php
                                         if( array_key_exists( 'UNTIL', $t_rule ) ) {
-                                            $t_time_until = $t_rule['UNTIL']->format( config_get( 'short_date_format' ) );
+                                            $t_time_until = $t_rule['UNTIL']->format( plugin_config_get( 'short_date_format' ) );
                                         } else {
                                             $t_time_until = plugin_lang_get( 'never_ending_repetition' );
                                         }
