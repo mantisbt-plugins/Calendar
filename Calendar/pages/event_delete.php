@@ -37,7 +37,7 @@ $t_bugs_attached = event_get_attached_bugs_id( $t_event_data->id );
 switch( $t_range ) {
 
     case 'THIS':
-        $t_rset_current = new \RRule\RSet( $t_event_data->recurrence_pattern );
+        $t_rset_current = new CalendarPluginRRuleExt\RSetExt( $t_event_data->recurrence_pattern );
         if( $t_rset_current->count() == 1 ) {
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
@@ -62,7 +62,7 @@ switch( $t_range ) {
             break;
         }
 
-        $t_rset_new            = new \RRule\RSet();
+        $t_rset_new            = new CalendarPluginRRuleExt\RSetExt();
         $t_event_data->date_to = $f_date_select - 1;
 
         $t_rset_current = new \RRule\RSet( $t_event_data->recurrence_pattern );
