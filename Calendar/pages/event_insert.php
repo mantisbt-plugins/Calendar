@@ -58,7 +58,7 @@ switch( $t_range ) {
 
         $t_event_child_id = $t_event_child_data->create();
 
-        $t_rset_child                            = new \RRule\RSet( $t_event_parent_data->recurrence_pattern );
+        $t_rset_child                            = new CalendarPluginRRuleExt\RSetExt( $t_event_parent_data->recurrence_pattern );
         $t_rset_child->addExDate( $f_date );
         $t_event_parent_data->recurrence_pattern = $t_rset_child->rfcString();
 
@@ -90,7 +90,7 @@ switch( $t_range ) {
             case 'WEEKLY':
             case 'MONTHLY':
             case 'YEARLY':
-                $t_rset_new = new \RRule\RSet();
+                $t_rset_new = new CalendarPluginRRuleExt\RSetExt();
 
                 $t_rrule = new RRule\RRule( array(
                                           'DTSTART'  => $t_event_child_data->date_from,
@@ -125,7 +125,7 @@ switch( $t_range ) {
         $t_rrule_parent_old['UNTIL'] = strtotime( date( 'Y-m-d', $t_event_child_data->date_from ) );
         $t_rrule_parent_new          = new RRule\RRule( $t_rrule_parent_old );
 
-        $t_rset_parent = new \RRule\RSet();
+        $t_rset_parent = new CalendarPluginRRuleExt\RSetExt();
         $t_rset_parent->addRRule( $t_rrule_parent_new );
 
         $t_exdates_parent_old = $t_rset_parent_old->getExDates();

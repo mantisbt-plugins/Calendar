@@ -286,6 +286,7 @@ class CalendarPlugin extends MantisPlugin {
 
     function init() {
         require_once 'api/vendor/autoload.php';
+        require_once 'core/classes/RSetExt.class.php';
         require_once 'core/calendar_event_data_api.php';
         require_once 'core/calendar_date_api.php';
         require_once 'core/calendar_access_api.php';
