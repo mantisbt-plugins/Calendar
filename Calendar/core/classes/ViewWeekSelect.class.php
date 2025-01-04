@@ -53,13 +53,13 @@ class ViewWeekSelect extends ViewWeekCalendar {
 
         echo '<div class="btn-group pull-right">';
         if( WeekCalendar::$full_time_is == FALSE ) {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_previous_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ) . '&id=' . $this->bug_id, plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_next_week_get( $this->week, $this->year ) ) . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
         } else {
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_previous_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_previous_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'week' ) );
-            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "Y", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
+            print_small_button( plugin_page( 'event_insert_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE" . '&id=' . $this->bug_id, plugin_lang_get( 'next_period' ) );
         }
         echo '</div>';
 

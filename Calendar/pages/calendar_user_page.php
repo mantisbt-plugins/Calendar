@@ -39,12 +39,7 @@ compress_enable();
 html_robots_noindex();
 
 $t_current_week = date( "W" );
-$t_current_year = date( "Y" );
-$t_year_start_of_current_week = date( "Y", strtotime( 'this week' ) );
-
-if( $t_current_year != $t_year_start_of_current_week ) {
-    $t_current_year = $t_year_start_of_current_week;
-}
+$t_current_year = date( "o" );
 
 $f_week        = gpc_get_int( "week", $t_current_week );
 $f_year        = gpc_get_int( "year", $t_current_year );
