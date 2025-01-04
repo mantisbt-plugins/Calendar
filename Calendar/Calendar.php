@@ -1,5 +1,5 @@
 <?php
-# Copyright (c) 2024 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
 # 
 # Calendar for MantisBT is free software: 
 # you can redistribute it and/or modify it under the terms of the GNU
@@ -138,7 +138,7 @@ class CalendarPlugin extends MantisPlugin {
         $this->description = plugin_lang_get( 'description' );
         $this->page        = 'config_page';
 
-        $this->version = '2.6.3';
+        $this->version = '2.6.4';
 
         $this->requires = array(
                                   'MantisCore' => '2.14.0, < 2.26.0',
