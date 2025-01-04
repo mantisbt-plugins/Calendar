@@ -32,8 +32,8 @@ function days_of_number_week( $p_start_step_days, $p_count_step_days, $t_week_da
     $t_week = str_pad( $p_week, 2, 0, STR_PAD_LEFT );
   
     if( $p_year == null ) {
-            $p_year = date( "Y" );
-        }
+            $p_year = date( "o" );
+    }
 
     $t_days_week    = array();
 
