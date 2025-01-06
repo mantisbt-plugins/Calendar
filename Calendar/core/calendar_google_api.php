@@ -241,8 +241,16 @@ function event_google_get_last_sync( $p_event_google_id ) {
 				  WHERE google_id=" . db_param();
 
     $t_result = db_query( $t_query, array( $p_event_google_id ) );
+    
+    $t_row = db_fetch_array( $t_result );
+    
+    if( $t_row === false ) {
+        $t_google_event_last_sync = 0;
+    } else {
+        $t_google_event_last_sync = $t_row['last_sync'];
+    }
 
-    return db_fetch_array( $t_result )['last_sync'];
+    return $t_google_event_last_sync;
 }
 
 function event_google_get_id( $p_event_id ) {
@@ -257,14 +265,22 @@ function event_google_get_id( $p_event_id ) {
 
     $t_result = db_query( $t_query, array( (int) $c_event_id ) );
 
-    return db_fetch_array( $t_result )['google_id'];
+    $t_row = db_fetch_array( $t_result );
+    
+    if( $t_row === false ) {
+        $t_google_event_id = 0;
+    } else {
+        $t_google_event_id = $t_row['google_id'];
+    }
+    
+    return $t_google_event_id;
 }
 
 function event_is_synchronized_with_google( $p_event_id ) {
 
-    $t_result = event_google_get_id( $p_event_id );
+    $t_google_event_id = event_google_get_id( $p_event_id );
 
-    if( !$t_result ) {
+    if( $t_google_event_id == 0 ) {
         return false;
     } else {
         return true;

@@ -130,12 +130,13 @@ if( access_compare_level( $t_access_level_current_user, plugin_config_get( 'upda
     $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, auth_get_current_user_id() );
     if( !array_key_exists('error', $t_oauth) && count($t_oauth) > 0 ) {
         $t_event_google_id        = event_google_get_id( $t_event_id );
-        $t_event_google_last_sync = event_google_get_last_sync( $t_event_google_id );
-
+        if( $t_event_google_id != 0 ) {
+            $t_event_google_last_sync = event_google_get_last_sync( $t_event_google_id );
+        }
         echo '<tr>';
         echo '<th class="bug-reporter category">', plugin_lang_get( 'view_event_google_last_sync' ), '</th>';
         echo '<td class="bug-reporter" >';
-        echo $t_event_google_last_sync == 0 ? plugin_lang_get( 'not_last_update' ) : date( config_get( 'normal_date_format' ), $t_event_google_last_sync );
+        echo $t_event_google_id == 0 || $t_event_google_last_sync == 0 ? plugin_lang_get( 'not_last_update' ) : date( config_get( 'normal_date_format' ), $t_event_google_last_sync );
 
         if( $t_event->author_id == auth_get_current_user_id() ) {
             echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_google_sync' ) . '&event_id=' . $f_event_id  . "&date=" . $t_event->date_from . htmlspecialchars( form_security_param( 'event_google_sync' ) ) . '"><i class="fa fa-refresh"></i></a>';
