@@ -31,7 +31,7 @@ function print_google_calendar_list() {
 }
 
 function get_response_google_url() {
-    $t_state = array( 'user_config_google' );
+    $t_state = array( 'user_config_google' => '' );
 
     $client = new Google_Client();
     $client->setApplicationName( "MantisBT Calendar plugin" );
