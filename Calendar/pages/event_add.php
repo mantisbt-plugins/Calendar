@@ -88,7 +88,7 @@ layout_page_begin( plugin_page( 'event_add_page' ) );
 
 
 if( $f_from_bug != 0 ) {
-    print_successful_redirect_to_bug( $f_from_bug );
+    print_header_redirect_view( $f_from_bug );
 } else {
     $t_buttons = array(
                               array( plugin_page( 'calendar_user_page' ), plugin_lang_get( 'menu_main_front' ) ),

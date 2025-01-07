@@ -113,7 +113,7 @@ switch( $t_range ) {
 form_security_purge( 'event_delete' );
 
 if( $f_from_bug_id != 0 && bug_exists( $f_from_bug_id ) ) {
-    print_successful_redirect_to_bug( $f_from_bug_id );
+    print_header_redirect_view( $f_from_bug_id );
 } else {
     print_header_redirect( plugin_page( 'calendar_user_page', TRUE ) . "&week=" . date( "W", $f_date_select ) );
 }

@@ -150,14 +150,6 @@ switch( $t_range ) {
 
 }
 
-layout_page_header_begin();
-
-layout_page_header_end();
-
-layout_page_begin( plugin_page( 'event_insert_page' ) );
-
-print_successful_redirect_to_bug( $f_bug );
-
 form_security_purge( 'event_insert' );
 
-layout_page_end();
+print_header_redirect_view( $f_bug );
