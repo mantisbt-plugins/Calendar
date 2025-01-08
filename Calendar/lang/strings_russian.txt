@@ -138,3 +138,5 @@ $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Событие %1$d не найде�
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'ВРЕМЯ НАЧАЛА/ОКОНЧАНИЯ РАБОЧЕГО ДИАПАЗОНА ЗАДАНО НЕ ВЕРНО.';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = 'У СОБЫТИЯ ДОЛЖЕН БЫТЬ ХОТЯ БЫ ОДИН УЧАСТНИК';
 $s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'СОБЫТИЕ #%1$s В УКАЗАННОМ ПЕРИОДЕ НЕ СУЩЕСТВУЕТ.';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Отсутствуют требуемые зависимости в Calendar/api/vendor/';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = 'Если вы загрузили версию для разработки, то выполните composer install для загрузки зависимостей. Иначе загрузите файл Calendar-vX_X_X.zip из https://github.com/mantisbt-plugins/Calendar/releases';

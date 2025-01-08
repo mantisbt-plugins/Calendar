@@ -138,3 +138,5 @@ $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = '无法找到事件 %1$d .';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = '事件至少需要一位成员';
 $s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = '事件 ＃％1$s 在指定期间内不存在。';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Calendar/api/vendor/ 中缺少必需的依赖项';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = '如果您下载的是开发版本，请运行 composer install 以下载依赖项。否则，请从 https://github.com/mantisbt-plugins/Calendar/releases 下载 Calendar-vX_X_X.zip 文件';

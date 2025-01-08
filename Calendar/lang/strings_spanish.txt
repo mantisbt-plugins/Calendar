@@ -138,3 +138,5 @@ $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Evento %1$d No encontrado.';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'EL RANGO de INICIO/FINALIZACION DEL TRABAJO NO SE ASIGNO CORRECTAMENTE ';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EL EVENTO DEBE SER UN MIEMBRO';
 $s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EL EVENTO #%1$s NO EXISTE EN EL PERÍODO ESPECIFICADO.';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Faltan dependencias requeridas en Calendar/api/vendor/';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = 'Si descargó la versión de desarrollo, ejecute composer install para descargar las dependencias. De lo contrario, descargue el archivo Calendar-vX_X_X.zip desde https://github.com/mantisbt-plugins/Calendar/releases';
