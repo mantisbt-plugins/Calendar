@@ -148,6 +148,34 @@ class CalendarPlugin extends MantisPlugin {
         $this->contact = 'igflocal@gmail.com';
         $this->url     = 'http://github.com/mantisbt-plugins/calendar';
     }
+    
+    function isValidDependency() {
+        $t_file_path = config_get_global( 'plugin_path' );
+	$t_file_path .= $this->basename . DIRECTORY_SEPARATOR;
+	$t_file_path .= 'api/vendor/autoload.php';
+        
+        $t_file_is = file_exists( $t_file_path );
+        return $t_file_is;
+    }
+    
+    function isValid() {
+        return parent::isValid() && $this->isValidDependency();
+    }
+    
+    function getInvalidPlugin() {
+        if(!parent::isValid()) {
+            return parent::getInvalidPlugin();
+        } else {
+            $t_plugin = new MissingClassPlugin( $this->basename );
+
+            $t_plugin->setInvalidPlugin( $this );
+
+            $t_plugin->description = plugin_lang_get( 'ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION', $this->basename );
+            $t_plugin->status_message = plugin_lang_get( 'ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE', $this->basename );
+
+            return $t_plugin;
+        }
+    }
 
     function schema() {
 

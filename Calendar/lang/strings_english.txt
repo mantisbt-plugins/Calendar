@@ -138,3 +138,5 @@ $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Event %1$d was not found.';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EVENT SHOULD BE ONE MEMBER';
 $s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EVENT #%1$s DOES NOT EXIST IN THE SPECIFIED PERIOD.';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Required dependencies are missing in Calendar/api/vendor/';
+$s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = 'If you downloaded the development version, then run composer install to download the dependencies. Otherwise, download the Calendar-vX_X_X.zip file from https://github.com/mantisbt-plugins/Calendar/releases';
