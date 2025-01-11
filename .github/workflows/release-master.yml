@@ -17,14 +17,16 @@ jobs:
 
     # 2. Install PHP and Composer
     - name: Setup PHP
+      if: ${{ github.event.release.target_commitish != 'master-2.6.x' }}
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        extensions: mbstring, intl, zip # Укажите нужные расширения
+        extensions: mbstring, intl, zip
         tools: composer
 
     # 3. Installing dependencies
     - name: Install dependencies
+      if: ${{ github.event.release.target_commitish != 'master-2.6.x' }}
       run: composer install --no-dev --optimize-autoloader
 
     # 4. Creating an archive
