@@ -63,7 +63,7 @@ https://github.com/mantisbt-plugins/Calendar/wiki#how-to-enabled-google-calendar
 
 Donate
 --------------
-All work on this plugin consists of many hours of coding during our free time, to provide you with a TelegramBot 
+All work on this plugin consists of many hours of coding during our free time, to provide you with a Calendar 
 that is easy to use. If you enjoy using this plugin and would like to say thank you, donations are a great 
 way to show your support.
 
