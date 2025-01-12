@@ -41,8 +41,10 @@ html_robots_noindex();
 $t_current_week = date( "W" );
 $t_current_year = date( "o" );
 
-$f_week        = gpc_get_int( "week", $t_current_week );
-$f_year        = gpc_get_int( "year", $t_current_year );
+$f_date_selected = gpc_get_string("date_select",'');
+
+$f_week        = gpc_get_int( "week", is_blank( $f_date_selected ) ? $t_current_week : date( "W", strtotime( $f_date_selected ) ) );
+$f_year        = gpc_get_int( "year", is_blank( $f_date_selected ) ? $t_current_year : date( "o", strtotime( $f_date_selected ) ) );
 $f_is_fulltime = gpc_get_bool( "full_time" );
 $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
 //$t_access_level_current_user        = access_get_project_level();

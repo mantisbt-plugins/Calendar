@@ -59,18 +59,29 @@ class ViewWeekCalendar extends WeekCalendar {
     }
 
     protected function print_menu_top() {
-        echo '<div class="widget-toolbox padding-8 clearfix">';
+        echo '<div class="widget-toolbox padding-8 clearfix">';      
         echo '<div class="btn-toolbar">';
-
+        echo '<form id="select_date_form" method="post" action="' . plugin_page( 'calendar_user_page' ) . '" class="btn-toolbar">';        
         echo '<div class="btn-group pull-left">';
+        
         if( self::$full_time_is == FALSE ) {
+            print_hidden_inputs( array( 'full_time' => 'FALSE' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&full_time=TRUE", "0-24" );
         } else {
+            print_hidden_inputs( array( 'full_time' => 'TRUE' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
         }
         echo '</div>';
 
         echo '<div class="btn-group pull-right">';
+        
+        echo '<input type="submit" class="btn btn-primary btn-xs btn-white btn-round" value="' . plugin_lang_get( 'goto_date_button' ) . '" />';
+
+        echo '<input type="text" id="date_select" name="date_select" class="datetimepicker input-sm" ' .
+                                'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                'size="10" maxlength="10" autocomplete="off"/>';
+
         if( self::$full_time_is == FALSE ) {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_previous_week_get( $this->week, $this->year ) ), plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ), plugin_lang_get( 'week' ) );
@@ -81,9 +92,9 @@ class ViewWeekCalendar extends WeekCalendar {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE", plugin_lang_get( 'next_period' ) );
         }
         echo '</div>';
-
+        echo '</form>';
         echo '</div>';
-        echo '</div>';
+        echo '</div>';        
     }
 
     protected function print_menu_bottom() {

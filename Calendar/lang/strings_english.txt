@@ -116,6 +116,7 @@ $s_plugin_Calendar_day = 'Day';
 $s_plugin_Calendar_next_period = 'Next';
 $s_plugin_Calendar_current_period = 'Current period';
 $s_plugin_Calendar_previous_period = 'Back';
+$s_plugin_Calendar_goto_date_button = 'Go to date:';
 
 $s_plugin_Calendar_assigned_event = 'Assigned Events';
 $s_plugin_Calendar_not_assigned_event = 'No events assigned';
