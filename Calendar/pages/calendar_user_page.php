@@ -41,10 +41,11 @@ html_robots_noindex();
 $t_current_week = date( "W" );
 $t_current_year = date( "o" );
 
-$f_date_selected = gpc_get_string("date_select",'');
+$f_string_date_selected = gpc_get_string( "date_select", '' );
+$p_date_selected = strtotime( $f_string_date_selected );
 
-$f_week        = gpc_get_int( "week", is_blank( $f_date_selected ) ? $t_current_week : date( "W", strtotime( $f_date_selected ) ) );
-$f_year        = gpc_get_int( "year", is_blank( $f_date_selected ) ? $t_current_year : date( "o", strtotime( $f_date_selected ) ) );
+$f_week        = gpc_get_int( "week", !$p_date_selected ? $t_current_week : date( "W", $p_date_selected ) );
+$f_year        = gpc_get_int( "year", !$p_date_selected ? $t_current_year : date( "o", $p_date_selected ) );
 $f_is_fulltime = gpc_get_bool( "full_time" );
 $f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
 //$t_access_level_current_user        = access_get_project_level();
@@ -62,7 +63,7 @@ $t_arWeekdaysName        = plugin_config_get( "arWeekdaysName" );
 $t_days        = days_of_number_week( $t_start_day_of_the_week, $t_step_days_count, $t_arWeekdaysName, $f_week, $f_year );
 $t_days_events = get_days_object( $t_days, helper_get_current_project(), $f_for_user );
 
-$t_calendar_week = new ViewWeekCalendar( $f_week, $f_for_user, $f_is_fulltime, $t_days_events, plugin_page( 'view' ), $f_year );
+$t_calendar_week = new ViewWeekCalendar( $f_week, $f_for_user, $f_is_fulltime, $t_days_events, plugin_page( 'view' ), $f_year, $p_date_selected );
 
 $t_calendar_week->print_html();
 

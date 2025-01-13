@@ -23,14 +23,17 @@ class ViewWeekCalendar extends WeekCalendar {
     protected $week;
     protected $for_user;
     protected $year;
+    protected $date_selected;
 
     //put your code here
-    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_link_options, $p_year ) {
+    public function __construct( $p_week, $p_user, $p_is_full_time, $p_days_events, $p_link_options, $p_year, $p_date_selected = false ) {
         parent::__construct($p_days_events, $p_link_options, $p_is_full_time);
 
         $this->week         = $p_week;
         $this->for_user     = (int)$p_user;
         $this->year         = $p_year;
+        
+        $this->date_selected = $p_date_selected;
     }
 
     protected function print_spacer_top() {
@@ -64,24 +67,22 @@ class ViewWeekCalendar extends WeekCalendar {
         echo '<form id="select_date_form" method="post" action="' . plugin_page( 'calendar_user_page' ) . '" class="btn-toolbar">';        
         echo '<div class="btn-group pull-left">';
         
+        if( !is_bool( $this->date_selected ) ) {
+            $t_date_to_display = date( plugin_config_get( 'short_date_format' ), $this->date_selected );
+	} else {
+            $t_date_to_display = '';
+        }
+        
         if( self::$full_time_is == FALSE ) {
             print_hidden_inputs( array( 'full_time' => 'FALSE' ) );
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&full_time=TRUE", "0-24" );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&full_time=TRUE" . "&date_select=" . $t_date_to_display, "0-24" );
         } else {
             print_hidden_inputs( array( 'full_time' => 'TRUE' ) );
-            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
+            print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . $this->week . "&year=" . $this->year . "&date_select=" . $t_date_to_display, gmdate( "H", plugin_config_get( 'time_day_start' ) ) . "-" . gmdate( "H", plugin_config_get( 'time_day_finish' ) ) );
         }
         echo '</div>';
 
         echo '<div class="btn-group pull-right">';
-        
-        echo '<input type="submit" class="btn btn-primary btn-xs btn-white btn-round" value="' . plugin_lang_get( 'goto_date_button' ) . '" />';
-
-        echo '<input type="text" id="date_select" name="date_select" class="datetimepicker input-sm" ' .
-                                'data-picker-locale="' . lang_get_current_datetime_locale() .
-                                '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
-                                'size="10" maxlength="10" autocomplete="off"/>';
-
         if( self::$full_time_is == FALSE ) {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_previous_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_previous_week_get( $this->week, $this->year ) ), plugin_lang_get( 'previous_period' ) );
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . (int)date( "W" ), plugin_lang_get( 'week' ) );
@@ -92,6 +93,15 @@ class ViewWeekCalendar extends WeekCalendar {
             print_small_button( plugin_page( 'calendar_user_page' ) . "&for_user=" . $this->for_user . "&week=" . date( "W", timestamp_next_week_get( $this->week, $this->year ) ) . "&year=" . date( "o", timestamp_next_week_get( $this->week, $this->year ) ) . "&full_time=TRUE", plugin_lang_get( 'next_period' ) );
         }
         echo '</div>';
+        
+        echo '<div class="btn-group pull-right">';
+        echo '<input type="submit" class="btn btn-primary btn-white btn-round btn-sm" value="' . plugin_lang_get( 'goto_date_button' ) . '" />';
+        echo '<input type="text" id="date_select" name="date_select" class="datetimepicker input-sm" ' .
+                                'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                'size="10" maxlength="10" autocomplete="off" value="' . $t_date_to_display . '" />';
+        echo '</div>';
+        
         echo '</form>';
         echo '</div>';
         echo '</div>';        
