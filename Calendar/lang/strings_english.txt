@@ -82,6 +82,7 @@ $s_plugin_Calendar_members = 'Event Members';
 $s_plugin_Calendar_owner_is_members = 'A member of the event?';
 $s_plugin_Calendar_add_user_to_member = 'Make user a member of the event';
 $s_plugin_Calendar_select_all_users = 'All users';
+$s_plugin_Calendar_select_author_is_me = 'I am the author';
 $s_plugin_Calendar_filter_text = 'Filter by:';
 
 $s_plugin_Calendar_event_hystory_bug_detach = 'Removed from event';

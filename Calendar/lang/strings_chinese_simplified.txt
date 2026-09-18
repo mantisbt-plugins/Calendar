@@ -82,6 +82,7 @@ $s_plugin_Calendar_members = '事件成员';
 $s_plugin_Calendar_owner_is_members = '是否为此事件成员?';
 $s_plugin_Calendar_add_user_to_member = '添加该成员到事件中';
 $s_plugin_Calendar_select_all_users = '所有成员';
+$s_plugin_Calendar_select_author_is_me = '我是创建者';
 $s_plugin_Calendar_filter_text = '筛选方式:';
 
 $s_plugin_Calendar_event_hystory_bug_detach = '从事件中删除';

@@ -14,6 +14,11 @@
 # along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
+# for_user value of the calendar filter that keeps the events the current
+# user has created, whoever their members are; ALL_USERS (0) and a real
+# user id are the other two modes
+define( 'CALENDAR_FILTER_AUTHOR', -1 );
+
 # Where the calendar of the issue view page is placed, see bug_calendar_block_position.
 # A row of the issue details table, the way it has always been.
 define( 'CALENDAR_BUG_BLOCK_DETAILS', 0 );

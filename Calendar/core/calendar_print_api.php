@@ -15,6 +15,24 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * The <option> rows of the for_user filter of the calendar views: the reset
+ * entry, all users, the events the current user has created, and then every
+ * user of the project who can report events
+ * @param integer $p_for_user The selected value: a user id, ALL_USERS or CALENDAR_FILTER_AUTHOR.
+ * @return void
+ */
+function print_for_user_option_list( $p_for_user ) {
+    echo '<option value="' . auth_get_current_user_id() . '">[' . lang_get( 'reset_query' ) . ']</option>';
+    foreach( array( ALL_USERS => 'select_all_users', CALENDAR_FILTER_AUTHOR => 'select_author_is_me' ) as $t_value => $t_lang_key ) {
+        echo '<option value="' . $t_value . '"' . ( $p_for_user == $t_value ? ' selected="selected"' : '' ) . '>[' . plugin_lang_get( $t_lang_key ) . ']</option>';
+    }
+    # The core appends a "deleted user" row for an id it cannot find and
+    # marks it selected, so the author sentinel must not reach it
+    $t_selected_user = $p_for_user == CALENDAR_FILTER_AUTHOR ? NO_USER : $p_for_user;
+    print_user_option_list( $t_selected_user, helper_get_current_project(), plugin_config_get( 'report_event_threshold' ) );
+}
+
+/**
  * Timezone <option> list grouped by continent, like the core
  * print_timezone_option_list(), but with the UTC offset in effect at
  * $p_timestamp appended to every label, e.g. "Moscow (UTC+03:00)".

@@ -225,8 +225,8 @@ class ViewMonthCalendar {
                 'project_name' => string_html_specialchars(project_get_name($t_event['project_id'])),
                 'style' => calendar_project_color_style($t_event['project_id'])
             );
-            // In the all-users mode show whose event it is
-            if ($this->user_id == ALL_USERS) {
+            // Show whose event it is unless the grid is already one user's
+            if ($this->user_id == ALL_USERS || $this->user_id == CALENDAR_FILTER_AUTHOR) {
                 $t_member_names = array();
                 foreach (event_get_members($t_event['id']) as $t_member_id) {
                     $t_member_names[] = user_get_name($t_member_id);
@@ -361,14 +361,7 @@ class ViewMonthCalendar {
 
         echo '<label class="inline"></label>';
         echo '<select name="for_user">';
-        echo '<option value="' . auth_get_current_user_id() . '">[' . lang_get( 'reset_query' ) . ']</option>';
-        if( $this->user_id == 0 ) {
-            echo '<option selected="selected" value="0">[' . plugin_lang_get( 'select_all_users' ) . ']</option>';
-        } else {
-            echo '<option value="0">[' . plugin_lang_get( 'select_all_users' ) . ']</option>';
-        }
-
-        print_user_option_list( $this->user_id, helper_get_current_project(), plugin_config_get( 'report_event_threshold' ) );
+        print_for_user_option_list( $this->user_id );
 
         echo '</select>';
         echo '</form>';

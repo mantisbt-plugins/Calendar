@@ -166,14 +166,7 @@ class ViewWeekCalendar extends WeekCalendar {
 
         echo '<label class="inline"></label>';
         echo '<select name="for_user">';
-        echo '<option value="' . auth_get_current_user_id() . '">[' . lang_get( 'reset_query' ) . ']</option>';
-        if( $this->for_user == 0 ) {
-            echo '<option selected="selected" value="0">[' . plugin_lang_get( 'select_all_users' ) . ']</option>';
-        } else {
-            echo '<option value="0">[' . plugin_lang_get( 'select_all_users' ) . ']</option>';
-        }
-
-        print_user_option_list( $this->for_user, helper_get_current_project(), plugin_config_get( 'report_event_threshold' ) );
+        print_for_user_option_list( $this->for_user );
 
         echo '</select>';
         echo '</form>';
