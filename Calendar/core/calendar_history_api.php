@@ -219,7 +219,7 @@ function event_history_delete( $p_event_id ) {
 /**
  * Turn a raw history row into the strings shown to the user
  * @param array $p_row History row as returned by event_history_get_events().
- * @return array with the keys date, user_id, note, old_value and new_value
+ * @return array with the keys date, user_id, note, old_value, new_value and change
  * @access public
  */
 function event_history_localize_row( array $p_row ) {
@@ -306,6 +306,14 @@ function event_history_localize_row( array $p_row ) {
             $t_localized['old_value'] = $p_row['old_value'];
             $t_localized['new_value'] = $p_row['new_value'];
             break;
+    }
+
+    # the same single "change" column the core history shows: both values
+    # around an arrow for a field change, the only one present otherwise
+    if( $t_localized['old_value'] !== '' && $t_localized['new_value'] !== '' ) {
+        $t_localized['change'] = $t_localized['old_value'] . ' => ' . $t_localized['new_value'];
+    } else {
+        $t_localized['change'] = $t_localized['old_value'] . $t_localized['new_value'];
     }
 
     return $t_localized;

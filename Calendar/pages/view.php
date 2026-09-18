@@ -329,6 +329,11 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
 
     <?php
 } # show member list
+
+# reminders: what applies to the viewer, with the means to make it their own
+if( calendar_reminder_feature_enabled() ) {
+    print_event_reminder_block( $f_event_id, $t_event->date_from, auth_get_current_user_id() );
+}
 ?>
 
 
@@ -398,26 +403,25 @@ if( access_has_event_level( plugin_config_get( 'view_event_history_threshold' ),
         <div id="event_history" class="widget-box widget-color-blue2 <?php echo $t_block_css ?>">
             <div class="widget-header widget-header-small">
                 <h4 class="widget-title lighter">
-                    <i class="ace-icon fa fa-history"></i>
+                    <?php print_icon( 'fa-history', 'ace-icon' ); ?>
                     <?php echo plugin_lang_get( 'event_history' ) ?>
                 </h4>
                 <div class="widget-toolbar">
                     <a data-action="collapse" href="#">
-                        <i class="1 ace-icon fa <?php echo $t_block_icon ?> bigger-125"></i>
+                        <?php print_icon( $t_block_icon, '1 ace-icon bigger-125' ); ?>
                     </a>
                 </div>
             </div>
             <div class="widget-body">
                 <div class="widget-main no-padding">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-condensed table-striped">
+                        <table class="table table-bordered table-condensed table-hover table-striped">
                             <thead>
                                 <tr>
-                                    <th class="category"><?php echo lang_get( 'date_modified' ) ?></th>
-                                    <th class="category"><?php echo lang_get( 'username' ) ?></th>
-                                    <th class="category"><?php echo plugin_lang_get( 'event_history_field' ) ?></th>
-                                    <th class="category"><?php echo plugin_lang_get( 'event_history_old_value' ) ?></th>
-                                    <th class="category"><?php echo plugin_lang_get( 'event_history_new_value' ) ?></th>
+                                    <th class="small-caption"><?php echo lang_get( 'date_modified' ) ?></th>
+                                    <th class="small-caption"><?php echo lang_get( 'username' ) ?></th>
+                                    <th class="small-caption"><?php echo lang_get( 'field' ) ?></th>
+                                    <th class="small-caption"><?php echo lang_get( 'change' ) ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -436,8 +440,7 @@ if( access_has_event_level( plugin_config_get( 'view_event_history_threshold' ),
                                     }
                                     echo '</td>';
                                     echo '<td class="small-caption">' . string_display_line( $t_history_item['note'] ) . '</td>';
-                                    echo '<td class="small-caption">' . string_display_line( $t_history_item['old_value'] ) . '</td>';
-                                    echo '<td class="small-caption">' . string_display_line( $t_history_item['new_value'] ) . '</td>';
+                                    echo '<td class="small-caption">' . string_display_line( $t_history_item['change'] ) . '</td>';
                                     echo '</tr>';
                                 }
                                 ?>
