@@ -28,7 +28,10 @@
  * its own and is exported on its own, so the series and the split-off
  * occurrence import as two calendar entries, exactly the way the plugin
  * stores them. The file is published (METHOD:PUBLISH), never sent as an
- * invitation: a client does not answer it, and there are no attendees in it.
+ * invitation: a client does not answer it, and there are no attendees in it -
+ * an iTIP reply would go by mail to the organizer, which nothing here reads.
+ * A member replies through the personal links in the description instead,
+ * the very links the mails carry, which act for them without a session.
  *
  * The UID is derived from the event identifier and the SEQUENCE from the
  * date of the last change, so a client that matches on UID replaces its copy
@@ -370,7 +373,7 @@ function calendar_ical_duration( $p_seconds ) {
 /**
  * Text of the DESCRIPTION: the description of the event, then the issues it
  * is attached to that the user may view, each with its link, then - for a
- * member - the link to the page of the event, where they reply.
+ * member - the personal links to reply with, the ones the mails carry.
  * @param array   $p_event   Event row.
  * @param integer $p_user_id User the file is built for.
  * @return string
@@ -402,11 +405,16 @@ function calendar_ical_description( array $p_event, $p_user_id ) {
                 . "\n" . string_get_bug_view_url_with_fqdn( $t_bug_id );
     }
 
-    # the page of the event once more, in the text this time: some clients
-    # drop the URL property on import, and a member replies on that page
-    if( calendar_rsvp_feature_enabled() && user_is_member_event( $p_user_id, (int)$p_event['id'] ) ) {
-        $t_parts[] = config_get_global( 'path' ) . plugin_page( 'view', true )
-                . '&event_id=' . (int)$p_event['id'] . '&date=' . (int)$p_event['date_from'];
+    # a member replies right from their calendar through the same personal
+    # links the mails carry; the links are signed for the member, and the
+    # block is worded in their language, since the file may be built on their
+    # behalf by another plugin. Empty when there is nothing to reply to.
+    lang_push( user_pref_get_language( $p_user_id ) );
+    $t_rsvp_block = calendar_rsvp_mail_block( (int)$p_event['id'], $p_user_id );
+    lang_pop();
+
+    if( !is_blank( $t_rsvp_block ) ) {
+        $t_parts[] = $t_rsvp_block;
     }
 
     return implode( "\n\n", $t_parts );
