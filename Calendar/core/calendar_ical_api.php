@@ -19,9 +19,11 @@
  *
  * The file is what a user imports into the calendar of their choice - the
  * Google sync covers Google only, the .ics file covers everybody else. It is
- * offered as a link in the notification mails and on the event page, and it
- * is served by pages/event_ics.php; the public API hands the same file to
- * other plugins that deliver notifications through their own channel.
+ * served by pages/event_ics.php behind a button on the event page and on
+ * pages/event_ics_page.php, the page the notification mails link to (a link
+ * that ends in the file would leave a guest on a spent login form, see
+ * there); the public API hands the same file to other plugins that deliver
+ * notifications through their own channel.
  *
  * One file holds one event row: a plain event, or a whole series with its
  * RRULE and EXDATEs. An occurrence that was split off a series is a row of
@@ -51,7 +53,7 @@ define( 'CALENDAR_ICAL_LINE_LENGTH', 75 );
 define( 'CALENDAR_ICAL_TIMEZONE_MARGIN', 366 * SECONDS_PER_DAY );
 
 /**
- * Absolute link to the iCalendar file of an event.
+ * Absolute link to the page that offers the iCalendar file of an event.
  *
  * Built from the configured path of the installation, the way the mails
  * build the link to the event, so it holds without a request to take the
@@ -61,7 +63,7 @@ define( 'CALENDAR_ICAL_TIMEZONE_MARGIN', 366 * SECONDS_PER_DAY );
  * @access public
  */
 function calendar_ical_url( $p_event_id ) {
-    return config_get_global( 'path' ) . plugin_page( 'event_ics', true ) . '&event_id=' . (int)$p_event_id;
+    return config_get_global( 'path' ) . plugin_page( 'event_ics_page', true ) . '&event_id=' . (int)$p_event_id;
 }
 
 /**

@@ -737,9 +737,11 @@ function calendar_api_event_history_log( int $p_event_id, string $p_field_name, 
 }
 
 /**
- * Link to the iCalendar file of the given event.
+ * Link to the page that offers the iCalendar file of the given event.
  *
- * The very link the notification mails of the calendar carry: a plugin that
+ * The very link the notification mails of the calendar carry: a page with
+ * the download button rather than the file itself, so that a guest who logs
+ * in on the way lands on a page and not on a spent login form. A plugin that
  * delivers its notifications through another channel - a messenger, a chat
  * room - can offer the same "add to your calendar" link there, or fetch the
  * file itself with calendar_api_event_ics() and send it along as a document.
