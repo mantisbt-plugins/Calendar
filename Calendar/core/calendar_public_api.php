@@ -478,6 +478,29 @@ function calendar_api_event_members( int $p_event_id ) : array {
 }
 
 /**
+ * Whether the members of the events may reply at all, that is whether the
+ * master switch 'rsvp_feature_enabled' of the instance is on.
+ *
+ * A plugin with a channel of its own asks here before it offers the replies
+ * there - the buttons under an invitation, say - since
+ * calendar_api_event_member_status_set() takes no reply while the switch is
+ * off, the way the event page and the mails offer none then.
+ *
+ * @return bool
+ * @access public
+ */
+function calendar_api_rsvp_enabled() : bool {
+
+    plugin_push_current( 'Calendar' );
+
+    try {
+        return calendar_rsvp_feature_enabled();
+    } finally {
+        plugin_pop_current();
+    }
+}
+
+/**
  * Replies of the members of the given event: whether each of them will take
  * part, keyed by user identifier.
  *
@@ -562,6 +585,63 @@ function calendar_api_event_member_status_set( int $p_event_id, int $p_user_id, 
         }
 
         event_member_set_status( $p_event_id, $p_user_id, $p_status, $p_user_id );
+    } finally {
+        restore_error_handler();
+        plugin_pop_current();
+    }
+}
+
+/**
+ * Put the reminder of a recipient about one occurrence off to a later
+ * moment, on their behalf: the "remind me again in a quarter of an hour" of
+ * a plugin with a channel of its own, pressed under the reminder it delivered
+ * on EVENT_CALENDAR_EVENT_REMINDER.
+ *
+ * The put off reminder is a reminder like any other and goes the way of the
+ * scheduled ones when its moment comes: the mail of the calendar, the signal
+ * to every subscriber - the caller included, which gets to offer the buttons
+ * again -, a record in the history of the event. It goes out once; a
+ * recipient has one put off reminder per occurrence at a time, and putting
+ * it off again moves it.
+ *
+ * The call guarantees that the event exists, that the occurrence is one of
+ * the event - the start of a single event, or a timestamp its rule yields,
+ * the one the signal carried -, that the user is among those reminded about
+ * the event, and that the moment lies ahead but before the occurrence is
+ * over; it is rejected while 'reminders_feature_enabled' is off, when no
+ * reminder would go out anyway. Whatever changes by the time the moment
+ * comes - a cancelled occurrence, a member who left, a switched off feature -
+ * drops the reminder silently.
+ *
+ * @param int $p_event_id   Event the reminder is about.
+ * @param int $p_occurrence Start of the occurrence, as EVENT_CALENDAR_EVENT_REMINDER carried it.
+ * @param int $p_user_id    Recipient of the reminder.
+ * @param int $p_fire_at    Timestamp the reminder is to go out at.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event, the occurrence,
+ *                                            the user or the moment is
+ *                                            rejected.
+ * @access public
+ */
+function calendar_api_event_reminder_snooze( int $p_event_id, int $p_occurrence, int $p_user_id, int $p_fire_at ) : void {
+
+    plugin_push_current( 'Calendar' );
+
+    set_error_handler( function( $p_severity, $p_message ) {
+        $t_code = is_numeric( $p_message ) ? (int)$p_message : ERROR_GENERIC;
+        throw new \Mantis\Exceptions\ClientException( error_string( $p_message ), $t_code );
+    }, E_USER_ERROR );
+
+    try {
+        event_ensure_exists( $p_event_id );
+
+        if( !calendar_reminder_feature_enabled() ) {
+            trigger_error( ERROR_ACCESS_DENIED, ERROR );
+        }
+
+        calendar_reminder_snooze_ensure_valid( $p_event_id, $p_occurrence, $p_user_id, $p_fire_at );
+
+        event_reminder_snooze_set( $p_event_id, $p_occurrence, $p_user_id, $p_fire_at );
     } finally {
         restore_error_handler();
         plugin_pop_current();

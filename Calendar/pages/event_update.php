@@ -71,6 +71,9 @@ switch( $t_range ) {
         $t_event_parent_data->update();
         event_google_update( $t_event_parent_data );
 
+        # the series lost an occurrence, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         event_attach_issue( $t_event_child_id, $f_bugs );
 
         $t_event_members_current = event_get_members( $t_event_parent_data->id );
@@ -178,6 +181,9 @@ switch( $t_range ) {
 
         event_google_update( $t_event_parent_data );
 
+        # the series was cut short, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         break;
 
     case 'ALL':
@@ -217,16 +223,19 @@ switch( $t_range ) {
         }
 
         if( $t_event_child_data != $t_event_parent_data ) {
-            $t_event_child_data->update();
 
             # a reply was given to a time: once that time is gone, so is the
-            # reply, except for the one of whoever moved the event
+            # reply, except for the one of whoever moved the event. Dropped
+            # before the change is stored, so that a subscriber of
+            # EVENT_CALENDAR_EVENT_UPDATED already finds the replies asked anew
             if( calendar_rsvp_feature_enabled()
                     && ( $t_event_child_data->date_from != $t_event_parent_data->date_from
                     || $t_event_child_data->duration != $t_event_parent_data->duration
                     || $t_event_child_data->recurrence_pattern != $t_event_parent_data->recurrence_pattern ) ) {
                 event_member_reset_statuses( $t_event_child_data->id, auth_get_current_user_id() );
             }
+
+            $t_event_child_data->update();
         }
 
         $t_event_child_id = $t_event_child_data->id;
@@ -248,7 +257,10 @@ switch( $t_range ) {
         if( $t_event_child_data != $t_event_parent_data || $f_bugs != $t_current_bugs ) {
             event_google_update( $t_event_child_data );
 
+            # the row, the reminders and the issue links are all written now;
             # a form that was submitted without touching anything is not news
+            event_signal_updated( $t_event_child_data->id );
+
             calendar_notify_event_updated( $t_event_child_data->id, auth_get_current_user_id() );
         }
 }

@@ -239,7 +239,11 @@ class CalendarEventData {
         # Update the last update date
         event_update_date( $t_event_id );
 
-        event_signal( 'EVENT_CALENDAR_EVENT_UPDATED', array( $t_event_id ) );
+        # EVENT_CALENDAR_EVENT_UPDATED is deliberately NOT signalled here, for
+        # the same reason as in create(): the reminders and the issue links of
+        # a changed event are written by the caller after this method returns.
+        # Every change flow calls event_signal_updated() once the change is
+        # complete.
 
         return true;
     }
@@ -306,6 +310,24 @@ function event_signal_created( $p_event_id ) {
 }
 
 /**
+ * Announce a changed event to the subscribers of EVENT_CALENDAR_EVENT_UPDATED.
+ *
+ * Called by every change flow as its last step, after the row, the reminders
+ * and the issue links of the event are written - never from
+ * CalendarEventData::update() itself, whose caller may still be at it. What
+ * counts as a change is what the user did, the same thing the mail about a
+ * change follows: a form submitted without touching anything is not news,
+ * while a series that lost an occurrence or gained an issue link is, even
+ * though its row may read the same.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @return void
+ * @access public
+ */
+function event_signal_updated( $p_event_id ) {
+    event_signal( 'EVENT_CALENDAR_EVENT_UPDATED', array( (int)$p_event_id ) );
+}
+
+/**
  * Check if a event exists. If it doesn't then trigger an error
  * @param integer $p_event_id Integer representing bug identifier.
  * @return void
@@ -347,9 +369,22 @@ function event_occurrence_ensure_exist( $p_event_id, $p_date ) {
     }
 }
 
+/**
+ * Whether the given timestamp is the start of an occurrence of the given
+ * event: the only one of a single event, or one its rule yields - a cancelled
+ * occurrence is an EXDATE of the stored rule and so is none
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_date     Timestamp the occurrence would start at.
+ * @return boolean
+ * @access public
+ */
 function event_occurrence_exists( $p_event_id, $p_date ) {
 
     $t_event = event_get( $p_event_id );
+
+    if( is_blank( $t_event->recurrence_pattern ) ) {
+        return (int)$p_date == (int)$t_event->date_from;
+    }
 
     $t_rset = new \RRule\RSet( $t_event->recurrence_pattern );
 

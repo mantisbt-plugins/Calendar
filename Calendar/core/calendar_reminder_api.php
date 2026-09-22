@@ -27,6 +27,14 @@
  * the fly and compares the resulting fire times with the window that has
  * passed since its previous run.
  *
+ * The one exception is a reminder that a recipient has put off: "remind me
+ * again in a quarter of an hour", pressed on a reminder they have just
+ * received. That is a one-off reminder about one occurrence, stored with its
+ * absolute moment in plugin_table( 'event_reminder_snooze' ), fired once by
+ * the same dispatcher and forgotten. Nothing offers it in the pages or the
+ * mails of the calendar so far; it exists for the plugins that deliver the
+ * reminders through a channel of their own, see calendar_api_event_reminder_snooze().
+ *
  * The dispatcher runs from EVENT_CRONJOB, that is from the command line, and
  * from EVENT_CORE_READY as a throttled fallback. Everything below must
  * therefore work without a session user and must not touch the Google client,
@@ -193,7 +201,9 @@ function calendar_reminder_offset_to_input( $p_offset ) {
 }
 
 /**
- * Format an offset for the history and for the reminder mail
+ * Format an offset of a reminder set, for the history of the set: the
+ * switched off marker reads as such, anything else is a distance to the
+ * start
  * @param integer $p_offset Offset in seconds.
  * @return string
  * @access public
@@ -204,9 +214,35 @@ function calendar_reminder_format_offset( $p_offset ) {
         return plugin_lang_get( 'reminder_offset_disabled' );
     }
 
-    $t_input = calendar_reminder_offset_to_input( $p_offset );
+    return calendar_reminder_format_distance( $p_offset );
+}
 
-    return sprintf( plugin_lang_get( 'reminder_offset_' . $t_input['unit'] ), $t_input['value'] );
+/**
+ * Format the distance between the moment a reminder goes out and the start
+ * of its occurrence, for the history of the sent reminders and for the
+ * reminder mail. A scheduled reminder goes out before the start; a put off
+ * one may go out at the start or after it, which is a distance of zero or
+ * less.
+ * @param integer $p_distance Seconds before the start, negative after it.
+ * @return string
+ * @access public
+ */
+function calendar_reminder_format_distance( $p_distance ) {
+
+    $t_distance = (int)$p_distance;
+
+    if( $t_distance == 0 ) {
+        return plugin_lang_get( 'reminder_offset_at_start' );
+    }
+
+    $t_input = calendar_reminder_offset_to_input( abs( $t_distance ) );
+    $t_text  = sprintf( plugin_lang_get( 'reminder_offset_' . $t_input['unit'] ), $t_input['value'] );
+
+    if( $t_distance < 0 ) {
+        return sprintf( plugin_lang_get( 'reminder_offset_after_start' ), $t_text );
+    }
+
+    return $t_text;
 }
 
 /**
@@ -496,8 +532,9 @@ function event_reminder_set_all( $p_event_id, array $p_offsets, $p_acting_user_i
 }
 
 /**
- * Drop every reminder of the given event, its own and the personal sets of
- * its recipients, used when the event itself is deleted
+ * Drop every reminder of the given event, its own, the personal sets of its
+ * recipients and the ones they have put off, used when the event itself is
+ * deleted
  * @param integer $p_event_id Integer representing event identifier.
  * @return boolean (always true)
  * @access public
@@ -512,7 +549,104 @@ function event_reminder_delete_all( $p_event_id ) {
 
     db_query( $t_query, Array( (int)$p_event_id ) );
 
+    event_reminder_snooze_delete_all( $p_event_id );
+
     return true;
+}
+
+/**
+ * Put the reminder of one recipient about one occurrence off to the given
+ * moment. A recipient has one put off reminder per occurrence at a time, so
+ * putting it off again moves it. Nothing is checked here, see
+ * calendar_reminder_snooze_ensure_valid(); nothing is logged either, the
+ * reminder is logged when it goes out, like any other.
+ * @param integer $p_event_id   Integer representing event identifier.
+ * @param integer $p_occurrence Timestamp the occurrence starts at.
+ * @param integer $p_user_id    Integer representing user identifier.
+ * @param integer $p_fire_at    Timestamp the reminder is to go out at.
+ * @return boolean (always true)
+ * @access public
+ * @uses database_api.php
+ */
+function event_reminder_snooze_set( $p_event_id, $p_occurrence, $p_user_id, $p_fire_at ) {
+
+    $c_event_id   = (int)$p_event_id;
+    $c_occurrence = (int)$p_occurrence;
+    $c_user_id    = (int)$p_user_id;
+    $t_table      = plugin_table( 'event_reminder_snooze' );
+
+    db_param_push();
+    $t_query = "DELETE FROM $t_table
+                 WHERE event_id=" . db_param() . " AND occurrence=" . db_param() . " AND user_id=" . db_param();
+    db_query( $t_query, Array( $c_event_id, $c_occurrence, $c_user_id ) );
+
+    db_param_push();
+    $t_query = "INSERT INTO $t_table
+                            ( event_id, occurrence, user_id, fire_at
+                            )
+                          VALUES
+                            ( " . db_param() . ',' . db_param() . ',' . db_param() . ',' . db_param() . ')';
+    db_query( $t_query, Array( $c_event_id, $c_occurrence, $c_user_id, (int)$p_fire_at ) );
+
+    return true;
+}
+
+/**
+ * Drop the put off reminders of the given event
+ * @param integer $p_event_id Integer representing event identifier.
+ * @return boolean (always true)
+ * @access public
+ * @uses database_api.php
+ */
+function event_reminder_snooze_delete_all( $p_event_id ) {
+
+    $t_table = plugin_table( 'event_reminder_snooze' );
+
+    db_param_push();
+    $t_query = "DELETE FROM $t_table WHERE event_id=" . db_param();
+
+    db_query( $t_query, Array( (int)$p_event_id ) );
+
+    return true;
+}
+
+/**
+ * Check that the reminder of a recipient may be put off to the given moment,
+ * and halt with the usual error otherwise: the occurrence has to be one of
+ * the event, the user has to be among those reminded about it, and the
+ * moment has to lie ahead but before the occurrence is over - a reminder
+ * about a meeting that has ended reminds of nothing. Whether the reminders
+ * are switched on at all is for the caller to check.
+ * @param integer $p_event_id   Integer representing event identifier.
+ * @param integer $p_occurrence Timestamp the occurrence starts at.
+ * @param integer $p_user_id    Integer representing user identifier.
+ * @param integer $p_fire_at    Timestamp the reminder is to go out at.
+ * @return void
+ * @access public
+ */
+function calendar_reminder_snooze_ensure_valid( $p_event_id, $p_occurrence, $p_user_id, $p_fire_at ) {
+
+    $t_event = event_get_row( $p_event_id );
+
+    if( !event_occurrence_exists( $p_event_id, $p_occurrence ) ) {
+        error_parameters( $p_event_id );
+        plugin_error( 'ERROR_EVENT_TIME_PERIOD_NOT_FOUND', ERROR );
+    }
+
+    if( !in_array( (int)$p_user_id, event_reminder_recipients( $p_event_id, (int)$t_event['author_id'] ), true ) ) {
+        error_parameters( $p_user_id );
+        trigger_error( ERROR_USER_BY_ID_NOT_FOUND, ERROR );
+    }
+
+    # a single event stores the end of its only occurrence in date_to, a
+    # series the length of one occurrence in duration
+    $t_duration = (int)$t_event['duration'];
+    $t_end      = $t_duration > 0 ? (int)$p_occurrence + $t_duration : (int)$t_event['date_to'];
+
+    if( (int)$p_fire_at <= time() || (int)$p_fire_at >= $t_end ) {
+        error_parameters( 'fire_at' );
+        trigger_error( ERROR_INVALID_FIELD_VALUE, ERROR );
+    }
 }
 
 /**
@@ -558,7 +692,7 @@ function event_reminder_recipients( $p_event_id, $p_author_id ) {
  * @param array   $p_event      Event row with id, project_id, name.
  * @param integer $p_occurrence Timestamp the occurrence starts at.
  * @param integer $p_user_id    Integer representing user identifier.
- * @param integer $p_offset     Offset in seconds the reminder was asked for.
+ * @param integer $p_offset     Seconds between the reminder and the start, negative once the occurrence has begun.
  * @return boolean true if the mail was queued
  * @access public
  * @uses email_api.php
@@ -589,12 +723,16 @@ function calendar_reminder_send_email( array $p_event, $p_occurrence, $p_user_id
     $t_url = config_get_global( 'path' ) . plugin_page( 'view', true )
             . '&event_id=' . (int)$p_event['id'] . '&date=' . (int)$p_occurrence;
 
+    # a put off reminder may go out once the occurrence has begun, and then
+    # cannot announce it as upcoming
+    $t_body_key = (int)$p_offset > 0 ? 'reminder_email_body' : 'reminder_email_body_started';
+
     $t_subject = sprintf( plugin_lang_get( 'reminder_email_subject' ), $p_event['name'] );
-    $t_body    = sprintf( plugin_lang_get( 'reminder_email_body' ),
+    $t_body    = sprintf( plugin_lang_get( $t_body_key ),
                           $p_event['name'],
                           project_get_name( (int)$p_event['project_id'], false ),
                           $t_occurrence_text,
-                          calendar_reminder_format_offset( $p_offset ),
+                          calendar_reminder_format_distance( $p_offset ),
                           $t_url );
 
     email_store( $t_email, $t_subject, $t_body );
@@ -723,6 +861,77 @@ function calendar_reminder_process() {
 
             calendar_reminder_log_history( $t_event_id, $t_sent, $t_is_recurring );
         }
+    }
+
+    calendar_reminder_process_snoozes( $t_window_start, $t_now );
+}
+
+/**
+ * Send the put off reminders whose moment fell into the given window, each
+ * once, and forget them. One is dropped without a word when its world has
+ * changed meanwhile - its event is gone or no longer active, its occurrence
+ * was cancelled or moved, its recipient is no longer reminded about the event
+ * - and when its moment fell before the window: a put off reminder is not
+ * replayed after a long downtime any more than a scheduled one.
+ * @param integer $p_window_start Start of the window, exclusive.
+ * @param integer $p_now          End of the window, inclusive.
+ * @return void
+ * @access private
+ * @uses database_api.php
+ */
+function calendar_reminder_process_snoozes( $p_window_start, $p_now ) {
+
+    $t_events_table = plugin_table( 'events' );
+    $t_snooze_table = plugin_table( 'event_reminder_snooze' );
+
+    if( !db_table_exists( $t_snooze_table ) ) {
+        return;
+    }
+
+    db_param_push();
+    $t_query  = "SELECT s.id, s.event_id, s.occurrence, s.user_id, s.fire_at,
+                        e.project_id, e.author_id, e.name, e.activity, e.recurrence_pattern
+                   FROM $t_snooze_table s
+                   JOIN $t_events_table e ON e.id = s.event_id
+                  WHERE s.fire_at <= " . db_param();
+    $t_result = db_query( $t_query, Array( (int)$p_now ) );
+
+    $t_due = array();
+    while( $t_row = db_fetch_array( $t_result ) ) {
+        $t_due[] = $t_row;
+    }
+
+    foreach( $t_due as $t_row ) {
+
+        $t_event_id   = (int)$t_row['event_id'];
+        $t_occurrence = (int)$t_row['occurrence'];
+        $t_user_id    = (int)$t_row['user_id'];
+        $t_fire_at    = (int)$t_row['fire_at'];
+
+        if( $t_fire_at > $p_window_start
+                && $t_row['activity'] == 'Y'
+                && event_occurrence_exists( $t_event_id, $t_occurrence )
+                && in_array( $t_user_id, event_reminder_recipients( $t_event_id, (int)$t_row['author_id'] ), true ) ) {
+
+            # the offset of a put off reminder is where it went out relative to
+            # the start, zero or negative once the occurrence has begun
+            $t_offset = $t_occurrence - $t_fire_at;
+            $t_event  = array( 'id' => $t_event_id, 'project_id' => (int)$t_row['project_id'], 'name' => $t_row['name'] );
+
+            calendar_reminder_send_email( $t_event, $t_occurrence, $t_user_id, $t_offset );
+
+            event_signal( 'EVENT_CALENDAR_EVENT_REMINDER', array( $t_event_id, $t_occurrence, $t_user_id, $t_offset ) );
+
+            plugin_log_event( sprintf( 'put off reminder of event #%d at %s sent to user #%d, %d seconds before the start',
+                                       $t_event_id, date( 'c', $t_occurrence ), $t_user_id, $t_offset ) );
+
+            # one recipient asked for it, so it is logged for that recipient
+            # whether the event is a series or not
+            event_history_log( $t_event_id, CALENDAR_HISTORY_REMINDER_SENT, '', $t_offset, '', $t_user_id );
+        }
+
+        db_param_push();
+        db_query( "DELETE FROM $t_snooze_table WHERE id=" . db_param(), Array( (int)$t_row['id'] ) );
     }
 }
 

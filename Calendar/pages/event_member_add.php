@@ -28,13 +28,15 @@ foreach( $f_usernames as $t_user_id ) {
     access_ensure_event_level(plugin_config_get( 'member_event_threshold' ), $f_event_id, $t_user_id );
 
     # a user who is a member already is told nothing, the request is a no-op
-    # for them
+    # for them - and nothing is signalled about them either
     $t_member_is_new = !user_is_member_event( $t_user_id, $f_event_id );
 
     event_member_add( $f_event_id, $t_user_id );
 
     if( $t_member_is_new ) {
         calendar_notify_member_added( $f_event_id, $t_user_id, $t_actor_id );
+
+        event_signal( 'EVENT_CALENDAR_EVENT_MEMBER_ADDED', array( $f_event_id, (int)$t_user_id, $t_actor_id ) );
     }
 }
 

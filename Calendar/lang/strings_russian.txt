@@ -226,6 +226,8 @@ $s_plugin_Calendar_reminder_offset_hours = '%1$d ч';
 $s_plugin_Calendar_reminder_offset_days = '%1$d дн';
 $s_plugin_Calendar_reminder_disable_label = 'Не напоминать об этом событии';
 $s_plugin_Calendar_reminder_offset_disabled = 'без напоминаний';
+$s_plugin_Calendar_reminder_offset_at_start = 'в момент начала';
+$s_plugin_Calendar_reminder_offset_after_start = '%1$s после начала';
 $s_plugin_Calendar_reminder_hint_defaults = 'Если у события нет своих напоминаний, используются напоминания по умолчанию каждого участника.';
 $s_plugin_Calendar_view_event_reminders_defaults = 'Напоминания по умолчанию каждого участника';
 $s_plugin_Calendar_reminders_source_event = 'Напоминания события';
@@ -241,6 +243,13 @@ $s_plugin_Calendar_reminders_pref_default = 'Напоминания по умо�
 $s_plugin_Calendar_reminders_pref_hint = 'Эти напоминания используются для событий, у которых нет своих собственных.';
 $s_plugin_Calendar_reminder_email_subject = 'Напоминание: %1$s';
 $s_plugin_Calendar_reminder_email_body = 'Событие календаря начнётся через %4$s.
+
+Событие: %1$s
+Проект: %2$s
+Начало: %3$s
+
+%5$s';
+$s_plugin_Calendar_reminder_email_body_started = 'Событие календаря уже началось.
 
 Событие: %1$s
 Проект: %2$s

@@ -496,6 +496,19 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'AddColumnSQL', array( plugin_table( "event_member" ), "
                                         status I UNSIGNED $t_notnull DEFAULT '0'
                                 " ) ),
+                                  //version 3.0.0 (schema 25): a reminder put off to a later moment, see core/calendar_reminder_api.php
+                                  array( "CreateTableSQL", array( plugin_table( "event_reminder_snooze" ), "
+                                        id I $t_notnull AUTOINCREMENT PRIMARY,
+                                        event_id I UNSIGNED $t_notnull DEFAULT '0',
+                                        occurrence I UNSIGNED $t_notnull DEFAULT '0',
+                                        user_id I UNSIGNED $t_notnull DEFAULT '0',
+                                        fire_at I UNSIGNED $t_notnull DEFAULT '0'
+                                " ,
+                                      $t_table_options ) ),
+                                  //version 3.0.0 (schema 26)
+                                  array( 'CreateIndexSQL', array( 'idx_event_reminder_snooze_fire_at', plugin_table( "event_reminder_snooze" ), "
+                                      fire_at
+                                      " ) ),
         );
     }
 
@@ -640,10 +653,29 @@ class CalendarPlugin extends MantisPlugin {
      * parameter. EVENT_CALENDAR_EVENT_CREATED is signalled only after the
      * event is fully assembled - its members, issue links and reminders are
      * already written - so a subscriber may look the event up by id and see
-     * it complete (see event_signal_created()). EVENT_CALENDAR_EVENT_DELETED
-     * is signalled before anything is removed, the way the core raises
-     * EVENT_BUG_DELETED: the handler still finds the event and its members,
-     * so calendar_api_event_notify_recipients() works there as well.
+     * it complete (see event_signal_created()). EVENT_CALENDAR_EVENT_UPDATED
+     * likewise comes once the change is complete - the row, the reminders and
+     * the issue links -, and follows what the user did, the same thing the
+     * mail about a change follows: a form submitted without touching anything
+     * raises it not, while a series that lost an occurrence or was cut short,
+     * or an event that gained an issue link, raises it even though its row
+     * may read the same (see event_signal_updated()). A change of the members
+     * or of their replies has signals of its own, below.
+     * EVENT_CALENDAR_EVENT_DELETED is signalled before anything is removed,
+     * the way the core raises EVENT_BUG_DELETED: the handler still finds the
+     * event and its members, so calendar_api_event_notify_recipients() works
+     * there as well.
+     *
+     * EVENT_CALENDAR_EVENT_MEMBER_ADDED and EVENT_CALENDAR_EVENT_MEMBER_REMOVED
+     * are signalled when a user is added to or removed from the members of an
+     * existing event, with array( $p_event_id, $p_user_id, $p_actor_id ): the
+     * member and whoever added or removed them. Like the mails about it, they
+     * follow what the user did rather than how it is stored: the members
+     * written while an event is assembled - at its creation, or when an
+     * occurrence is split off its series - are announced by
+     * EVENT_CALENDAR_EVENT_CREATED alone, and the members dropped with a
+     * deleted event by EVENT_CALENDAR_EVENT_DELETED. Both are raised once the
+     * change is stored, and the event still exists in either case.
      *
      * EVENT_CALENDAR_EVENT_REMINDER is signalled once per due reminder, that is
      * once per triple of occurrence, recipient and offset, and its parameters
@@ -651,7 +683,11 @@ class CalendarPlugin extends MantisPlugin {
      * $p_offset_seconds ). It is raised for every allowed recipient even when
      * no mail is sent (empty address, notifications switched off globally), so
      * a subscriber can deliver the reminder through its own channel; a user who
-     * opted out of reminders gets neither the mail nor the signal.
+     * opted out of reminders gets neither the mail nor the signal. A reminder
+     * that a recipient has put off through calendar_api_event_reminder_snooze()
+     * is signalled the same way when its moment comes; its offset is then the
+     * distance between that moment and the start of the occurrence, zero or
+     * negative once the occurrence has begun.
      *
      * EVENT_CALENDAR_EVENT_RSVP is signalled when a member of an event replies
      * whether they will take part, and its parameters are array( $p_event_id,
@@ -690,13 +726,15 @@ class CalendarPlugin extends MantisPlugin {
      */
     function events() {
         return array(
-                                  'EVENT_CALENDAR_EVENT_CREATED'       => EVENT_TYPE_EXECUTE,
-                                  'EVENT_CALENDAR_EVENT_UPDATED'       => EVENT_TYPE_EXECUTE,
-                                  'EVENT_CALENDAR_EVENT_DELETED'       => EVENT_TYPE_EXECUTE,
-                                  'EVENT_CALENDAR_EVENT_REMINDER'      => EVENT_TYPE_EXECUTE,
-                                  'EVENT_CALENDAR_EVENT_RSVP'          => EVENT_TYPE_EXECUTE,
-                                  'EVENT_CALENDAR_NOTIFY_USER_INCLUDE' => EVENT_TYPE_DEFAULT,
-                                  'EVENT_CALENDAR_NOTIFY_USER_EXCLUDE' => EVENT_TYPE_DEFAULT,
+                                  'EVENT_CALENDAR_EVENT_CREATED'        => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_UPDATED'        => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_DELETED'        => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_MEMBER_ADDED'   => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_MEMBER_REMOVED' => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_REMINDER'       => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_RSVP'           => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_NOTIFY_USER_INCLUDE'  => EVENT_TYPE_DEFAULT,
+                                  'EVENT_CALENDAR_NOTIFY_USER_EXCLUDE'  => EVENT_TYPE_DEFAULT,
         );
     }
 

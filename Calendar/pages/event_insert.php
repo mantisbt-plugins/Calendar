@@ -70,6 +70,9 @@ switch( $t_range ) {
         $t_event_parent_data->update();
         event_google_update( $t_event_parent_data );
 
+        # the series lost an occurrence, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         $t_bugs   = event_get_attached_bugs_id( $t_event_parent_data->id );
         $t_bugs[] = $f_bug;
         event_attach_issue( $t_event_child_id, $t_bugs );
@@ -159,6 +162,9 @@ switch( $t_range ) {
 
         event_google_update( $t_event_parent_data );
 
+        # the series was cut short, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         break;
 
     case 'ALL':
@@ -168,6 +174,9 @@ switch( $t_range ) {
         $t_event_parent_data->update();
 
         event_google_update( $t_event_child_data );
+
+        # the event gained an issue link
+        event_signal_updated( $t_event_parent_data->id );
 
         calendar_notify_event_updated( $t_event_parent_data->id, auth_get_current_user_id() );
 }

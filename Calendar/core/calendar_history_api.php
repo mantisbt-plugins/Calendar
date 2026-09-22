@@ -293,12 +293,12 @@ function event_history_localize_row( array $p_row ) {
 
         case CALENDAR_HISTORY_REMINDER_SENT:
             $t_localized['note']      = plugin_lang_get( 'event_history_reminder_sent' );
-            $t_localized['new_value'] = calendar_reminder_format_offset( (int)$p_row['old_value'] );
+            $t_localized['new_value'] = calendar_reminder_format_distance( (int)$p_row['old_value'] );
             break;
 
         case CALENDAR_HISTORY_REMINDER_SENT_MANY:
             $t_localized['note']      = sprintf( plugin_lang_get( 'event_history_reminder_sent_many' ), (int)$p_row['new_value'] );
-            $t_localized['new_value'] = calendar_reminder_format_offset( (int)$p_row['old_value'] );
+            $t_localized['new_value'] = calendar_reminder_format_distance( (int)$p_row['old_value'] );
             break;
 
         case CALENDAR_HISTORY_RSVP:

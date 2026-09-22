@@ -66,6 +66,10 @@ switch( $t_range ) {
 
         $t_event_data->update();
         event_google_update( $t_event_data );
+
+        # to the subscribers the series is an event that changed: it lost an
+        # occurrence and goes on
+        event_signal_updated( $t_event_data->id );
         break;
 
     case 'THISANDFUTURE':
@@ -126,6 +130,10 @@ switch( $t_range ) {
         event_update_date( $t_event_id );
 
         event_google_update( $t_event_data );
+
+        # to the subscribers the series is an event that changed: it was cut
+        # short and goes on
+        event_signal_updated( $t_event_data->id );
 
         break;
 

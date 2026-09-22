@@ -62,6 +62,9 @@ if( calendar_reminder_feature_enabled() && $t_event->author_id != $t_user_id ) {
 # a user who left the event on their own is not mailed about it
 calendar_notify_member_removed( $f_event_id, $t_user_id, $t_logged_in_user_id );
 
+# the subscribers are told in any case, whom to tell in turn is up to them
+event_signal( 'EVENT_CALENDAR_EVENT_MEMBER_REMOVED', array( $f_event_id, (int)$t_user_id, $t_logged_in_user_id ) );
+
 event_google_update( event_get( $f_event_id ) );
 
 form_security_purge( 'event_member_delete' );

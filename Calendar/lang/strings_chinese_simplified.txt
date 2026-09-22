@@ -226,6 +226,8 @@ $s_plugin_Calendar_reminder_offset_hours = '%1$d h';
 $s_plugin_Calendar_reminder_offset_days = '%1$d d';
 $s_plugin_Calendar_reminder_disable_label = 'Do not remind about this event';
 $s_plugin_Calendar_reminder_offset_disabled = 'no reminders';
+$s_plugin_Calendar_reminder_offset_at_start = '开始时';
+$s_plugin_Calendar_reminder_offset_after_start = '开始后 %1$s';
 $s_plugin_Calendar_reminder_hint_defaults = 'Without reminders of its own, the event uses the default reminders of every participant.';
 $s_plugin_Calendar_view_event_reminders_defaults = 'Default reminders of every participant';
 $s_plugin_Calendar_reminders_source_event = 'Reminders of the event';
@@ -241,6 +243,13 @@ $s_plugin_Calendar_reminders_pref_default = 'Default reminders';
 $s_plugin_Calendar_reminders_pref_hint = 'These reminders are used for the events that do not define their own ones.';
 $s_plugin_Calendar_reminder_email_subject = 'Reminder: %1$s';
 $s_plugin_Calendar_reminder_email_body = '日历事件将在 %4$s 后开始。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%5$s';
+$s_plugin_Calendar_reminder_email_body_started = '日历事件已经开始。
 
 事件: %1$s
 项目: %2$s
