@@ -162,6 +162,20 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 
                                 <tr>
                                     <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_rsvp_feature_enabled' ) ?>
+
+                                    </td>
+
+                                    <td colspan="3" width="50%">
+                                        <?php
+                                        echo '<label><input type="checkbox" name="rsvp_feature_enabled" value="1"'
+                                                . ( plugin_config_get( 'rsvp_feature_enabled' ) == ON ? ' checked="checked"' : '' ) . '></input></label>';
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_bug_calendar_block_position' ) ?>
 
                                     </td>

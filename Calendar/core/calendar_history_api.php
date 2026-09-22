@@ -54,6 +54,12 @@ define( 'CALENDAR_HISTORY_REMINDER_SENT', 10 );
 # instead of one per recipient, which would swamp the history of a series.
 define( 'CALENDAR_HISTORY_REMINDER_SENT_MANY', 11 );
 
+# a member replied whether they will take part, old_value = user id of the
+# member, new_value = one of the CALENDAR_RSVP_* constants
+define( 'CALENDAR_HISTORY_RSVP', 12 );
+# the replies of the members were dropped because the time of the event changed
+define( 'CALENDAR_HISTORY_RSVP_RESET', 13 );
+
 # a record written by another plugin through calendar_api_event_history_log(),
 # field_name = basename of that plugin plus the name of its own field,
 # old_value/new_value are its raw values. The number leaves room for further
@@ -293,6 +299,15 @@ function event_history_localize_row( array $p_row ) {
         case CALENDAR_HISTORY_REMINDER_SENT_MANY:
             $t_localized['note']      = sprintf( plugin_lang_get( 'event_history_reminder_sent_many' ), (int)$p_row['new_value'] );
             $t_localized['new_value'] = calendar_reminder_format_offset( (int)$p_row['old_value'] );
+            break;
+
+        case CALENDAR_HISTORY_RSVP:
+            $t_localized['note']      = sprintf( plugin_lang_get( 'event_history_rsvp' ), user_get_name( (int)$p_row['old_value'] ) );
+            $t_localized['new_value'] = calendar_rsvp_status_label( (int)$p_row['new_value'] );
+            break;
+
+        case CALENDAR_HISTORY_RSVP_RESET:
+            $t_localized['note'] = plugin_lang_get( 'event_history_rsvp_reset' );
             break;
 
         case CALENDAR_HISTORY_PLUGIN:

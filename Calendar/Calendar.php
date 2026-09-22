@@ -492,6 +492,10 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'AddColumnSQL', array( plugin_table( "event_reminder" ), "
                                         user_id I UNSIGNED $t_notnull DEFAULT '0'
                                 " ) ),
+                                  //version 3.0.0 (schema 24): reply of the member, see core/calendar_rsvp_api.php
+                                  array( 'AddColumnSQL', array( plugin_table( "event_member" ), "
+                                        status I UNSIGNED $t_notnull DEFAULT '0'
+                                " ) ),
         );
     }
 
@@ -543,6 +547,8 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_event_threshold'                              => DEVELOPER, //The level of access necessary to become a member of the event.
                                   'member_add_others_event_threshold'                   => DEVELOPER,
                                   'member_delete_others_event_threshold'                => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
+                                  //Replies of the members: whether they will take part.
+                                  'rsvp_feature_enabled'                                => ON, //Master switch of the whole feature, changed by the administrator only.
                                   //Reminders about upcoming events.
                                   'reminders_feature_enabled'                           => OFF, //Master switch of the whole feature, changed by the administrator only.
                                   'reminders_enabled'                                   => ON, //Per user opt-out.
@@ -565,7 +571,8 @@ class CalendarPlugin extends MantisPlugin {
                                                                                             'updated'        => array( 'author' => ON, 'members' => ON, 'actor' => OFF ),
                                                                                             'deleted'        => array( 'author' => ON, 'members' => ON, 'actor' => OFF ),
                                                                                             'member_added'   => array( 'author' => OFF, 'members' => OFF, 'actor' => OFF ),
-                                                                                            'member_removed' => array( 'author' => OFF, 'members' => OFF, 'actor' => OFF )
+                                                                                            'member_removed' => array( 'author' => OFF, 'members' => OFF, 'actor' => OFF ),
+                                                                                            'rsvp'           => array( 'author' => ON, 'members' => OFF, 'actor' => OFF )
                                                                                             ),
                                   //Outcome of the last manual check for a newer release, see core/calendar_update_api.php.
                                   'update_check_result'                                 => array(),
@@ -583,6 +590,7 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_event_data_api.php';
         require_once 'core/calendar_history_api.php';
         require_once 'core/calendar_reminder_api.php';
+        require_once 'core/calendar_rsvp_api.php';
         require_once 'core/calendar_notify_api.php';
         require_once 'core/calendar_ical_api.php';
         require_once 'core/calendar_date_api.php';
@@ -645,6 +653,14 @@ class CalendarPlugin extends MantisPlugin {
      * a subscriber can deliver the reminder through its own channel; a user who
      * opted out of reminders gets neither the mail nor the signal.
      *
+     * EVENT_CALENDAR_EVENT_RSVP is signalled when a member of an event replies
+     * whether they will take part, and its parameters are array( $p_event_id,
+     * $p_user_id, $p_status ), the status being one of the CALENDAR_RSVP_*
+     * constants. It is raised for a changed reply only, on every path that
+     * records one - the event page, the links in the mails and the public
+     * calendar_api_event_member_status_set(); the mark of the author as
+     * taking part in a freshly created event is not a reply and raises it not.
+     *
      * EVENT_CALENDAR_NOTIFY_USER_INCLUDE and EVENT_CALENDAR_NOTIFY_USER_EXCLUDE
      * let a subscriber take part in the choice of the recipients of a
      * notification, the way EVENT_NOTIFY_USER_INCLUDE and
@@ -667,7 +683,8 @@ class CalendarPlugin extends MantisPlugin {
      * Both are handed the raw action rather than the row of the matrix it maps
      * to, that is one of 'created', 'updated', 'deleted',
      * 'occurrence_cancelled', 'from_date_cancelled', 'member_added',
-     * 'member_removed', 'member_added_others' and 'member_removed_others'. They
+     * 'member_removed', 'member_added_others', 'member_removed_others' and
+     * 'rsvp'. They
      * are raised on every path that computes recipients, the public
      * calendar_api_event_notify_recipients() included.
      */
@@ -677,6 +694,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'EVENT_CALENDAR_EVENT_UPDATED'       => EVENT_TYPE_EXECUTE,
                                   'EVENT_CALENDAR_EVENT_DELETED'       => EVENT_TYPE_EXECUTE,
                                   'EVENT_CALENDAR_EVENT_REMINDER'      => EVENT_TYPE_EXECUTE,
+                                  'EVENT_CALENDAR_EVENT_RSVP'          => EVENT_TYPE_EXECUTE,
                                   'EVENT_CALENDAR_NOTIFY_USER_INCLUDE' => EVENT_TYPE_DEFAULT,
                                   'EVENT_CALENDAR_NOTIFY_USER_EXCLUDE' => EVENT_TYPE_DEFAULT,
         );

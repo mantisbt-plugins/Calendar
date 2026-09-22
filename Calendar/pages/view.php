@@ -283,9 +283,14 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                             <td>
                                 <?php
                                 $t_can_delete_others = access_has_event_level( plugin_config_get( 'member_delete_others_event_threshold' ), $f_event_id );
+                                $t_rsvp_enabled      = calendar_rsvp_feature_enabled();
+                                $t_rsvp_statuses     = $t_rsvp_enabled ? event_member_get_statuses( $f_event_id ) : array();
                                 for( $i = 0; $i < $t_num_users; $i++ ) {
                                     echo ($i > 0) ? ', ' : '';
                                     print_user( $t_users[$i] );
+                                    if( $t_rsvp_enabled ) {
+                                        print_rsvp_status_label( isset( $t_rsvp_statuses[$t_users[$i]] ) ? $t_rsvp_statuses[$t_users[$i]] : CALENDAR_RSVP_NONE );
+                                    }
                                     if( $t_can_delete_others || $t_users[$i] == auth_get_current_user_id() || $t_event->author_id == auth_get_current_user_id() ) {
                                         echo ' <a class="btn btn-xs btn-primary btn-white btn-round" href="' . plugin_page( 'event_member_delete' ) . '&event_id=' . $f_event_id . '&amp;user_id=' . $t_users[$i] . "&date=" . $t_event->date_from . htmlspecialchars( form_security_param( 'event_member_delete' ) ) . '"><i class="fa fa-times"></i></a>';
                                     }
@@ -320,6 +325,11 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                 <?php } ?>
                             </td>
                         </tr>
+                        <?php
+                        if( $t_rsvp_enabled ) {
+                            print_rsvp_rows( $f_event_id, $t_event->date_from, auth_get_current_user_id() );
+                        }
+                        ?>
                     </table>
                 </div>
             </div>

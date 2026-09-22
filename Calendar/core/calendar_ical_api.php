@@ -369,7 +369,8 @@ function calendar_ical_duration( $p_seconds ) {
 
 /**
  * Text of the DESCRIPTION: the description of the event, then the issues it
- * is attached to that the user may view, each with its link.
+ * is attached to that the user may view, each with its link, then - for a
+ * member - the link to the page of the event, where they reply.
  * @param array   $p_event   Event row.
  * @param integer $p_user_id User the file is built for.
  * @return string
@@ -399,6 +400,13 @@ function calendar_ical_description( array $p_event, $p_user_id ) {
 
         $t_parts[] = bug_format_id( $t_bug_id ) . ': ' . bug_get_field( $t_bug_id, 'summary' )
                 . "\n" . string_get_bug_view_url_with_fqdn( $t_bug_id );
+    }
+
+    # the page of the event once more, in the text this time: some clients
+    # drop the URL property on import, and a member replies on that page
+    if( calendar_rsvp_feature_enabled() && user_is_member_event( $p_user_id, (int)$p_event['id'] ) ) {
+        $t_parts[] = config_get_global( 'path' ) . plugin_page( 'view', true )
+                . '&event_id=' . (int)$p_event['id'] . '&date=' . (int)$p_event['date_from'];
     }
 
     return implode( "\n\n", $t_parts );

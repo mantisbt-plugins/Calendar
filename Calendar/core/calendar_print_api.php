@@ -322,3 +322,70 @@ function print_project_legend( array $p_project_ids ) {
     echo '</div>';
 }
 
+/**
+ * Print the reply of a member as a label next to their name
+ * @param integer $p_status One of the CALENDAR_RSVP_* constants.
+ * @return void
+ * @access public
+ */
+function print_rsvp_status_label( $p_status ) {
+
+    $t_classes = array(
+                              CALENDAR_RSVP_NONE      => 'label-default',
+                              CALENDAR_RSVP_ACCEPTED  => 'label-success',
+                              CALENDAR_RSVP_TENTATIVE => 'label-warning',
+                              CALENDAR_RSVP_DECLINED  => 'label-danger',
+    );
+
+    $c_status = (int)$p_status;
+    $t_class  = isset( $t_classes[$c_status] ) ? $t_classes[$c_status] : 'label-default';
+
+    echo ' <span class="label ' . $t_class . '">' . string_display_line( calendar_rsvp_status_label( $c_status ) ) . '</span>';
+}
+
+/**
+ * Print the reply rows of the member table of the event page: how the members
+ * replied so far, and - for a viewer who is a member - the buttons to reply
+ * with, the current reply drawn filled
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_date     Occurrence the page shows, carried by the links.
+ * @param integer $p_user_id  The viewer.
+ * @return void
+ * @access public
+ */
+function print_rsvp_rows( $p_event_id, $p_date, $p_user_id ) {
+
+    $c_event_id = (int)$p_event_id;
+    $c_date     = (int)$p_date;
+    $c_user_id  = (int)$p_user_id;
+
+    $t_statuses = event_member_get_statuses( $c_event_id );
+    $t_summary  = calendar_rsvp_summary( $c_event_id, $t_statuses );
+
+    echo '<tr>';
+    echo '<th class="category">' . plugin_lang_get( 'rsvp_replies' ) . '</th>';
+    echo '<td>' . sprintf( plugin_lang_get( 'rsvp_summary' ),
+                           $t_summary[CALENDAR_RSVP_ACCEPTED], $t_summary[CALENDAR_RSVP_TENTATIVE],
+                           $t_summary[CALENDAR_RSVP_DECLINED], $t_summary[CALENDAR_RSVP_NONE] ) . '</td>';
+    echo '</tr>';
+
+    if( !isset( $t_statuses[$c_user_id] ) ) {
+        return;
+    }
+
+    echo '<tr class="noprint">';
+    echo '<th class="category">' . plugin_lang_get( 'rsvp_your_reply' ) . '</th>';
+    echo '<td>';
+
+    foreach( calendar_rsvp_replies() as $t_reply ) {
+        $t_class = $t_statuses[$c_user_id] == $t_reply ? 'btn-primary' : 'btn-primary btn-white';
+
+        echo '<a class="btn btn-xs ' . $t_class . ' btn-round" href="'
+                . plugin_page( 'event_member_status' ) . '&amp;event_id=' . $c_event_id . '&amp;date=' . $c_date . '&amp;status=' . (int)$t_reply
+                . htmlspecialchars( form_security_param( 'event_member_status' ) ) . '">'
+                . plugin_lang_get( 'rsvp_reply_' . calendar_rsvp_status_name( $t_reply ) ) . '</a> ';
+    }
+
+    echo '</td>';
+    echo '</tr>';
+}

@@ -212,6 +212,8 @@ function calendar_api_event_create( \CalendarPluginApi\EventCreateRequest $p_req
             event_member_add( $t_event_id, (int)$t_member_id, $t_user_id );
         }
 
+        event_member_accept_author( $t_event_id );
+
         if( $t_reminder_offsets !== null ) {
             event_reminder_set_all( $t_event_id, $t_reminder_offsets, $t_user_id );
         }
@@ -469,6 +471,97 @@ function calendar_api_event_members( int $p_event_id ) : array {
         event_ensure_exists( $p_event_id );
 
         return event_get_member_ids( $p_event_id );
+    } finally {
+        restore_error_handler();
+        plugin_pop_current();
+    }
+}
+
+/**
+ * Replies of the members of the given event: whether each of them will take
+ * part, keyed by user identifier.
+ *
+ * The values are the CALENDAR_RSVP_* constants - CALENDAR_RSVP_NONE for a
+ * member who has not replied yet. Like calendar_api_event_members(), the
+ * answer is the stored list, not gated by show_member_list_threshold: it is
+ * the input of a plugin with a channel of its own, and whom it shows the
+ * replies to is its own decision. The master switch 'rsvp_feature_enabled'
+ * is not consulted here either, for the same reason - the replies that were
+ * given are still there while the feature is off.
+ *
+ * @param int $p_event_id Event the members belong to.
+ * @return array user id => status, may be empty.
+ * @throws \Mantis\Exceptions\ClientException When the event is unknown.
+ * @access public
+ */
+function calendar_api_event_member_statuses( int $p_event_id ) : array {
+
+    plugin_push_current( 'Calendar' );
+
+    set_error_handler( function( $p_severity, $p_message ) {
+        $t_code = is_numeric( $p_message ) ? (int)$p_message : ERROR_GENERIC;
+        throw new \Mantis\Exceptions\ClientException( error_string( $p_message ), $t_code );
+    }, E_USER_ERROR );
+
+    try {
+        event_ensure_exists( $p_event_id );
+
+        return event_member_get_statuses( $p_event_id );
+    } finally {
+        restore_error_handler();
+        plugin_pop_current();
+    }
+}
+
+/**
+ * Record the reply of a member of the given event on their behalf, the way
+ * the event page and the links in the mails do it: a plugin with a channel
+ * of its own - a bot, a mobile client - lets the member answer there.
+ *
+ * The call guarantees that the event exists, that the user is one of its
+ * members and that the reply is one a member may give, that is
+ * CALENDAR_RSVP_ACCEPTED, CALENDAR_RSVP_TENTATIVE or CALENDAR_RSVP_DECLINED;
+ * it is rejected while 'rsvp_feature_enabled' is off, since the pages would
+ * not take the reply either. An unchanged reply is accepted and changes
+ * nothing; a changed one is logged in the history of the event under the
+ * name of the member, signalled through EVENT_CALENDAR_EVENT_RSVP and mailed
+ * to whoever the notification matrix names for the 'rsvp' action.
+ *
+ * @param int $p_event_id Event the member replies to.
+ * @param int $p_user_id  The member who replies.
+ * @param int $p_status   The reply, one of the CALENDAR_RSVP_* constants.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event, the member or
+ *                                            the reply is rejected.
+ * @access public
+ */
+function calendar_api_event_member_status_set( int $p_event_id, int $p_user_id, int $p_status ) : void {
+
+    plugin_push_current( 'Calendar' );
+
+    set_error_handler( function( $p_severity, $p_message ) {
+        $t_code = is_numeric( $p_message ) ? (int)$p_message : ERROR_GENERIC;
+        throw new \Mantis\Exceptions\ClientException( error_string( $p_message ), $t_code );
+    }, E_USER_ERROR );
+
+    try {
+        event_ensure_exists( $p_event_id );
+
+        if( !calendar_rsvp_feature_enabled() ) {
+            trigger_error( ERROR_ACCESS_DENIED, ERROR );
+        }
+
+        if( !user_is_member_event( $p_user_id, $p_event_id ) ) {
+            error_parameters( $p_user_id );
+            trigger_error( ERROR_USER_BY_ID_NOT_FOUND, ERROR );
+        }
+
+        if( !in_array( $p_status, calendar_rsvp_replies(), true ) ) {
+            error_parameters( 'status' );
+            trigger_error( ERROR_INVALID_FIELD_VALUE, ERROR );
+        }
+
+        event_member_set_status( $p_event_id, $p_user_id, $p_status, $p_user_id );
     } finally {
         restore_error_handler();
         plugin_pop_current();

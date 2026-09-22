@@ -270,7 +270,9 @@ Comienza: %3$s
 
 %4$s
 
-Archivo de calendario (.ics): %5$s';
+Archivo de calendario (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_updated_email_subject = 'Evento modificado: %1$s';
 $s_plugin_Calendar_notify_updated_email_body = 'El evento del calendario ha sido modificado.
 
@@ -280,7 +282,9 @@ Comienza: %3$s
 
 %4$s
 
-Archivo de calendario (.ics): %5$s';
+Archivo de calendario (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_deleted_email_subject = 'Evento cancelado: %1$s';
 $s_plugin_Calendar_notify_deleted_email_body = 'El evento del calendario ha sido cancelado.
 
@@ -316,7 +320,9 @@ Comienza: %3$s
 
 %4$s
 
-Archivo de calendario (.ics): %5$s';
+Archivo de calendario (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_member_removed_email_subject = 'Eliminado del evento: %1$s';
 $s_plugin_Calendar_notify_member_removed_email_body = 'Usted ha sido eliminado de un evento.
 
@@ -351,7 +357,7 @@ $s_plugin_Calendar_notify_config_revert_to_global = 'Volver a los valores global
 $s_plugin_Calendar_notify_config_revert_to_default = 'Volver a los valores predeterminados';
 
 $s_plugin_Calendar_notify_member_added_others_email_subject = 'Participante añadido: %1$s';
-$s_plugin_Calendar_notify_member_added_others_email_body = 'Se ha añadido a %6$s a un evento en el que usted participa.
+$s_plugin_Calendar_notify_member_added_others_email_body = 'Se ha añadido a %7$s a un evento en el que usted participa.
 
 Evento: %1$s
 Proyecto: %2$s
@@ -361,7 +367,7 @@ Comienza: %3$s
 
 Archivo de calendario (.ics): %5$s';
 $s_plugin_Calendar_notify_member_removed_others_email_subject = 'Participante eliminado: %1$s';
-$s_plugin_Calendar_notify_member_removed_others_email_body = '%6$s ya no participa en un evento en el que usted participa.
+$s_plugin_Calendar_notify_member_removed_others_email_body = '%7$s ya no participa en un evento en el que usted participa.
 
 Evento: %1$s
 Proyecto: %2$s
@@ -370,3 +376,33 @@ Comienza: %3$s
 %4$s
 
 Archivo de calendario (.ics): %5$s';
+
+$s_plugin_Calendar_config_rsvp_feature_enabled = 'Los participantes responden si van a participar';
+$s_plugin_Calendar_rsvp_status_none = 'Sin respuesta';
+$s_plugin_Calendar_rsvp_status_accepted = 'Participará';
+$s_plugin_Calendar_rsvp_status_tentative = 'Quizás';
+$s_plugin_Calendar_rsvp_status_declined = 'No participará';
+$s_plugin_Calendar_rsvp_reply_accepted = 'Sí';
+$s_plugin_Calendar_rsvp_reply_tentative = 'Quizás';
+$s_plugin_Calendar_rsvp_reply_declined = 'No';
+$s_plugin_Calendar_rsvp_your_reply = '¿Va a participar?';
+$s_plugin_Calendar_rsvp_replies = 'Respuestas';
+$s_plugin_Calendar_rsvp_summary = 'sí: %1$d, quizás: %2$d, no: %3$d, sin respuesta: %4$d';
+$s_plugin_Calendar_rsvp_recorded = 'Su respuesta al evento «%1$s» ha sido registrada: %2$s.';
+$s_plugin_Calendar_rsvp_link_invalid = 'Este enlace ya no funciona: ha caducado, o usted ya no participa en el evento.';
+$s_plugin_Calendar_rsvp_open_event = 'Abrir el evento';
+$s_plugin_Calendar_event_history_rsvp = 'Respuesta de %1$s';
+$s_plugin_Calendar_event_history_rsvp_reset = 'Respuestas descartadas, la hora del evento ha cambiado';
+$s_plugin_Calendar_notify_config_row_rsvp = 'Un participante respondió si va a participar';
+$s_plugin_Calendar_notify_rsvp_links = '¿Va a participar?
+Sí: %1$s
+Quizás: %2$s
+No: %3$s';
+$s_plugin_Calendar_notify_rsvp_email_subject = 'Respuesta al evento: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_body = '%7$s respondió al evento: %8$s.
+
+Evento: %1$s
+Proyecto: %2$s
+Comienza: %3$s
+
+%4$s';

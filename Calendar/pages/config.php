@@ -24,6 +24,7 @@ $f_time_finish = gpc_get_int( 'time_day_finish' );
 
 $f_reminders_feature_enabled     = gpc_get_bool( 'reminders_feature_enabled' ) ? ON : OFF;
 $f_notifications_feature_enabled = gpc_get_bool( 'notifications_feature_enabled' ) ? ON : OFF;
+$f_rsvp_feature_enabled          = gpc_get_bool( 'rsvp_feature_enabled' ) ? ON : OFF;
 $f_bug_calendar_block_position   = gpc_get_int( 'bug_calendar_block_position' );
 
 $f_file = gpc_get_file( 'ufile' );
@@ -66,6 +67,10 @@ if( plugin_config_get( 'reminders_feature_enabled' ) != $f_reminders_feature_ena
 
 if( plugin_config_get( 'notifications_feature_enabled' ) != $f_notifications_feature_enabled ) {
     plugin_config_set( 'notifications_feature_enabled', $f_notifications_feature_enabled );
+}
+
+if( plugin_config_get( 'rsvp_feature_enabled' ) != $f_rsvp_feature_enabled ) {
+    plugin_config_set( 'rsvp_feature_enabled', $f_rsvp_feature_enabled );
 }
 
 if( plugin_config_get( 'bug_calendar_block_position' ) != $f_bug_calendar_block_position ) {

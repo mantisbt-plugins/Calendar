@@ -271,7 +271,9 @@ $s_plugin_Calendar_notify_created_email_body = '新的日历事件。
 
 %4$s
 
-日历文件 (.ics)：%5$s';
+日历文件 (.ics)：%5$s
+
+%6$s';
 $s_plugin_Calendar_notify_updated_email_subject = '事件已变更: %1$s';
 $s_plugin_Calendar_notify_updated_email_body = '日历事件已变更。
 
@@ -281,7 +283,9 @@ $s_plugin_Calendar_notify_updated_email_body = '日历事件已变更。
 
 %4$s
 
-日历文件 (.ics)：%5$s';
+日历文件 (.ics)：%5$s
+
+%6$s';
 $s_plugin_Calendar_notify_deleted_email_subject = '事件已取消: %1$s';
 $s_plugin_Calendar_notify_deleted_email_body = '日历事件已取消。
 
@@ -317,7 +321,9 @@ $s_plugin_Calendar_notify_member_added_email_body = '您已被加入一个事件
 
 %4$s
 
-日历文件 (.ics)：%5$s';
+日历文件 (.ics)：%5$s
+
+%6$s';
 $s_plugin_Calendar_notify_member_removed_email_subject = '已从事件中移除: %1$s';
 $s_plugin_Calendar_notify_member_removed_email_body = '您已从一个事件中被移除。
 
@@ -352,7 +358,7 @@ $s_plugin_Calendar_notify_config_revert_to_global = '恢复为全局设置';
 $s_plugin_Calendar_notify_config_revert_to_default = '恢复为默认设置';
 
 $s_plugin_Calendar_notify_member_added_others_email_subject = '已加入参与者: %1$s';
-$s_plugin_Calendar_notify_member_added_others_email_body = '%6$s 已被加入您参与的事件。
+$s_plugin_Calendar_notify_member_added_others_email_body = '%7$s 已被加入您参与的事件。
 
 事件: %1$s
 项目: %2$s
@@ -362,7 +368,7 @@ $s_plugin_Calendar_notify_member_added_others_email_body = '%6$s 已被加入您
 
 日历文件 (.ics)：%5$s';
 $s_plugin_Calendar_notify_member_removed_others_email_subject = '已移除参与者: %1$s';
-$s_plugin_Calendar_notify_member_removed_others_email_body = '%6$s 已不再参与您参与的事件。
+$s_plugin_Calendar_notify_member_removed_others_email_body = '%7$s 已不再参与您参与的事件。
 
 事件: %1$s
 项目: %2$s
@@ -371,3 +377,33 @@ $s_plugin_Calendar_notify_member_removed_others_email_body = '%6$s 已不再参�
 %4$s
 
 日历文件 (.ics)：%5$s';
+
+$s_plugin_Calendar_config_rsvp_feature_enabled = '参与者答复是否参加';
+$s_plugin_Calendar_rsvp_status_none = '未答复';
+$s_plugin_Calendar_rsvp_status_accepted = '将参加';
+$s_plugin_Calendar_rsvp_status_tentative = '可能';
+$s_plugin_Calendar_rsvp_status_declined = '不参加';
+$s_plugin_Calendar_rsvp_reply_accepted = '是';
+$s_plugin_Calendar_rsvp_reply_tentative = '可能';
+$s_plugin_Calendar_rsvp_reply_declined = '否';
+$s_plugin_Calendar_rsvp_your_reply = '您会参加吗？';
+$s_plugin_Calendar_rsvp_replies = '答复';
+$s_plugin_Calendar_rsvp_summary = '是: %1$d，可能: %2$d，否: %3$d，未答复: %4$d';
+$s_plugin_Calendar_rsvp_recorded = '您对事件“%1$s”的答复已记录: %2$s。';
+$s_plugin_Calendar_rsvp_link_invalid = '此链接已失效: 已过期，或您已不再参与该事件。';
+$s_plugin_Calendar_rsvp_open_event = '打开事件';
+$s_plugin_Calendar_event_history_rsvp = '%1$s 的答复';
+$s_plugin_Calendar_event_history_rsvp_reset = '答复已清除，事件时间已变更';
+$s_plugin_Calendar_notify_config_row_rsvp = '参与者答复了是否参加';
+$s_plugin_Calendar_notify_rsvp_links = '您会参加吗？
+是: %1$s
+可能: %2$s
+否: %3$s';
+$s_plugin_Calendar_notify_rsvp_email_subject = '事件答复: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_body = '%7$s 答复了事件: %8$s。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s';

@@ -271,7 +271,9 @@ Starts: %3$s
 
 %4$s
 
-Calendar file (.ics): %5$s';
+Calendar file (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_updated_email_subject = 'Event changed: %1$s';
 $s_plugin_Calendar_notify_updated_email_body = 'The calendar event has been changed.
 
@@ -281,7 +283,9 @@ Starts: %3$s
 
 %4$s
 
-Calendar file (.ics): %5$s';
+Calendar file (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_deleted_email_subject = 'Event cancelled: %1$s';
 $s_plugin_Calendar_notify_deleted_email_body = 'The calendar event has been cancelled.
 
@@ -317,7 +321,9 @@ Starts: %3$s
 
 %4$s
 
-Calendar file (.ics): %5$s';
+Calendar file (.ics): %5$s
+
+%6$s';
 $s_plugin_Calendar_notify_member_removed_email_subject = 'Removed from the event: %1$s';
 $s_plugin_Calendar_notify_member_removed_email_body = 'You have been removed from an event.
 
@@ -352,7 +358,7 @@ $s_plugin_Calendar_notify_config_revert_to_global = 'Revert to the global values
 $s_plugin_Calendar_notify_config_revert_to_default = 'Revert to the built-in values';
 
 $s_plugin_Calendar_notify_member_added_others_email_subject = 'Member added: %1$s';
-$s_plugin_Calendar_notify_member_added_others_email_body = '%6$s has been added to an event you take part in.
+$s_plugin_Calendar_notify_member_added_others_email_body = '%7$s has been added to an event you take part in.
 
 Event: %1$s
 Project: %2$s
@@ -362,7 +368,7 @@ Starts: %3$s
 
 Calendar file (.ics): %5$s';
 $s_plugin_Calendar_notify_member_removed_others_email_subject = 'Member removed: %1$s';
-$s_plugin_Calendar_notify_member_removed_others_email_body = '%6$s no longer takes part in an event you take part in.
+$s_plugin_Calendar_notify_member_removed_others_email_body = '%7$s no longer takes part in an event you take part in.
 
 Event: %1$s
 Project: %2$s
@@ -371,3 +377,33 @@ Starts: %3$s
 %4$s
 
 Calendar file (.ics): %5$s';
+
+$s_plugin_Calendar_config_rsvp_feature_enabled = 'Members reply whether they will take part';
+$s_plugin_Calendar_rsvp_status_none = 'No reply';
+$s_plugin_Calendar_rsvp_status_accepted = 'Will take part';
+$s_plugin_Calendar_rsvp_status_tentative = 'Maybe';
+$s_plugin_Calendar_rsvp_status_declined = 'Will not take part';
+$s_plugin_Calendar_rsvp_reply_accepted = 'Yes';
+$s_plugin_Calendar_rsvp_reply_tentative = 'Maybe';
+$s_plugin_Calendar_rsvp_reply_declined = 'No';
+$s_plugin_Calendar_rsvp_your_reply = 'Will you take part?';
+$s_plugin_Calendar_rsvp_replies = 'Replies';
+$s_plugin_Calendar_rsvp_summary = 'yes: %1$d, maybe: %2$d, no: %3$d, no reply: %4$d';
+$s_plugin_Calendar_rsvp_recorded = 'Your reply to the event "%1$s" has been recorded: %2$s.';
+$s_plugin_Calendar_rsvp_link_invalid = 'This link does not work any more: it has expired, or you no longer take part in the event.';
+$s_plugin_Calendar_rsvp_open_event = 'Open the event';
+$s_plugin_Calendar_event_history_rsvp = 'Reply of %1$s';
+$s_plugin_Calendar_event_history_rsvp_reset = 'Replies dropped, the time of the event has changed';
+$s_plugin_Calendar_notify_config_row_rsvp = 'Member replied whether they will take part';
+$s_plugin_Calendar_notify_rsvp_links = 'Will you take part?
+Yes: %1$s
+Maybe: %2$s
+No: %3$s';
+$s_plugin_Calendar_notify_rsvp_email_subject = 'Reply to the event: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_body = '%7$s replied to the event: %8$s.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s';

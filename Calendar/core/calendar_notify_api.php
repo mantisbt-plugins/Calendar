@@ -52,7 +52,7 @@ function calendar_notify_feature_enabled() {
  * @access public
  */
 function calendar_notify_actions() {
-    return array( 'created', 'updated', 'deleted', 'member_added', 'member_removed' );
+    return array( 'created', 'updated', 'deleted', 'member_added', 'member_removed', 'rsvp' );
 }
 
 /**
@@ -93,6 +93,9 @@ function calendar_notify_action_row( $p_action ) {
         case 'member_removed':
         case 'member_removed_others':
             return 'member_removed';
+
+        case 'rsvp':
+            return 'rsvp';
 
         default :
             return 'deleted';
@@ -177,6 +180,7 @@ function calendar_notify_action_pref( $p_action ) {
             return 'created';
 
         case 'updated':
+        case 'rsvp':
             return 'updated';
 
         default :
@@ -321,16 +325,19 @@ function calendar_notify_recipients( array $p_event, $p_action, $p_actor_id = nu
 /**
  * Send the mail of one action to one recipient.
  *
- * Every body is formatted with the same five arguments - name, project, date,
- * link to the event and link to its iCalendar file - so that a translation is
- * free to leave out the links of an event that no longer exists without
- * changing the call. An action that has more to say appends its own arguments
- * after those five.
+ * Every body is formatted with the same six arguments - name, project, date,
+ * link to the event, link to its iCalendar file and the paragraph with the
+ * reply links of the recipient - so that a translation is free to leave out
+ * the links of an event that no longer exists without changing the call. An
+ * action that has more to say appends its own arguments after those six; in
+ * the subject they follow the name, from %2$s on. An argument given as
+ * array( 'lang' => key ) is replaced by that string of the plugin in the
+ * language of the recipient.
  * @param array        $p_event   Event row with id, project_id, name, date_from.
  * @param integer      $p_user_id Integer representing user identifier.
  * @param string       $p_action  Suffix of the notify_<action>_email_* strings.
  * @param integer|null $p_date    Timestamp shown in the mail, defaults to the start of the event.
- * @param array        $p_args    Further arguments of the action, from %6$s on.
+ * @param array        $p_args    Further arguments of the action, from %7$s on.
  * @return boolean true if the mail was queued
  * @access public
  * @uses email_api.php
@@ -364,6 +371,12 @@ function calendar_notify_send( array $p_event, $p_user_id, $p_action, $p_date = 
     $t_url = config_get_global( 'path' ) . plugin_page( 'view', true )
             . '&event_id=' . (int)$p_event['id'] . '&date=' . (int)$p_event['date_from'];
 
+    foreach( $p_args as $t_index => $t_arg ) {
+        if( is_array( $t_arg ) && isset( $t_arg['lang'] ) ) {
+            $p_args[$t_index] = plugin_lang_get( $t_arg['lang'] );
+        }
+    }
+
     $t_subject = vsprintf( plugin_lang_get( 'notify_' . $p_action . '_email_subject' ),
                            array_merge( array( $p_event['name'] ), $p_args ) );
     $t_body    = vsprintf( plugin_lang_get( 'notify_' . $p_action . '_email_body' ),
@@ -373,6 +386,7 @@ function calendar_notify_send( array $p_event, $p_user_id, $p_action, $p_date = 
                                                     $t_date_text,
                                                     $t_url,
                                                     calendar_ical_url( (int)$p_event['id'] ),
+                                                    calendar_rsvp_mail_block( (int)$p_event['id'], $p_user_id ),
                                           ), $p_args ) );
 
     email_store( $t_email, $t_subject, $t_body );
@@ -597,4 +611,38 @@ function calendar_notify_member( $p_event_id, $p_user_id, $p_action, $p_actor_id
     }
 
     calendar_notify_send( calendar_notify_event_fields( $p_event_id ), $c_user_id, $p_action );
+}
+
+/**
+ * Tell the author of an event - or whoever else the matrix names - that a
+ * member replied whether they will take part. The member is never among the
+ * recipients unless the matrix asks for the actor, and a reply of the author
+ * to their own event is announced to nobody.
+ * @param integer      $p_event_id Integer representing event identifier.
+ * @param integer      $p_user_id  The member who replied.
+ * @param integer      $p_status   One of the CALENDAR_RSVP_* constants.
+ * @param integer|null $p_actor_id User who acted, a recipient only where the matrix says so.
+ * @return void
+ * @access public
+ */
+function calendar_notify_rsvp( $p_event_id, $p_user_id, $p_status, $p_actor_id ) {
+
+    if( !calendar_notify_feature_enabled() ) {
+        return;
+    }
+
+    $t_event = calendar_notify_event_fields( $p_event_id );
+
+    if( (int)$p_user_id == $t_event['author_id'] ) {
+        return;
+    }
+
+    $t_member_name = user_get_name( (int)$p_user_id );
+
+    $t_recipients = calendar_notify_recipients( $t_event, 'rsvp', $p_actor_id, $p_user_id );
+
+    foreach( $t_recipients as $t_recipient_id ) {
+        calendar_notify_send( $t_event, $t_recipient_id, 'rsvp', null,
+                              array( $t_member_name, array( 'lang' => 'rsvp_status_' . calendar_rsvp_status_name( $p_status ) ) ) );
+    }
 }

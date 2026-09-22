@@ -87,6 +87,8 @@ foreach( $f_member_user_list as $t_member ) {
     event_member_add( $t_event_id, $t_member );
 }
 
+event_member_accept_author( $t_event_id );
+
 if( calendar_reminder_feature_enabled() ) {
     event_reminder_set_all( $t_event_id, $t_reminder_offsets );
 }

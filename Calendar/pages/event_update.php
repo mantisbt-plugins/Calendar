@@ -78,6 +78,10 @@ switch( $t_range ) {
             event_member_add( $t_event_child_id, $t_event_member );
         }
 
+        # the split off event has a time of its own, so the replies given to
+        # the series do not carry over; its author is the one who moved it
+        event_member_accept_author( $t_event_child_id );
+
         # like the members, the reminders are copied to the split off event
         # instead of being inherited from the series at run time
         if( calendar_reminder_feature_enabled() ) {
@@ -138,6 +142,8 @@ switch( $t_range ) {
         foreach( $t_event_members_current as $t_event_member ) {
             event_member_add( $t_event_child_id, $t_event_member );
         }
+
+        event_member_accept_author( $t_event_child_id );
 
         if( calendar_reminder_feature_enabled() ) {
             event_reminder_set_all( $t_event_child_id, $t_reminder_offsets );
@@ -212,6 +218,15 @@ switch( $t_range ) {
 
         if( $t_event_child_data != $t_event_parent_data ) {
             $t_event_child_data->update();
+
+            # a reply was given to a time: once that time is gone, so is the
+            # reply, except for the one of whoever moved the event
+            if( calendar_rsvp_feature_enabled()
+                    && ( $t_event_child_data->date_from != $t_event_parent_data->date_from
+                    || $t_event_child_data->duration != $t_event_parent_data->duration
+                    || $t_event_child_data->recurrence_pattern != $t_event_parent_data->recurrence_pattern ) ) {
+                event_member_reset_statuses( $t_event_child_data->id, auth_get_current_user_id() );
+            }
         }
 
         $t_event_child_id = $t_event_child_data->id;
