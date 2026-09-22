@@ -185,6 +185,22 @@ function calendar_ical_event( $p_event_id, $p_user_id ) {
     $t_lines[] = 'URL:' . config_get_global( 'path' ) . plugin_page( 'view', true )
             . '&event_id=' . (int)$t_event['id'] . '&date=' . (int)$t_event['date_from'];
     $t_lines[] = 'STATUS:CONFIRMED';
+
+    # the reminders the user gets from the plugin, as display alarms; a client
+    # that honours them needs no setting up by hand, one that ignores them
+    # falls back to its own defaults
+    if( calendar_reminder_feature_enabled() ) {
+        $t_effective = calendar_reminder_effective( (int)$t_event['id'], (int)$p_user_id );
+
+        foreach( $t_effective['offsets'] as $t_offset ) {
+            $t_lines[] = 'BEGIN:VALARM';
+            $t_lines[] = 'ACTION:DISPLAY';
+            $t_lines[] = 'TRIGGER:' . calendar_ical_duration( -(int)$t_offset );
+            $t_lines[] = 'DESCRIPTION:' . calendar_ical_escape( $t_event['name'] );
+            $t_lines[] = 'END:VALARM';
+        }
+    }
+
     $t_lines[] = 'END:VEVENT';
     $t_lines[] = 'END:VCALENDAR';
 
@@ -310,6 +326,45 @@ function calendar_ical_utc_offset( $p_seconds ) {
     $t_abs = abs( (int)$p_seconds );
 
     return ( $p_seconds < 0 ? '-' : '+' ) . sprintf( '%02d%02d', intdiv( $t_abs, 3600 ), intdiv( $t_abs % 3600, 60 ) );
+}
+
+/**
+ * A number of seconds as an RFC 5545 duration, e.g. -PT10M, -PT1H30M, -P2D
+ * @param integer $p_seconds Length in seconds, negative for "before".
+ * @return string
+ * @access private
+ */
+function calendar_ical_duration( $p_seconds ) {
+
+    $t_abs   = abs( (int)$p_seconds );
+    $t_days  = intdiv( $t_abs, 86400 );
+    $t_hours = intdiv( $t_abs % 86400, 3600 );
+    $t_mins  = intdiv( $t_abs % 3600, 60 );
+    $t_secs  = $t_abs % 60;
+
+    $t_text = ( $p_seconds < 0 ? '-' : '' ) . 'P';
+
+    if( $t_days > 0 ) {
+        $t_text .= $t_days . 'D';
+    }
+
+    if( $t_hours > 0 || $t_mins > 0 || $t_secs > 0 || $t_days == 0 ) {
+        $t_text .= 'T';
+
+        if( $t_hours > 0 ) {
+            $t_text .= $t_hours . 'H';
+        }
+
+        if( $t_mins > 0 ) {
+            $t_text .= $t_mins . 'M';
+        }
+
+        if( $t_secs > 0 || ( $t_hours == 0 && $t_mins == 0 ) ) {
+            $t_text .= $t_secs . 'S';
+        }
+    }
+
+    return $t_text;
 }
 
 /**

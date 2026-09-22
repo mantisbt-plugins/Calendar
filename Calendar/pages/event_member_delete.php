@@ -54,6 +54,11 @@ if( count( event_get_members( $f_event_id ) ) <= 1 ) {
 
 event_member_delete( $f_event_id, $t_user_id );
 
+# the personal reminder set of the member is theirs for this event only
+if( calendar_reminder_feature_enabled() && $t_event->author_id != $t_user_id ) {
+    event_reminder_user_reset( $f_event_id, $t_user_id );
+}
+
 # a user who left the event on their own is not mailed about it
 calendar_notify_member_removed( $f_event_id, $t_user_id, $t_logged_in_user_id );
 

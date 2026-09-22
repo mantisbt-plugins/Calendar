@@ -18,11 +18,14 @@
  * Reminders about upcoming events.
  *
  * A reminder is an offset in seconds before the start of an occurrence. The
- * offsets of an event are stored in plugin_table( 'event_reminder' ); if an
- * event has none, every recipient is reminded by its own personal defaults
- * instead. Nothing is materialized per occurrence: the dispatcher expands the
- * recurrence rules on the fly and compares the resulting fire times with the
- * window that has passed since its previous run.
+ * offsets of an event are stored in plugin_table( 'event_reminder' ) with
+ * user_id = 0; if an event has none, every recipient is reminded by its own
+ * personal defaults instead. A recipient may replace what applies to them by
+ * a set of their own, stored in the same table under their user_id - that set
+ * is theirs alone and is consulted before the offsets of the event. Nothing is
+ * materialized per occurrence: the dispatcher expands the recurrence rules on
+ * the fly and compares the resulting fire times with the window that has
+ * passed since its previous run.
  *
  * The dispatcher runs from EVENT_CRONJOB, that is from the command line, and
  * from EVENT_CORE_READY as a throttled fallback. Everything below must
@@ -237,22 +240,24 @@ function calendar_reminder_user_offsets( $p_user_id ) {
 }
 
 /**
- * Return the reminder offsets of the given event
+ * Return the reminder offsets of the given event: those of the event itself,
+ * or the personal set of one of its recipients
  * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Owner of the set, 0 for the event itself.
  * @return array offsets in seconds, ascending
  * @access public
  * @uses database_api.php
  */
-function event_reminder_get_offsets( $p_event_id ) {
+function event_reminder_get_offsets( $p_event_id, $p_user_id = 0 ) {
 
     $t_event_reminder_table = plugin_table( 'event_reminder' );
 
     db_param_push();
     $t_query  = "SELECT time_offset
 						  FROM $t_event_reminder_table
-						  WHERE event_id=" . db_param() . "
+						  WHERE event_id=" . db_param() . " AND user_id=" . db_param() . "
 						  ORDER BY time_offset ASC";
-    $t_result = db_query( $t_query, Array( (int)$p_event_id ) );
+    $t_result = db_query( $t_query, Array( (int)$p_event_id, (int)$p_user_id ) );
 
     $t_offsets = array();
     while( $t_row      = db_fetch_array( $t_result ) ) {
@@ -263,8 +268,182 @@ function event_reminder_get_offsets( $p_event_id ) {
 }
 
 /**
- * Replace the reminders of the given event by the given set of offsets.
- * Only the difference is written, so an unchanged set leaves no history behind.
+ * Every reminder set stored for the given event, keyed by its owner: 0 for
+ * the offsets of the event itself, a user id for a personal set. One query
+ * for the dispatcher instead of one per recipient.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @return array user id => offsets in seconds, ascending
+ * @access public
+ * @uses database_api.php
+ */
+function event_reminder_get_all( $p_event_id ) {
+
+    $t_event_reminder_table = plugin_table( 'event_reminder' );
+
+    db_param_push();
+    $t_query  = "SELECT user_id, time_offset
+						  FROM $t_event_reminder_table
+						  WHERE event_id=" . db_param() . "
+						  ORDER BY user_id ASC, time_offset ASC";
+    $t_result = db_query( $t_query, Array( (int)$p_event_id ) );
+
+    $t_sets = array();
+    while( $t_row = db_fetch_array( $t_result ) ) {
+        $t_sets[(int)$t_row['user_id']][] = (int)$t_row['time_offset'];
+    }
+
+    return $t_sets;
+}
+
+/**
+ * The reminders that apply to one recipient of an event, and where they come
+ * from: the personal set of the recipient for this event, else the offsets of
+ * the event, else the personal defaults of the recipient. A set that is
+ * switched off yields no offsets.
+ * @param integer    $p_event_id Integer representing event identifier.
+ * @param integer    $p_user_id  Integer representing user identifier.
+ * @param array|null $p_sets     Sets as returned by event_reminder_get_all(), read here when omitted.
+ * @return array 'source' => 'personal' | 'event' | 'defaults', 'offsets' => offsets in seconds, ascending
+ * @access public
+ */
+function calendar_reminder_effective( $p_event_id, $p_user_id, ?array $p_sets = null ) {
+
+    if( $p_sets === null ) {
+        $p_sets = event_reminder_get_all( $p_event_id );
+    }
+
+    $c_user_id = (int)$p_user_id;
+
+    if( $c_user_id > 0 && isset( $p_sets[$c_user_id] ) ) {
+        $t_source  = 'personal';
+        $t_offsets = $p_sets[$c_user_id];
+    } elseif( isset( $p_sets[0] ) ) {
+        $t_source  = 'event';
+        $t_offsets = $p_sets[0];
+    } else {
+        $t_source  = 'defaults';
+        $t_offsets = $c_user_id > 0 ? calendar_reminder_user_offsets( $c_user_id ) : array();
+    }
+
+    if( calendar_reminder_offsets_disabled( $t_offsets ) ) {
+        $t_offsets = array();
+    }
+
+    return array( 'source' => $t_source, 'offsets' => $t_offsets );
+}
+
+/**
+ * Whether the given user is among those reminded about the given event: its
+ * author or one of its members. The opt-out of the user is not looked at
+ * here, the page tells them about it instead.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Integer representing user identifier.
+ * @return boolean
+ * @access public
+ */
+function calendar_reminder_user_is_recipient( $p_event_id, $p_user_id ) {
+
+    $c_user_id = (int)$p_user_id;
+
+    if( $c_user_id <= 0 ) {
+        return false;
+    }
+
+    return (int)event_get_field( $p_event_id, 'author_id' ) == $c_user_id
+            || in_array( $c_user_id, event_get_member_ids( $p_event_id ), true );
+}
+
+/**
+ * Replace the personal reminder set of one recipient of an event. An empty
+ * set is stored as the switched off marker, so that it does not fall back to
+ * the offsets of the event; to get back to those, use event_reminder_user_reset().
+ * Personal sets are not logged in the history of the event: they are private
+ * to the recipient.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Integer representing user identifier.
+ * @param array   $p_offsets  Offsets in seconds.
+ * @return boolean (always true)
+ * @access public
+ * @uses database_api.php
+ */
+function event_reminder_user_set_all( $p_event_id, $p_user_id, array $p_offsets ) {
+
+    $c_event_id             = (int)$p_event_id;
+    $c_user_id              = (int)$p_user_id;
+    $t_event_reminder_table = plugin_table( 'event_reminder' );
+
+    $t_offsets = array_values( array_unique( array_map( 'intval', $p_offsets ) ) );
+    sort( $t_offsets );
+
+    if( count( $t_offsets ) == 0 ) {
+        $t_offsets = array( CALENDAR_REMINDER_DISABLED );
+    }
+
+    event_reminder_user_reset( $c_event_id, $c_user_id );
+
+    foreach( $t_offsets as $t_offset ) {
+
+        db_param_push();
+        $t_query = "INSERT INTO $t_event_reminder_table
+                                                ( event_id, user_id, time_offset
+                                                )
+                                              VALUES
+                                                ( " . db_param() . ',' . db_param() . ',' . db_param() . ')';
+
+        db_query( $t_query, Array( $c_event_id, $c_user_id, $t_offset ) );
+    }
+
+    return true;
+}
+
+/**
+ * Drop the personal reminder set of one recipient of an event, so that the
+ * offsets of the event (or their personal defaults) apply to them again
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Integer representing user identifier.
+ * @return boolean (always true)
+ * @access public
+ * @uses database_api.php
+ */
+function event_reminder_user_reset( $p_event_id, $p_user_id ) {
+
+    $t_event_reminder_table = plugin_table( 'event_reminder' );
+
+    db_param_push();
+    $t_query = "DELETE FROM $t_event_reminder_table WHERE event_id=" . db_param() . " AND user_id=" . db_param();
+
+    db_query( $t_query, Array( (int)$p_event_id, (int)$p_user_id ) );
+
+    return true;
+}
+
+/**
+ * Copy the personal reminder sets of every recipient from one event to
+ * another, used when an occurrence is split off its series: the members are
+ * copied the same way, and their choices go with them
+ * @param integer $p_source_event_id Event the sets are read from.
+ * @param integer $p_target_event_id Event the sets are written to.
+ * @return boolean (always true)
+ * @access public
+ */
+function event_reminder_user_copy_all( $p_source_event_id, $p_target_event_id ) {
+
+    foreach( event_reminder_get_all( $p_source_event_id ) as $t_user_id => $t_offsets ) {
+
+        if( $t_user_id == 0 ) {
+            continue;
+        }
+
+        event_reminder_user_set_all( $p_target_event_id, $t_user_id, $t_offsets );
+    }
+
+    return true;
+}
+
+/**
+ * Replace the reminders of the event itself by the given set of offsets; the
+ * personal sets of its recipients are left alone. Only the difference is
+ * written, so an unchanged set leaves no history behind.
  * @param integer      $p_event_id       Integer representing event identifier.
  * @param array        $p_offsets        Offsets in seconds.
  * @param integer|null $p_acting_user_id User the history is logged for, defaults to the logged in one.
@@ -292,7 +471,7 @@ function event_reminder_set_all( $p_event_id, array $p_offsets, $p_acting_user_i
 
         db_param_push();
         $t_query = "DELETE FROM $t_event_reminder_table
-                                              WHERE event_id=" . db_param() . " AND time_offset=" . db_param();
+                                              WHERE event_id=" . db_param() . " AND user_id=0 AND time_offset=" . db_param();
 
         db_query( $t_query, Array( $c_event_id, $t_offset ) );
 
@@ -303,10 +482,10 @@ function event_reminder_set_all( $p_event_id, array $p_offsets, $p_acting_user_i
 
         db_param_push();
         $t_query = "INSERT INTO $t_event_reminder_table
-                                                ( event_id, time_offset
+                                                ( event_id, user_id, time_offset
                                                 )
                                               VALUES
-                                                ( " . db_param() . ',' . db_param() . ')';
+                                                ( " . db_param() . ', 0, ' . db_param() . ')';
 
         db_query( $t_query, Array( $c_event_id, $t_offset ) );
 
@@ -317,7 +496,8 @@ function event_reminder_set_all( $p_event_id, array $p_offsets, $p_acting_user_i
 }
 
 /**
- * Drop every reminder of the given event, used when the event itself is deleted
+ * Drop every reminder of the given event, its own and the personal sets of
+ * its recipients, used when the event itself is deleted
  * @param integer $p_event_id Integer representing event identifier.
  * @return boolean (always true)
  * @access public
@@ -501,13 +681,7 @@ function calendar_reminder_process() {
             continue;
         }
 
-        $t_offsets_explicit = event_reminder_get_offsets( $t_event_id );
-
-        # reminders switched off for this event: neither its own offsets nor
-        # the personal defaults of the recipients apply
-        if( calendar_reminder_offsets_disabled( $t_offsets_explicit ) ) {
-            continue;
-        }
+        $t_reminder_sets = event_reminder_get_all( $t_event_id );
 
         $t_recipients  = event_reminder_recipients( $t_event_id, (int)$t_event['author_id'] );
         $t_is_recurring = !is_blank( $t_event['recurrence_pattern'] );
@@ -520,9 +694,10 @@ function calendar_reminder_process() {
 
             foreach( $t_recipients as $t_user_id ) {
 
-                # reminders of the event, if any, apply to every recipient;
-                # only an event without them falls back to personal defaults
-                $t_offsets = count( $t_offsets_explicit ) > 0 ? $t_offsets_explicit : calendar_reminder_user_offsets( $t_user_id );
+                # the personal set of the recipient, else the reminders of the
+                # event, else the personal defaults of the recipient
+                $t_effective = calendar_reminder_effective( $t_event_id, $t_user_id, $t_reminder_sets );
+                $t_offsets   = $t_effective['offsets'];
 
                 foreach( $t_offsets as $t_offset ) {
 

@@ -82,6 +82,7 @@ switch( $t_range ) {
         # instead of being inherited from the series at run time
         if( calendar_reminder_feature_enabled() ) {
             event_reminder_set_all( $t_event_child_id, $t_reminder_offsets );
+            event_reminder_user_copy_all( $t_event_parent_data->id, $t_event_child_id );
         }
 
         event_google_add( $t_event_child_id, $t_event_child_data->author_id, $t_event_members_current );
@@ -140,6 +141,7 @@ switch( $t_range ) {
 
         if( calendar_reminder_feature_enabled() ) {
             event_reminder_set_all( $t_event_child_id, $t_reminder_offsets );
+            event_reminder_user_copy_all( $t_event_parent_data->id, $t_event_child_id );
         }
 
         event_google_add( $t_event_child_id, $t_event_child_data->author_id, $t_event_members_current );

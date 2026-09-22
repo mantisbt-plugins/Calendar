@@ -145,6 +145,118 @@ function print_event_reminder_rows( array $p_offsets, $p_show_hint = true, $p_sh
 }
 
 /**
+ * Print the reminder block of the event page: the reminders that apply to the
+ * viewer and where they come from. A recipient of the event - its author or
+ * a member - can add an offset, drop one, or go back to the reminders of the
+ * event; every change is theirs alone, the event keeps its own set.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_date     Occurrence the page shows, carried by the links.
+ * @param integer $p_user_id  The viewer.
+ * @return void
+ * @access public
+ */
+function print_event_reminder_block( $p_event_id, $p_date, $p_user_id ) {
+
+    $c_event_id = (int)$p_event_id;
+    $c_date     = (int)$p_date;
+
+    $t_is_recipient = calendar_reminder_user_is_recipient( $c_event_id, $p_user_id );
+    $t_sets         = event_reminder_get_all( $c_event_id );
+    $t_effective    = calendar_reminder_effective( $c_event_id, $t_is_recipient ? $p_user_id : 0, $t_sets );
+    $t_max_rows     = (int)plugin_config_get( 'reminder_max_per_event' );
+
+    if( $t_is_recipient ) {
+        $t_source_label = plugin_lang_get( 'reminders_source_' . $t_effective['source'] );
+    } else {
+        $t_source_label = $t_effective['source'] == 'event'
+                ? plugin_lang_get( 'reminders_source_event' )
+                : plugin_lang_get( 'view_event_reminders_defaults' );
+    }
+
+    $t_collapse_block = is_collapsed( 'reminders' );
+    $t_block_css      = $t_collapse_block ? 'collapsed' : '';
+    $t_block_icon     = $t_collapse_block ? 'fa-chevron-down' : 'fa-chevron-up';
+
+    echo '<div class="col-md-12 col-xs-12">';
+    echo '<a id="reminders"></a>';
+    echo '<div class="space-10"></div>';
+    echo '<div id="reminders" class="widget-box widget-color-blue2 ' . $t_block_css . '">';
+    echo '<div class="widget-header widget-header-small">';
+    echo '<h4 class="widget-title lighter"><i class="ace-icon fa fa-bell-o"></i>' . plugin_lang_get( 'reminders_title' ) . '</h4>';
+    echo '<div class="widget-toolbar"><a data-action="collapse" href="#"><i class="1 ace-icon fa ' . $t_block_icon . ' bigger-125"></i></a></div>';
+    echo '</div>';
+    echo '<div class="widget-body"><div class="widget-main no-padding"><div class="table-responsive">';
+    echo '<table class="table table-bordered table-condensed table-striped">';
+
+    echo '<tr>';
+    echo '<th class="category" width="15%">' . $t_source_label . '</th>';
+    echo '<td>';
+
+    if( count( $t_effective['offsets'] ) == 0 ) {
+        echo plugin_lang_get( 'reminder_offset_disabled' );
+    }
+
+    $t_first = true;
+    foreach( $t_effective['offsets'] as $t_offset ) {
+        echo $t_first ? '' : ', ';
+        $t_first = false;
+        echo string_display_line( calendar_reminder_format_offset( $t_offset ) );
+
+        if( $t_is_recipient ) {
+            echo ' <a class="btn btn-xs btn-primary btn-white btn-round" title="' . plugin_lang_get( 'reminder_remove_for_me' ) . '" href="'
+                    . plugin_page( 'event_reminder_delete' ) . '&amp;event_id=' . $c_event_id . '&amp;date=' . $c_date . '&amp;offset=' . (int)$t_offset
+                    . htmlspecialchars( form_security_param( 'event_reminder_delete' ) ) . '"><i class="fa fa-times"></i></a>';
+        }
+    }
+
+    if( $t_is_recipient ) {
+
+        # the set of the event is shown next to a personal one, so that the
+        # recipient sees what they diverged from and can go back to it
+        if( $t_effective['source'] == 'personal' ) {
+            $t_event_offsets = isset( $t_sets[0] ) && !calendar_reminder_offsets_disabled( $t_sets[0] ) ? $t_sets[0] : array();
+            $t_event_text    = count( $t_event_offsets ) == 0
+                    ? plugin_lang_get( 'reminder_offset_disabled' )
+                    : implode( ', ', array_map( 'calendar_reminder_format_offset', $t_event_offsets ) );
+
+            echo '<br /><span class="small">' . sprintf( plugin_lang_get( 'reminders_event_set' ), string_display_line( $t_event_text ) ) . '</span> ';
+            echo '<a class="btn btn-xs btn-primary btn-white btn-round" href="'
+                    . plugin_page( 'event_reminder_reset' ) . '&amp;event_id=' . $c_event_id . '&amp;date=' . $c_date
+                    . htmlspecialchars( form_security_param( 'event_reminder_reset' ) ) . '">' . plugin_lang_get( 'reminders_reset' ) . '</a>';
+        }
+
+        if( !calendar_reminder_user_enabled( $p_user_id ) ) {
+            echo '<br /><span class="small">' . plugin_lang_get( 'reminders_opted_out' ) . '</span>';
+        }
+
+        if( $t_max_rows <= 0 || count( $t_effective['offsets'] ) < $t_max_rows ) {
+            echo '<br /><br />';
+            echo '<form method="post" action="' . plugin_page( 'event_reminder_add' ) . '" class="form-inline noprint">';
+            echo form_security_field( 'event_reminder_add' );
+            echo '<input type="hidden" name="event_id" value="' . $c_event_id . '" />';
+            echo '<input type="hidden" name="date" value="' . $c_date . '" />';
+            echo '<input style="width: 70px;" type="number" class="input-sm" name="reminder_value" min="1" step="1" value="10" /> ';
+            echo '<select class="input-sm" name="reminder_unit">';
+            foreach( array_keys( calendar_reminder_units() ) as $t_unit ) {
+                echo '<option value="' . $t_unit . '">' . plugin_lang_get( 'reminder_unit_' . $t_unit ) . '</option>';
+            }
+            echo '</select> ';
+            echo '<input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="' . plugin_lang_get( 'reminder_add_row' ) . '" />';
+            echo '</form>';
+        }
+
+        echo '<div class="space-4"></div>';
+        echo '<span class="small">' . plugin_lang_get( 'reminders_personal_hint' ) . '</span>';
+    }
+
+    echo '</td>';
+    echo '</tr>';
+
+    echo '</table>';
+    echo '</div></div></div></div></div>';
+}
+
+/**
  * Print one row of the reminder editor
  * @param array   $p_input       Row as returned by calendar_reminder_offset_to_input().
  * @param boolean $p_is_template Whether this is the hidden row cloned by the script.
@@ -209,3 +321,4 @@ function print_project_legend( array $p_project_ids ) {
     }
     echo '</div>';
 }
+

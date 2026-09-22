@@ -488,6 +488,10 @@ class CalendarPlugin extends MantisPlugin {
                                   array( 'AddColumnSQL', array( plugin_table( "events" ), "
                                         description X
                                 " ) ),
+                                  //version 3.0.0 (schema 23): 0 = the reminders of the event, else the personal set of that recipient
+                                  array( 'AddColumnSQL', array( plugin_table( "event_reminder" ), "
+                                        user_id I UNSIGNED $t_notnull DEFAULT '0'
+                                " ) ),
         );
     }
 
