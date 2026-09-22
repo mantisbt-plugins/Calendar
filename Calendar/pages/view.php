@@ -27,7 +27,9 @@ $g_project_override = $t_event->project_id;
 
 access_ensure_event_level( plugin_config_get( 'view_event_threshold' ), $t_event->id );
 
-$t_referer_page = array_key_exists( 'HTTP_REFERER', $_SERVER ) ? parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_QUERY ) : 0;
+# the query of the referer: none, or a malformed referer, is an empty string
+# rather than the null or false parse_url() answers, parse_str() takes no null
+$t_referer_page = array_key_exists( 'HTTP_REFERER', $_SERVER ) ? (string)parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_QUERY ) : '';
 
 $f_referer_page_array = array();
 parse_str( $t_referer_page, $f_referer_page_array );
