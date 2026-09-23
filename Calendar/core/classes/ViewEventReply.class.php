@@ -17,7 +17,8 @@
 /**
  * The week grid of the reply page: the days one occurrence of an event
  * covers, with every event of the member on those days, so that they see
- * what the invitation collides with before they answer it.
+ * what the invitation collides with before they answer it. The invitation
+ * is drawn as usual and the other events faded, so the eye finds it first.
  *
  * The grid is read only - no time range selection, no switch of the time
  * range; the range is the full day when the occurrence reaches outside the
@@ -26,11 +27,14 @@
 class ViewEventReply extends WeekCalendar {
 
     /**
+     * @param integer $p_event_id   The event of the invitation.
      * @param integer $p_occurrence Start of the occurrence shown.
      * @param integer $p_duration   Length of the occurrence in seconds.
      * @param integer $p_user_id    The member whose events are shown.
      */
-    public function __construct( $p_occurrence, $p_duration, $p_user_id ) {
+    public function __construct( $p_event_id, $p_occurrence, $p_duration, $p_user_id ) {
+
+        self::$focus_event_id = (int)$p_event_id;
 
         $t_days = array_keys( calendar_event_day_segments( $p_occurrence, max( 1, (int)$p_duration ) ) );
 

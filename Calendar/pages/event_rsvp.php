@@ -165,7 +165,7 @@ echo '</div>';
 
 # what else the member has on the days of the occurrence
 if( $t_own ) {
-    $t_calendar = new ViewEventReply( $t_start, $t_duration, $t_user_id );
+    $t_calendar = new ViewEventReply( $f_event_id, $t_start, $t_duration, $t_user_id );
     $t_calendar->print_html();
 }
 

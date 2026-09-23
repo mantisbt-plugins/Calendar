@@ -71,6 +71,7 @@ class EventBand {
                 . ' class="' . $t_class . '"'
                 . ' title="' . string_attribute( $t_title ) . '"'
                 . ' style="' . calendar_project_color_style( $t_project_id )
+                . WeekCalendar::focus_style( $this->event['id'] )
                 . 'z-index:' . ( 100 + $this->lane ) . ';'
                 . ' top:' . $t_top . 'px;'
                 . ' height:' . ( ColumnForm::BAND_HEIGHT - 2 ) . 'px;'

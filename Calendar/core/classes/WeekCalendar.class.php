@@ -22,6 +22,8 @@
 abstract class WeekCalendar {
     public static $full_time_is = false;
     public static $link_options = '';
+    # the one event a grid is about; every other one is drawn faded, see focus_style()
+    public static $focus_event_id = NULL;
     protected $day_colums       = array();
     protected $project_ids      = array();
 
@@ -113,6 +115,21 @@ abstract class WeekCalendar {
     public function __destruct() {
         ColumnForm::$is_initialized = FALSE;
         ColumnForm::$band_lanes     = 0;
+        self::$focus_event_id       = NULL;
+    }
+
+    /**
+     * Inline style that fades an event out when the grid is about another
+     * one; empty when the grid is about none or about this one
+     * @param integer $p_event_id Event drawn.
+     * @return string
+     */
+    public static function focus_style( $p_event_id ) {
+        if( self::$focus_event_id === NULL || (int)$p_event_id == self::$focus_event_id ) {
+            return '';
+        }
+
+        return 'opacity:0.35;';
     }
 
     protected function print_spacer_top() {

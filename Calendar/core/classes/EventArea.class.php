@@ -67,6 +67,7 @@ class EventArea {
                 . ' id="' . $t_id . '"'
                 . ' title="' . string_attribute( $t_title ) . '"'
                 . ' style="' . calendar_project_color_style( $t_project_id )
+                . WeekCalendar::focus_style( $this->event['id'] )
                 . 'z-index:' . (100 + $this->current_number_in_group) . ';'
                 . ' height:' . $t_hight . 'px;'
                 . ' width:' . $t_width . '%;'
