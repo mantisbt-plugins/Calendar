@@ -407,6 +407,7 @@ $s_plugin_Calendar_rsvp_summary = 'yes: %1$d, maybe: %2$d, no: %3$d, no reply: %
 $s_plugin_Calendar_rsvp_recorded = 'Your reply to the event "%1$s" has been recorded: %2$s.';
 $s_plugin_Calendar_rsvp_link_invalid = 'This link does not work any more: it has expired, or you no longer take part in the event.';
 $s_plugin_Calendar_rsvp_link_other_account = 'This link was sent to %1$s: log in under that account to reply.';
+$s_plugin_Calendar_rsvp_page_invitation_title = 'Invitation to an event';
 $s_plugin_Calendar_rsvp_page_series_hint = 'The event repeats; the reply is given for all of its occurrences.';
 $s_plugin_Calendar_rsvp_page_calendar_title = 'Your events on these days';
 $s_plugin_Calendar_rsvp_open_event = 'Open the event';

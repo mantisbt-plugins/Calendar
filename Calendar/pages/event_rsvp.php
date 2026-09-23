@@ -117,12 +117,15 @@ if( $t_own ) {
 
     echo '<div class="widget-box widget-color-blue2">';
     echo '<div class="widget-header widget-header-small">';
-    echo '<h4 class="widget-title lighter"><i class="ace-icon fa fa-calendar"></i> ' . string_display_line( $t_event['name'] ) . '</h4>';
+    echo '<h4 class="widget-title lighter"><i class="ace-icon fa fa-envelope-o"></i> ' . plugin_lang_get( 'rsvp_page_invitation_title' ) . '</h4>';
     echo '</div>';
     echo '<div class="widget-body"><div class="widget-main no-padding">';
     echo '<div class="table-responsive"><table class="table table-bordered table-condensed">';
 
-    echo '<tr><th class="category width-30">' . lang_get( 'email_project' ) . '</th>';
+    echo '<tr><th class="category width-30">' . plugin_lang_get( 'name_event' ) . '</th>';
+    echo '<td>' . string_display_line( $t_event['name'] ) . '</td></tr>';
+
+    echo '<tr><th class="category">' . lang_get( 'email_project' ) . '</th>';
     echo '<td>' . string_display_line( project_get_name( (int)$t_event['project_id'] ) ) . '</td></tr>';
 
     # the day in front of the times of an occurrence within a day, the label
