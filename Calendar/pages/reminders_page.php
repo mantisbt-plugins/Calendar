@@ -28,11 +28,12 @@ auth_ensure_user_authenticated();
 current_user_ensure_unprotected();
 
 $t_view_settings         = calendar_user_view_settings_allowed();
+$t_rsvp_user_choice      = calendar_rsvp_user_choice();
 $t_reminders_enabled     = calendar_reminder_feature_enabled();
 $t_notifications_enabled = calendar_notify_feature_enabled();
 $t_bug_block_user_choice = calendar_bug_block_user_choice();
 
-if( !$t_view_settings && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
+if( !$t_view_settings && !$t_rsvp_user_choice && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
     access_denied();
 }
 
@@ -151,6 +152,45 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                     </td>
                                 </tr>
                                 <?php } ?>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
+
+            <?php if( $t_rsvp_user_choice ) { ?>
+            <div id="rsvp" class="widget-box widget-color-blue2">
+                <div class="widget-header widget-header-small">
+                    <h4 class="widget-title lighter">
+                        <i class="ace-icon fa fa-envelope-o"></i>
+                        <?php echo plugin_lang_get( 'rsvp_pref_title' ) ?>
+                    </h4>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main no-padding">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-condensed table-hover">
+                                <colgroup>
+                                    <col style="width:50%" />
+                                    <col style="width:50%" />
+                                </colgroup>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'rsvp_pref_enabled' ) ?>
+                                    </td>
+
+                                    <td>
+                                        <?php
+                                        echo '<label><input type="checkbox" name="rsvp_enabled" value="1"'
+                                                . ( calendar_rsvp_user_enabled( $t_current_user_id ) ? ' checked="checked"' : '' ) . '></input></label>';
+                                        ?>
+                                        <p class="small"><?php echo plugin_lang_get( 'rsvp_pref_hint' ) ?></p>
+                                    </td>
+                                </tr>
 
                             </table>
                         </div>

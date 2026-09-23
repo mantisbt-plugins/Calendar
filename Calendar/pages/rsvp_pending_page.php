@@ -26,7 +26,7 @@
  * in event_rsvp.php.
  */
 
-if( !auth_is_user_authenticated() || current_user_is_anonymous() || !calendar_rsvp_feature_enabled() ) {
+if( !auth_is_user_authenticated() || current_user_is_anonymous() || !calendar_rsvp_user_enabled( auth_get_current_user_id() ) ) {
     access_denied();
 }
 

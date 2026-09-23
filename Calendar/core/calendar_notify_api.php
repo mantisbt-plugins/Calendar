@@ -288,6 +288,12 @@ function calendar_notify_recipients( array $p_event, $p_action, $p_actor_id = nu
             continue;
         }
 
+        # the replies of others mean nothing to a user who does not take part
+        # in the replies themselves
+        if( $p_action == 'rsvp' && !calendar_rsvp_user_enabled( $t_user_id ) ) {
+            continue;
+        }
+
         # the author and the members have access implicitly, this only catches
         # users that were meanwhile removed from the project
         if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), $t_event_id, $t_user_id ) ) {

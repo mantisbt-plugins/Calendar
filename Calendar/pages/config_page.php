@@ -168,8 +168,20 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
 
                                     <td colspan="3" width="50%">
                                         <?php
-                                        echo '<label><input type="checkbox" name="rsvp_feature_enabled" value="1"'
-                                                . ( plugin_config_get( 'rsvp_feature_enabled' ) == ON ? ' checked="checked"' : '' ) . '></input></label>';
+                                        $t_rsvp_mode = calendar_rsvp_mode();
+
+                                        $t_rsvp_mode_options = array(
+                                            CALENDAR_RSVP_MODE_OFF         => 'config_rsvp_mode_off',
+                                            CALENDAR_RSVP_MODE_ON          => 'config_rsvp_mode_on',
+                                            CALENDAR_RSVP_MODE_USER_CHOICE => 'config_rsvp_mode_user_choice',
+                                        );
+
+                                        echo '<select name="rsvp_mode" class="input-sm">';
+                                        foreach( $t_rsvp_mode_options as $t_value => $t_lang_key ) {
+                                            echo '<option value="' . $t_value . '"' . ( $t_value == $t_rsvp_mode ? ' selected="selected"' : '' ) . '>'
+                                                    . plugin_lang_get( $t_lang_key ) . '</option>';
+                                        }
+                                        echo '</select>';
                                         echo '<p class="small">' . plugin_lang_get( 'config_rsvp_feature_hint' ) . '</p>';
                                         ?>
                                     </td>

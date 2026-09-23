@@ -397,6 +397,12 @@ Calendar file (.ics): %5$s';
 
 $s_plugin_Calendar_config_rsvp_feature_enabled = 'Members reply whether they will take part';
 $s_plugin_Calendar_config_rsvp_feature_hint = 'Switches on the replies of the members: the reply buttons of the event page, the reply link in the mails and in the .ics file, the mail to the author about a reply, the list of the invitations awaiting a reply with its button and filter, and the faded look of the events without a reply.';
+$s_plugin_Calendar_config_rsvp_mode_off = 'Off';
+$s_plugin_Calendar_config_rsvp_mode_on = 'On for everybody';
+$s_plugin_Calendar_config_rsvp_mode_user_choice = 'Every user chooses';
+$s_plugin_Calendar_rsvp_pref_title = 'Invitations to events';
+$s_plugin_Calendar_rsvp_pref_enabled = 'Reply to invitations';
+$s_plugin_Calendar_rsvp_pref_hint = 'The reply buttons and links, the list of the invitations awaiting your reply with its button and filter, the faded look of those invitations and the mails about the replies of others. Without them your reminders are not held back until you reply.';
 $s_plugin_Calendar_rsvp_status_none = 'No reply';
 $s_plugin_Calendar_rsvp_status_accepted = 'Will take part';
 $s_plugin_Calendar_rsvp_status_tentative = 'Maybe';

@@ -478,23 +478,27 @@ function calendar_api_event_members( int $p_event_id ) : array {
 }
 
 /**
- * Whether the members of the events may reply at all, that is whether the
- * master switch 'rsvp_feature_enabled' of the instance is on.
+ * Whether the members of the events may reply, by the 'rsvp_mode' the
+ * administrator has chosen: nobody, everybody, or every user who has
+ * switched the replies on for themselves.
  *
  * A plugin with a channel of its own asks here before it offers the replies
  * there - the buttons under an invitation, say - since
- * calendar_api_event_member_status_set() takes no reply while the switch is
- * off, the way the event page and the mails offer none then.
+ * calendar_api_event_member_status_set() takes no reply where this answers
+ * false, the way the event page and the mails offer none then. Without a
+ * user the answer is whether the replies exist on the instance at all; with
+ * one, whether that user takes part in them.
  *
+ * @param int|null $p_user_id The member asked about, or null for the instance.
  * @return bool
  * @access public
  */
-function calendar_api_rsvp_enabled() : bool {
+function calendar_api_rsvp_enabled( ?int $p_user_id = null ) : bool {
 
     plugin_push_current( 'Calendar' );
 
     try {
-        return calendar_rsvp_feature_enabled();
+        return $p_user_id === null ? calendar_rsvp_feature_enabled() : calendar_rsvp_user_enabled( $p_user_id );
     } finally {
         plugin_pop_current();
     }
@@ -508,9 +512,9 @@ function calendar_api_rsvp_enabled() : bool {
  * member who has not replied yet. Like calendar_api_event_members(), the
  * answer is the stored list, not gated by show_member_list_threshold: it is
  * the input of a plugin with a channel of its own, and whom it shows the
- * replies to is its own decision. The master switch 'rsvp_feature_enabled'
- * is not consulted here either, for the same reason - the replies that were
- * given are still there while the feature is off.
+ * replies to is its own decision. The 'rsvp_mode' is not consulted here
+ * either, for the same reason - the replies that were given are still there
+ * while the feature is off.
  *
  * @param int $p_event_id Event the members belong to.
  * @return array user id => status, may be empty.
@@ -544,8 +548,9 @@ function calendar_api_event_member_statuses( int $p_event_id ) : array {
  * The call guarantees that the event exists, that the user is one of its
  * members and that the reply is one a member may give, that is
  * CALENDAR_RSVP_ACCEPTED, CALENDAR_RSVP_TENTATIVE or CALENDAR_RSVP_DECLINED;
- * it is rejected while 'rsvp_feature_enabled' is off, since the pages would
- * not take the reply either. An unchanged reply is accepted and changes
+ * it is rejected when the member does not take part in the replies - the
+ * 'rsvp_mode' is off, or leaves the choice to the users and the member has
+ * switched them off -, since the pages would not take the reply either. An unchanged reply is accepted and changes
  * nothing; a changed one is logged in the history of the event under the
  * name of the member, signalled through EVENT_CALENDAR_EVENT_RSVP and mailed
  * to whoever the notification matrix names for the 'rsvp' action.
@@ -570,7 +575,7 @@ function calendar_api_event_member_status_set( int $p_event_id, int $p_user_id, 
     try {
         event_ensure_exists( $p_event_id );
 
-        if( !calendar_rsvp_feature_enabled() ) {
+        if( !calendar_rsvp_user_enabled( $p_user_id ) ) {
             trigger_error( ERROR_ACCESS_DENIED, ERROR );
         }
 

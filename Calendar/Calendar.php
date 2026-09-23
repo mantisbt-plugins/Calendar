@@ -561,7 +561,8 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_add_others_event_threshold'                   => DEVELOPER,
                                   'member_delete_others_event_threshold'                => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
                                   //Replies of the members: whether they will take part.
-                                  'rsvp_feature_enabled'                                => OFF, //Master switch of the whole feature, changed by the administrator only. Replies, their mails and links, the pending list, its filter and the fading of unanswered events.
+                                  'rsvp_mode'                                           => 0, //Who replies, see the CALENDAR_RSVP_MODE_* constants (config() runs before init(), so the literal): off, everybody, or every user by the rsvp_enabled below. Changed by the administrator only.
+                                  'rsvp_enabled'                                        => ON, //Per user choice, only consulted under CALENDAR_RSVP_MODE_USER_CHOICE.
                                   //Reminders about upcoming events.
                                   'reminders_feature_enabled'                           => OFF, //Master switch of the whole feature, changed by the administrator only.
                                   'reminders_enabled'                                   => ON, //Per user opt-out.
@@ -769,7 +770,7 @@ class CalendarPlugin extends MantisPlugin {
      */
     function menu_account() {
 
-        if( !calendar_user_view_settings_allowed() && !calendar_reminder_feature_enabled() && !calendar_notify_feature_enabled() && !calendar_bug_block_user_choice() ) {
+        if( !calendar_user_view_settings_allowed() && !calendar_rsvp_user_choice() && !calendar_reminder_feature_enabled() && !calendar_notify_feature_enabled() && !calendar_bug_block_user_choice() ) {
             return array();
         }
 

@@ -43,13 +43,66 @@ define( 'CALENDAR_RSVP_DECLINED', 2 );
 # the member is not sure yet
 define( 'CALENDAR_RSVP_TENTATIVE', 3 );
 
+# Who replies, the rsvp_mode set by the administrator: nobody,
+define( 'CALENDAR_RSVP_MODE_OFF', 0 );
+# every member,
+define( 'CALENDAR_RSVP_MODE_ON', 1 );
+# or every member who has switched the replies on for themselves on the
+# calendar tab of their account.
+define( 'CALENDAR_RSVP_MODE_USER_CHOICE', 2 );
+
 /**
- * Whether the replies are switched on for the whole instance
+ * The mode the administrator has chosen for the replies
+ * @return integer one of the CALENDAR_RSVP_MODE_* constants
+ * @access public
+ */
+function calendar_rsvp_mode() {
+    return (int)plugin_config_get( 'rsvp_mode' );
+}
+
+/**
+ * Whether the replies exist at all on this instance, whoever uses them: what
+ * belongs to an event rather than to one user - the author marked as taking
+ * part, the replies dropped when the time changes, the summary of the
+ * replies - hangs on this. What a user sees and does hangs on
+ * calendar_rsvp_user_enabled().
  * @return boolean
  * @access public
  */
 function calendar_rsvp_feature_enabled() {
-    return plugin_config_get( 'rsvp_feature_enabled' ) == ON;
+    return calendar_rsvp_mode() != CALENDAR_RSVP_MODE_OFF;
+}
+
+/**
+ * Whether the administrator leaves the replies to every user, which puts the
+ * choice on the calendar tab of the account
+ * @return boolean
+ * @access public
+ */
+function calendar_rsvp_user_choice() {
+    return calendar_rsvp_mode() == CALENDAR_RSVP_MODE_USER_CHOICE;
+}
+
+/**
+ * Whether the given user takes part in the replies: they are offered the
+ * reply buttons and links, the list of the invitations awaiting them with
+ * its button and filter, the faded look of those invitations, their
+ * reminders are held back until they reply, and they are mailed about the
+ * replies of others
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return boolean
+ * @access public
+ */
+function calendar_rsvp_user_enabled( $p_user_id ) {
+
+    $t_mode = calendar_rsvp_mode();
+
+    if( $t_mode == CALENDAR_RSVP_MODE_OFF || (int)$p_user_id <= 0 ) {
+        return false;
+    }
+
+    return $t_mode == CALENDAR_RSVP_MODE_ON
+            || plugin_config_get( 'rsvp_enabled', ON, FALSE, (int)$p_user_id ) == ON;
 }
 
 /**
@@ -361,7 +414,7 @@ function calendar_rsvp_url( $p_event_id, $p_user_id ) {
  */
 function calendar_rsvp_mail_block( $p_event_id, $p_user_id ) {
 
-    if( !calendar_rsvp_feature_enabled() || !user_is_member_event( $p_user_id, $p_event_id ) ) {
+    if( !calendar_rsvp_user_enabled( $p_user_id ) || !user_is_member_event( $p_user_id, $p_event_id ) ) {
         return '';
     }
 
@@ -502,7 +555,7 @@ function calendar_rsvp_pending_event_ids( $p_user_id ) {
  */
 function calendar_rsvp_is_pending_for_current_user( $p_event_id ) {
 
-    if( !calendar_rsvp_feature_enabled() || !auth_is_user_authenticated() || current_user_is_anonymous() ) {
+    if( !auth_is_user_authenticated() || current_user_is_anonymous() || !calendar_rsvp_user_enabled( auth_get_current_user_id() ) ) {
         return false;
     }
 

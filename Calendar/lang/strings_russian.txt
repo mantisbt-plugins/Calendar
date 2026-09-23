@@ -397,6 +397,12 @@ $s_plugin_Calendar_notify_member_removed_others_email_body = 'Из событи�
 
 $s_plugin_Calendar_config_rsvp_feature_enabled = 'Участники отвечают, будут ли они участвовать';
 $s_plugin_Calendar_config_rsvp_feature_hint = 'Включает ответы участников: кнопки ответа на странице события, ссылку на ответ в письмах и в файле .ics, письмо автору об ответе, список приглашений без ответа с его кнопкой и фильтром, а также полупрозрачный вид событий без ответа.';
+$s_plugin_Calendar_config_rsvp_mode_off = 'Выключено';
+$s_plugin_Calendar_config_rsvp_mode_on = 'Включено для всех';
+$s_plugin_Calendar_config_rsvp_mode_user_choice = 'По выбору пользователя';
+$s_plugin_Calendar_rsvp_pref_title = 'Приглашения на события';
+$s_plugin_Calendar_rsvp_pref_enabled = 'Отвечать на приглашения';
+$s_plugin_Calendar_rsvp_pref_hint = 'Кнопки и ссылки для ответа, список приглашений, ждущих вашего ответа, с его кнопкой и фильтром, полупрозрачный вид таких приглашений и письма об ответах других участников. Без них ваши напоминания не придерживаются до ответа.';
 $s_plugin_Calendar_rsvp_status_none = 'Нет ответа';
 $s_plugin_Calendar_rsvp_status_accepted = 'Будет участвовать';
 $s_plugin_Calendar_rsvp_status_tentative = 'Возможно';

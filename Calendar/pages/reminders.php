@@ -26,11 +26,12 @@ current_user_ensure_unprotected();
 form_security_validate( 'calendar_reminders_edit' );
 
 $t_view_settings         = calendar_user_view_settings_allowed();
+$t_rsvp_user_choice      = calendar_rsvp_user_choice();
 $t_reminders_enabled     = calendar_reminder_feature_enabled();
 $t_notifications_enabled = calendar_notify_feature_enabled();
 $t_bug_block_user_choice = calendar_bug_block_user_choice();
 
-if( !$t_view_settings && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
+if( !$t_view_settings && !$t_rsvp_user_choice && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
     access_denied();
 }
 
@@ -74,6 +75,10 @@ if( $t_view_settings ) {
             plugin_config_set( 'google_calendar_sync_id', $f_google_calendar, $t_current_user_id );
         }
     }
+}
+
+if( $t_rsvp_user_choice ) {
+    plugin_config_set( 'rsvp_enabled', gpc_get_bool( 'rsvp_enabled' ) ? ON : OFF, $t_current_user_id );
 }
 
 if( $t_reminders_enabled ) {

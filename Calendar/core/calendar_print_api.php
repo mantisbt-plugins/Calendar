@@ -25,7 +25,7 @@
 function print_for_user_option_list( $p_for_user ) {
     echo '<option value="' . auth_get_current_user_id() . '">[' . lang_get( 'reset_query' ) . ']</option>';
     $t_modes = array( ALL_USERS => 'select_all_users', CALENDAR_FILTER_AUTHOR => 'select_author_is_me' );
-    if( calendar_rsvp_feature_enabled() ) {
+    if( calendar_rsvp_user_enabled( auth_get_current_user_id() ) ) {
         $t_modes[CALENDAR_FILTER_PENDING] = 'select_pending_reply';
     }
     foreach( $t_modes as $t_value => $t_lang_key ) {
@@ -431,7 +431,7 @@ function print_rsvp_rows( $p_event_id, $p_date, $p_user_id ) {
                            $t_summary[CALENDAR_RSVP_DECLINED], $t_summary[CALENDAR_RSVP_NONE] ) . '</td>';
     echo '</tr>';
 
-    if( !isset( $t_statuses[$c_user_id] ) ) {
+    if( !isset( $t_statuses[$c_user_id] ) || !calendar_rsvp_user_enabled( $c_user_id ) ) {
         return;
     }
 
@@ -461,7 +461,7 @@ function print_rsvp_rows( $p_event_id, $p_date, $p_user_id ) {
  */
 function print_rsvp_pending_button() {
 
-    if( !calendar_rsvp_feature_enabled() || current_user_is_anonymous() ) {
+    if( current_user_is_anonymous() || !calendar_rsvp_user_enabled( auth_get_current_user_id() ) ) {
         return;
     }
 

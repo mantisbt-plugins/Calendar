@@ -55,7 +55,7 @@ if( $t_posted ) {
     $t_genuine = calendar_rsvp_token_valid( $f_event_id, $f_user_id, gpc_get_int( 'expires' ), gpc_get_string( 'token', '' ) );
 }
 
-$t_valid = calendar_rsvp_feature_enabled()
+$t_valid = calendar_rsvp_user_enabled( $f_user_id )
         && $t_genuine
         && event_exists( $f_event_id )
         && user_exists( $f_user_id ) && user_is_enabled( $f_user_id )

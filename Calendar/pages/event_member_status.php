@@ -36,7 +36,7 @@ access_ensure_event_level( plugin_config_get( 'view_event_threshold' ), $f_event
 
 $t_user_id = auth_get_current_user_id();
 
-if( !calendar_rsvp_feature_enabled() || !user_is_member_event( $t_user_id, $f_event_id ) ) {
+if( !calendar_rsvp_user_enabled( $t_user_id ) || !user_is_member_event( $t_user_id, $f_event_id ) ) {
     access_denied();
 }
 

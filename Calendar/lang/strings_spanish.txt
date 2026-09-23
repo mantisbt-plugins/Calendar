@@ -396,6 +396,12 @@ Archivo de calendario (.ics): %5$s';
 
 $s_plugin_Calendar_config_rsvp_feature_enabled = 'Los participantes responden si van a participar';
 $s_plugin_Calendar_config_rsvp_feature_hint = 'Activa las respuestas de los participantes: los botones de respuesta de la página del evento, el enlace de respuesta en los correos y en el archivo .ics, el correo al autor sobre una respuesta, la lista de invitaciones pendientes con su botón y su filtro, y el aspecto atenuado de los eventos sin respuesta.';
+$s_plugin_Calendar_config_rsvp_mode_off = 'Desactivado';
+$s_plugin_Calendar_config_rsvp_mode_on = 'Activado para todos';
+$s_plugin_Calendar_config_rsvp_mode_user_choice = 'Cada usuario elige';
+$s_plugin_Calendar_rsvp_pref_title = 'Invitaciones a eventos';
+$s_plugin_Calendar_rsvp_pref_enabled = 'Responder a las invitaciones';
+$s_plugin_Calendar_rsvp_pref_hint = 'Los botones y enlaces de respuesta, la lista de invitaciones que esperan su respuesta con su botón y filtro, el aspecto atenuado de esas invitaciones y los correos sobre las respuestas de otros. Sin ellos sus recordatorios no se retienen hasta que responda.';
 $s_plugin_Calendar_rsvp_status_none = 'Sin respuesta';
 $s_plugin_Calendar_rsvp_status_accepted = 'Participará';
 $s_plugin_Calendar_rsvp_status_tentative = 'Quizás';

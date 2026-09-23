@@ -397,7 +397,7 @@ function calendar_reminder_rsvp_hold( $p_event_id, $p_user_id, $p_source, ?array
 
     $c_user_id = (int)$p_user_id;
 
-    if( $c_user_id <= 0 || !calendar_rsvp_feature_enabled()
+    if( $c_user_id <= 0 || !calendar_rsvp_user_enabled( $c_user_id )
             || (int)event_get_field( $p_event_id, 'author_id' ) == $c_user_id ) {
         return null;
     }
