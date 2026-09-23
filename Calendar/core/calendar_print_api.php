@@ -145,10 +145,12 @@ function print_event_reminder_rows( array $p_offsets, $p_show_hint = true, $p_sh
 }
 
 /**
- * Print the reminder block of the event page: the reminders that apply to the
- * viewer and where they come from. A recipient of the event - its author or
- * a member - can add an offset, drop one, or go back to the reminders of the
- * event; every change is theirs alone, the event keeps its own set.
+ * Print the reminder block of the event page. Two rows: the reminders of the
+ * event itself, as an editor for whoever may update the event, and the
+ * reminders that apply to the viewer with where they come from. A recipient
+ * of the event - its author or a member - can add an offset to the latter,
+ * drop one, or go back to the reminders of the event; every such change is
+ * theirs alone, the event keeps its own set.
  * @param integer $p_event_id Integer representing event identifier.
  * @param integer $p_date     Occurrence the page shows, carried by the links.
  * @param integer $p_user_id  The viewer.
@@ -161,6 +163,7 @@ function print_event_reminder_block( $p_event_id, $p_date, $p_user_id ) {
     $c_date     = (int)$p_date;
 
     $t_is_recipient = calendar_reminder_user_is_recipient( $c_event_id, $p_user_id );
+    $t_can_update   = access_has_event_level( plugin_config_get( 'update_event_threshold' ), $c_event_id, $p_user_id );
     $t_sets         = event_reminder_get_all( $c_event_id );
     $t_effective    = calendar_reminder_effective( $c_event_id, $t_is_recipient ? $p_user_id : 0, $t_sets );
     $t_max_rows     = (int)plugin_config_get( 'reminder_max_per_event' );
@@ -187,6 +190,59 @@ function print_event_reminder_block( $p_event_id, $p_date, $p_user_id ) {
     echo '</div>';
     echo '<div class="widget-body"><div class="widget-main no-padding"><div class="table-responsive">';
     echo '<table class="table table-bordered table-condensed table-striped">';
+
+    # the reminders of the event are edited right here, so that changing them
+    # does not take the whole event form; they are saved for the event row the
+    # page shows, that is for a whole series when it shows one of its occurrences
+    if( $t_can_update ) {
+        echo '<tr>';
+        echo '<th class="category" width="15%">' . plugin_lang_get( 'reminders_source_event' ) . '</th>';
+        echo '<td>';
+        echo '<form method="post" action="' . plugin_page( 'event_reminder_update' ) . '" class="noprint">';
+        echo form_security_field( 'event_reminder_update' );
+        echo '<input type="hidden" name="event_id" value="' . $c_event_id . '" />';
+        echo '<input type="hidden" name="date" value="' . $c_date . '" />';
+        print_event_reminder_rows( isset( $t_sets[0] ) ? $t_sets[0] : array(), TRUE, TRUE );
+        echo '<div class="space-4"></div>';
+        echo '<input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="' . plugin_lang_get( 'save_button' ) . '" />';
+        echo '</form>';
+        echo '</td>';
+        echo '</tr>';
+    }
+
+    # a viewer who may edit the event but is not reminded about it would see
+    # the same set twice
+    if( $t_is_recipient || !$t_can_update ) {
+        print_event_reminder_personal_row( $c_event_id, $c_date, $p_user_id, $t_is_recipient, $t_sets, $t_effective, $t_source_label, $t_max_rows );
+    }
+
+    echo '</table>';
+    echo '</div></div></div></div></div>';
+}
+
+/**
+ * Print the row of the reminder block that shows what applies to the viewer,
+ * with the means for a recipient to make it their own
+ * @param integer $p_event_id     Integer representing event identifier.
+ * @param integer $p_date         Occurrence the page shows, carried by the links.
+ * @param integer $p_user_id      The viewer.
+ * @param boolean $p_is_recipient Whether the viewer is reminded about the event.
+ * @param array   $p_sets         Sets as returned by event_reminder_get_all().
+ * @param array   $p_effective    As returned by calendar_reminder_effective() for the viewer.
+ * @param string  $p_source_label Heading of the row.
+ * @param integer $p_max_rows     Limit of offsets per event.
+ * @return void
+ * @access private
+ */
+function print_event_reminder_personal_row( $p_event_id, $p_date, $p_user_id, $p_is_recipient, array $p_sets, array $p_effective, $p_source_label, $p_max_rows ) {
+
+    $c_event_id     = (int)$p_event_id;
+    $c_date         = (int)$p_date;
+    $t_is_recipient = $p_is_recipient;
+    $t_sets         = $p_sets;
+    $t_effective    = $p_effective;
+    $t_source_label = $p_source_label;
+    $t_max_rows     = (int)$p_max_rows;
 
     echo '<tr>';
     echo '<th class="category" width="15%">' . $t_source_label . '</th>';
@@ -251,9 +307,6 @@ function print_event_reminder_block( $p_event_id, $p_date, $p_user_id ) {
 
     echo '</td>';
     echo '</tr>';
-
-    echo '</table>';
-    echo '</div></div></div></div></div>';
 }
 
 /**
