@@ -14,10 +14,12 @@
 # along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
-# Personal reminder, notification and issue page settings, a tab of the
-# account section. Anyone who can be a member of an event or open an issue has
-# to reach this page, so it is not behind any of the calendar thresholds - it
-# only ever touches the settings of the current user. Each block is shown only
+# Personal calendar view, reminder, notification and issue page settings, a tab
+# of the account section. Anyone who can be a member of an event or open an
+# issue has to reach this page, so it is not behind any of the calendar
+# thresholds - it only ever touches the settings of the current user. The
+# calendar view block alone keeps the manage_calendar_threshold its settings
+# button in the calendar header has always had. Each block is shown only
 # when its feature is switched on, and the page as a whole is reachable as
 # long as one of them is.
 
@@ -25,11 +27,12 @@ auth_ensure_user_authenticated();
 
 current_user_ensure_unprotected();
 
+$t_view_settings         = calendar_user_view_settings_allowed();
 $t_reminders_enabled     = calendar_reminder_feature_enabled();
 $t_notifications_enabled = calendar_notify_feature_enabled();
 $t_bug_block_user_choice = calendar_bug_block_user_choice();
 
-if( !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
+if( !$t_view_settings && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
     access_denied();
 }
 
@@ -47,6 +50,115 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
     <div class="form-container">
         <form action="<?php echo plugin_page( 'reminders' ) ?>" method="post">
             <?php echo form_security_field( 'calendar_reminders_edit' ) ?>
+            <?php if( $t_view_settings ) { ?>
+            <div id="calendar_view" class="widget-box widget-color-blue2">
+                <div class="widget-header widget-header-small">
+                    <h4 class="widget-title lighter">
+                        <i class="ace-icon fa fa-calendar"></i>
+                        <?php echo plugin_lang_get( 'user_config_view_title' ) ?>
+                    </h4>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main no-padding">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-condensed table-hover">
+                                <colgroup>
+                                    <col style="width:50%" />
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                </colgroup>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'config_days_week_display' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <?php
+                                        foreach( plugin_config_get( 'arWeekdaysName' ) as $t_name_day => $t_status ) {
+                                            echo '<label><input type="checkbox" name="days_week[]" value="' . $t_name_day . '"'
+                                                    . ( $t_status == ON ? ' checked="checked"' : '' ) . '> ' . plugin_lang_get( $t_name_day ) . '</label><br>';
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'config_time_day_range' ) ?>
+                                    </td>
+
+                                    <td class="center">
+                                        <select name="time_day_start">
+                                            <?php print_time_select_option( plugin_config_get( 'time_day_start' ), TRUE ) ?>
+                                        </select>
+                                    </td>
+                                    <td class="center">
+                                        <select name="time_day_finish">
+                                            <?php print_time_select_option( plugin_config_get( 'time_day_finish' ), TRUE ) ?>
+                                        </select>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'config_step_day_minutes_count' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <input style="width: 50px;" type="number" name="step_day_minutes_count" min="1" max="6" value="<?php echo plugin_config_get( 'stepDayMinutesCount' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'config_start_step_days' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <input style="width: 50px;" type="number" name="start_step_days" min="0" value="<?php echo plugin_config_get( 'startStepDays' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'config_count_step_days' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <input style="width: 50px;" type="number" name="count_step_days" min="1" value="<?php echo plugin_config_get( 'countStepDays' ) ?>" step="1"/>
+                                    </td>
+                                </tr>
+
+                                <?php if( plugin_config_get( 'google_client_secret' ) ) { ?>
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'user_config_enable_google_calendar' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <?php
+                                        $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, $t_current_user_id );
+                                        if( count( $t_oauth ) == 0 || array_key_exists( 'error', $t_oauth ) && $t_oauth['error'] ) {
+                                            print_small_button( get_response_google_url(), plugin_lang_get( 'user_config_enable_google_calendar_button' ) );
+                                        } else {
+                                            echo '<select name="google_calendar_list">';
+                                            print_google_calendar_list();
+                                            echo '</select>';
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <?php } ?>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
+
             <?php if( $t_reminders_enabled ) { ?>
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header widget-header-small">

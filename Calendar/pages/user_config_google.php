@@ -44,7 +44,7 @@ try {
         switch( $key ) {
 
             case 'user_config_google':
-                $t_redirect_url = plugin_page( 'user_config_page', true );
+                $t_redirect_url = plugin_page( 'reminders_page', true ) . '#calendar_view';
                 break;
 
             case 'event_add':
@@ -72,7 +72,7 @@ try {
     html_operation_successful( $t_redirect_url );
 } catch( Exception $ex ) {
 
-    $t_redirect_url = plugin_page( 'user_config_page', true );
+    $t_redirect_url = plugin_page( 'reminders_page', true ) . '#calendar_view';
     layout_page_header( null, $t_redirect_url );
     layout_page_begin( $t_redirect_url );
     html_operation_failure( $t_redirect_url, sprintf( plugin_lang_get( 'config_user_google_access_denie' ), $ex->getMessage() ) );

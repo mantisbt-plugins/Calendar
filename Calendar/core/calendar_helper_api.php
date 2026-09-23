@@ -40,6 +40,17 @@ function calendar_bug_block_user_choice() {
 }
 
 /**
+ * Whether the logged in user may set up how their calendar grid looks - the
+ * days, the hours and the step of the week grid, the Google calendar to sync
+ * to - on the account tab; the same threshold the settings button of the
+ * calendar header has always been behind
+ * @return boolean
+ */
+function calendar_user_view_settings_allowed() {
+    return access_has_project_level( plugin_config_get( 'manage_calendar_threshold' ) );
+}
+
+/**
  * Whether the calendar of the issue view page is shown as a widget of its
  * own below the notes (EVENT_VIEW_BUG_EXTRA) rather than as a row of the
  * issue details table (EVENT_VIEW_BUG_DETAILS). Resolves the administrator's

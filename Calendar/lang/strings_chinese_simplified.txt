@@ -68,6 +68,7 @@ In the settings in the "Permitted URI redirection" you will need to specify the 
 $s_plugin_Calendar_config_page_google_api_settings = '当前用于连接google api的JSON文件';
 $s_plugin_Calendar_config_page_google_client_id = '当前客户端ID';
 
+$s_plugin_Calendar_user_config_view_title = '日历视图';
 $s_plugin_Calendar_user_config_enable_google_calendar = '与Google日历同步的状态';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = '启用Google日历同步功能';
 $s_plugin_Calendar_user_config_google_calendar_list = '选择一个日历...';

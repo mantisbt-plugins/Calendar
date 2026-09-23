@@ -14,10 +14,10 @@
 # along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
-# Store the personal reminder, notification and issue page settings submitted from
-# reminders_page.php. A block that the page did not render must not be stored,
-# otherwise switching a feature off would silently reset the settings of every
-# user who saves the page meanwhile.
+# Store the personal calendar view, reminder, notification and issue page
+# settings submitted from reminders_page.php. A block that the page did not
+# render must not be stored, otherwise switching a feature off would silently
+# reset the settings of every user who saves the page meanwhile.
 
 auth_ensure_user_authenticated();
 
@@ -25,15 +25,56 @@ current_user_ensure_unprotected();
 
 form_security_validate( 'calendar_reminders_edit' );
 
+$t_view_settings         = calendar_user_view_settings_allowed();
 $t_reminders_enabled     = calendar_reminder_feature_enabled();
 $t_notifications_enabled = calendar_notify_feature_enabled();
 $t_bug_block_user_choice = calendar_bug_block_user_choice();
 
-if( !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
+if( !$t_view_settings && !$t_reminders_enabled && !$t_notifications_enabled && !$t_bug_block_user_choice ) {
     access_denied();
 }
 
 $t_current_user_id = auth_get_current_user_id();
+
+if( $t_view_settings ) {
+
+    $f_days_week              = gpc_get_string_array( 'days_week', array() );
+    $f_time_start             = gpc_get_int( 'time_day_start' );
+    $f_time_finish            = gpc_get_int( 'time_day_finish' );
+    $f_step_day_minutes_count = gpc_get_int( 'step_day_minutes_count' );
+    $f_start_step_days        = gpc_get_int( 'start_step_days' );
+    $f_count_step_days        = gpc_get_int( 'count_step_days' );
+    $f_google_calendar        = gpc_get_string( 'google_calendar_list', NULL );
+
+    if( $f_time_start >= $f_time_finish
+            || $f_step_day_minutes_count < 1 || $f_step_day_minutes_count > 6
+            || $f_start_step_days < 0 || $f_count_step_days < 1 ) {
+        error_parameters( plugin_lang_get( 'date_event' ) );
+        plugin_error( 'ERROR_RANGE_TIME', ERROR );
+    }
+
+    $t_days_week = array();
+    foreach( plugin_config_get( 'arWeekdaysName' ) as $t_name_day => $t_status ) {
+        $t_days_week[$t_name_day] = in_array( $t_name_day, $f_days_week ) ? ON : OFF;
+    }
+
+    plugin_config_set( 'arWeekdaysName', $t_days_week, $t_current_user_id );
+    plugin_config_set( 'time_day_start', $f_time_start, $t_current_user_id );
+    plugin_config_set( 'time_day_finish', $f_time_finish, $t_current_user_id );
+    plugin_config_set( 'stepDayMinutesCount', $f_step_day_minutes_count, $t_current_user_id );
+    plugin_config_set( 'startStepDays', $f_start_step_days, $t_current_user_id );
+    plugin_config_set( 'countStepDays', $f_count_step_days, $t_current_user_id );
+
+    # the list is only on the page once the user has granted access to Google;
+    # "0" is its "do not sync" entry
+    if( $f_google_calendar !== NULL && plugin_config_get( 'google_calendar_sync_id', '0', FALSE, $t_current_user_id ) !== $f_google_calendar ) {
+        if( $f_google_calendar === '0' ) {
+            plugin_config_delete( 'google_calendar_sync_id', $t_current_user_id );
+        } else {
+            plugin_config_set( 'google_calendar_sync_id', $f_google_calendar, $t_current_user_id );
+        }
+    }
+}
 
 if( $t_reminders_enabled ) {
 

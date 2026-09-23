@@ -68,6 +68,7 @@ In the settings in the "Permitted URI redirection" you will need to specify the 
 $s_plugin_Calendar_config_page_google_api_settings = 'Current JSON file with credentials for access to google api';
 $s_plugin_Calendar_config_page_google_client_id = 'Current client id';
 
+$s_plugin_Calendar_user_config_view_title = 'Calendar view';
 $s_plugin_Calendar_user_config_enable_google_calendar = 'The status of one-way synchronization with Google Calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Enable sync with Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Select a calendar...';

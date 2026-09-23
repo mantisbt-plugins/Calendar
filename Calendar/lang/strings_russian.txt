@@ -68,6 +68,7 @@ $s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными �
 $s_plugin_Calendar_config_page_google_api_settings = 'Текущий JSON файл с учётными данными для доступа к google api';
 $s_plugin_Calendar_config_page_google_client_id = 'Текущий id клиента';
 
+$s_plugin_Calendar_user_config_view_title = 'Вид календаря';
 $s_plugin_Calendar_user_config_enable_google_calendar = 'Состояние синхронизации с Google Calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Включить синхронизацию с Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Выберите календарь';

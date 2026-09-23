@@ -68,6 +68,7 @@ En la configuración de "Redirección de URI permitida", deberá especificar la 
 $s_plugin_Calendar_config_page_google_api_settings = 'Archivo JSON actual con credenciales para acceder a google api';
 $s_plugin_Calendar_config_page_google_client_id = 'ID del cliente actual';
 
+$s_plugin_Calendar_user_config_view_title = 'Vista del calendario';
 $s_plugin_Calendar_user_config_enable_google_calendar = 'Estado de la sincronización con google calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Habilitar la sincronización con Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Seleccionar un calendario...';

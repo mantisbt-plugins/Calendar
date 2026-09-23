@@ -73,10 +73,11 @@ class ViewWeekCalendar extends WeekCalendar {
         echo "GMT " . date( "P" );
         echo '</h4>';
 
-        if( access_has_project_level( plugin_config_get( 'manage_calendar_threshold' ) ) ) {
+        # the settings of the grid live on the calendar tab of the account
+        if( calendar_user_view_settings_allowed() ) {
             echo '<div class="widget-toolbar no-border">';
             echo '<div class="widget-menu">';
-            print_small_button( plugin_page( 'user_config_page' ), plugin_lang_get( 'config_title' ) );
+            print_small_button( plugin_page( 'reminders_page' ) . '#calendar_view', plugin_lang_get( 'config_title' ) );
             echo '</div>';
             echo '</div>';
         }
