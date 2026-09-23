@@ -457,3 +457,64 @@ function calendar_rsvp_pending_events( $p_user_id ) {
 
     return $t_events;
 }
+
+/**
+ * The events the given user is asked about and has not answered: a member
+ * without a reply of an event somebody else has called. The answer of one
+ * request is kept, the calendar grids ask for every event they draw.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return array event id => true
+ * @access public
+ * @uses database_api.php
+ */
+function calendar_rsvp_pending_event_ids( $p_user_id ) {
+
+    static $s_cache = array();
+
+    $c_user_id = (int)$p_user_id;
+
+    if( !isset( $s_cache[$c_user_id] ) ) {
+        $t_events_table       = plugin_table( 'events' );
+        $t_event_member_table = plugin_table( 'event_member' );
+
+        db_param_push();
+        $t_query  = "SELECT m.event_id FROM $t_event_member_table m
+                       JOIN $t_events_table e ON e.id = m.event_id
+                      WHERE m.user_id=" . db_param() . " AND m.status=" . db_param() . " AND e.author_id<>" . db_param();
+        $t_result = db_query( $t_query, array( $c_user_id, CALENDAR_RSVP_NONE, $c_user_id ) );
+
+        $s_cache[$c_user_id] = array();
+        while( $t_row = db_fetch_array( $t_result ) ) {
+            $s_cache[$c_user_id][(int)$t_row['event_id']] = true;
+        }
+    }
+
+    return $s_cache[$c_user_id];
+}
+
+/**
+ * Whether the logged in user has yet to answer the given event, the test
+ * the calendar grids darken an event by; always false while the replies
+ * are switched off
+ * @param integer $p_event_id Integer representing event identifier.
+ * @return boolean
+ * @access public
+ */
+function calendar_rsvp_is_pending_for_current_user( $p_event_id ) {
+
+    if( !calendar_rsvp_feature_enabled() || !auth_is_user_authenticated() || current_user_is_anonymous() ) {
+        return false;
+    }
+
+    return isset( calendar_rsvp_pending_event_ids( auth_get_current_user_id() )[(int)$p_event_id] );
+}
+
+/**
+ * Inline style that darkens an event the logged in user has yet to answer
+ * @param integer $p_event_id Integer representing event identifier.
+ * @return string
+ * @access public
+ */
+function calendar_rsvp_pending_style( $p_event_id ) {
+    return calendar_rsvp_is_pending_for_current_user( $p_event_id ) ? 'filter:brightness(0.8) saturate(0.6);' : '';
+}

@@ -225,7 +225,7 @@ class ViewMonthCalendar {
                 'name' => string_html_specialchars($t_event['name']),
                 'url' => $this->get_event_url($t_event),
                 'project_name' => string_html_specialchars(project_get_name($t_event['project_id'])),
-                'style' => calendar_project_color_style($t_event['project_id'])
+                'style' => calendar_project_color_style($t_event['project_id']) . calendar_rsvp_pending_style($t_event['id'])
             );
             // Show whose event it is unless the grid is already one user's
             if ($this->user_id == ALL_USERS || $this->user_id == CALENDAR_FILTER_AUTHOR) {
@@ -256,7 +256,7 @@ class ViewMonthCalendar {
 
                 echo '<div class="calendar-event' .
                      (calendar_event_is_in_past($t_event['date_from'], $t_event['duration']) ? ' calendar-event-expired' : '') .
-                     '" style="' . calendar_project_color_style($t_event['project_id']) . '">';
+                     '" style="' . calendar_project_color_style($t_event['project_id']) . calendar_rsvp_pending_style($t_event['id']) . '">';
                 echo '<a href="' . $this->get_event_url($t_event) . '">';
                 echo '<span class="event-time">' . calendar_event_segment_time_label($t_event) . '</span> ';
                 echo '<span class="event-duration">(' . calendar_event_duration_label($t_event['date_from'], $t_event['duration']) . ')</span> ';

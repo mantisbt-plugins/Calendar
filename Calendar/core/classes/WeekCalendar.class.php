@@ -22,7 +22,7 @@
 abstract class WeekCalendar {
     public static $full_time_is = false;
     public static $link_options = '';
-    # the one event a grid is about; every other one is drawn faded, see focus_style()
+    # the one event a grid is about; every other one is drawn faded, see state_style()
     public static $focus_event_id = NULL;
     protected $day_colums       = array();
     protected $project_ids      = array();
@@ -119,17 +119,18 @@ abstract class WeekCalendar {
     }
 
     /**
-     * Inline style that fades an event out when the grid is about another
-     * one; empty when the grid is about none or about this one
+     * Inline style that tells the state of an event in the grid. A grid about
+     * one event fades every other one out; any other grid darkens the events
+     * the logged in user has yet to answer.
      * @param integer $p_event_id Event drawn.
      * @return string
      */
-    public static function focus_style( $p_event_id ) {
-        if( self::$focus_event_id === NULL || (int)$p_event_id == self::$focus_event_id ) {
-            return '';
+    public static function state_style( $p_event_id ) {
+        if( self::$focus_event_id === NULL ) {
+            return calendar_rsvp_pending_style( $p_event_id );
         }
 
-        return 'opacity:0.35;';
+        return (int)$p_event_id == self::$focus_event_id ? '' : 'opacity:0.35;';
     }
 
     protected function print_spacer_top() {

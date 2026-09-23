@@ -16,19 +16,24 @@
 
 /**
  * The <option> rows of the for_user filter of the calendar views: the reset
- * entry, all users, the events the current user has created, and then every
- * user of the project who can report events
- * @param integer $p_for_user The selected value: a user id, ALL_USERS or CALENDAR_FILTER_AUTHOR.
+ * entry, all users, the events the current user has created, those waiting
+ * for their reply while the replies are on, and then every user of the
+ * project who can report events
+ * @param integer $p_for_user The selected value: a user id, ALL_USERS, CALENDAR_FILTER_AUTHOR or CALENDAR_FILTER_PENDING.
  * @return void
  */
 function print_for_user_option_list( $p_for_user ) {
     echo '<option value="' . auth_get_current_user_id() . '">[' . lang_get( 'reset_query' ) . ']</option>';
-    foreach( array( ALL_USERS => 'select_all_users', CALENDAR_FILTER_AUTHOR => 'select_author_is_me' ) as $t_value => $t_lang_key ) {
+    $t_modes = array( ALL_USERS => 'select_all_users', CALENDAR_FILTER_AUTHOR => 'select_author_is_me' );
+    if( calendar_rsvp_feature_enabled() ) {
+        $t_modes[CALENDAR_FILTER_PENDING] = 'select_pending_reply';
+    }
+    foreach( $t_modes as $t_value => $t_lang_key ) {
         echo '<option value="' . $t_value . '"' . ( $p_for_user == $t_value ? ' selected="selected"' : '' ) . '>[' . plugin_lang_get( $t_lang_key ) . ']</option>';
     }
     # The core appends a "deleted user" row for an id it cannot find and
-    # marks it selected, so the author sentinel must not reach it
-    $t_selected_user = $p_for_user == CALENDAR_FILTER_AUTHOR ? NO_USER : $p_for_user;
+    # marks it selected, so the sentinels of the modes must not reach it
+    $t_selected_user = $p_for_user < 0 ? NO_USER : $p_for_user;
     print_user_option_list( $t_selected_user, helper_get_current_project(), plugin_config_get( 'report_event_threshold' ) );
 }
 
@@ -463,9 +468,12 @@ function print_rsvp_pending_button() {
     $t_count = count( calendar_rsvp_pending_events( auth_get_current_user_id() ) );
 
     echo '<div class="widget-toolbar no-border">';
-    echo '<a class="btn btn-primary btn-white btn-round btn-xs" href="' . plugin_page( 'rsvp_pending_page' ) . '">';
-    echo '<i class="fa fa-envelope-o"></i> ' . plugin_lang_get( 'rsvp_pending_title' );
-    echo ' <span class="badge' . ( $t_count > 0 ? ' badge-warning' : '' ) . '">' . $t_count . '</span>';
+    echo '<div class="widget-menu">';
+    echo '<a class="btn btn-primary btn-white btn-round btn-sm" href="' . plugin_page( 'rsvp_pending_page' ) . '">';
+    # ace-icon and a compact badge keep the button as low as its neighbours
+    echo '<i class="ace-icon fa fa-envelope-o"></i>' . plugin_lang_get( 'rsvp_pending_title' );
+    echo ' <span class="badge' . ( $t_count > 0 ? ' badge-warning' : '' ) . '" style="font-size:11px; line-height:1; padding:2px 5px; top:0; vertical-align:1px;">' . $t_count . '</span>';
     echo '</a>';
+    echo '</div>';
     echo '</div>';
 }

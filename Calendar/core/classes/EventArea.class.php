@@ -58,6 +58,9 @@ class EventArea {
         # and named in the tooltip only
         $t_project_id = event_get_field( $this->event['id'], "project_id" );
         $t_title      = $t_name . ' | ' . $t_time_label . ' [ ' . project_get_field( $t_project_id, "name" ) . ' ]';
+        if( calendar_rsvp_is_pending_for_current_user( $this->event['id'] ) ) {
+            $t_title .= ' - ' . plugin_lang_get( 'rsvp_status_none' );
+        }
 
         $t_id = $this->is_in_past ? 'event_week_expired' : 'event_week';
 
@@ -67,7 +70,7 @@ class EventArea {
                 . ' id="' . $t_id . '"'
                 . ' title="' . string_attribute( $t_title ) . '"'
                 . ' style="' . calendar_project_color_style( $t_project_id )
-                . WeekCalendar::focus_style( $this->event['id'] )
+                . WeekCalendar::state_style( $this->event['id'] )
                 . 'z-index:' . (100 + $this->current_number_in_group) . ';'
                 . ' height:' . $t_hight . 'px;'
                 . ' width:' . $t_width . '%;'

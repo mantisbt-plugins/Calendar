@@ -56,6 +56,9 @@ class EventBand {
 
         # the tooltip carries the dates, the bar only marks where it is cut off
         $t_title = $t_name . ' | ' . calendar_event_time_label( $this->event['date_from'], $this->event['duration'] ) . ' [ ' . $t_project . ' ]';
+        if( calendar_rsvp_is_pending_for_current_user( $this->event['id'] ) ) {
+            $t_title .= ' - ' . plugin_lang_get( 'rsvp_status_none' );
+        }
 
         $t_top   = ColumnForm::HEADER_HEIGHT + $this->lane * ColumnForm::BAND_HEIGHT + 1;
         $t_id    = $this->is_in_past ? 'event_week_expired' : 'event_week';
@@ -71,7 +74,7 @@ class EventBand {
                 . ' class="' . $t_class . '"'
                 . ' title="' . string_attribute( $t_title ) . '"'
                 . ' style="' . calendar_project_color_style( $t_project_id )
-                . WeekCalendar::focus_style( $this->event['id'] )
+                . WeekCalendar::state_style( $this->event['id'] )
                 . 'z-index:' . ( 100 + $this->lane ) . ';'
                 . ' top:' . $t_top . 'px;'
                 . ' height:' . ( ColumnForm::BAND_HEIGHT - 2 ) . 'px;'

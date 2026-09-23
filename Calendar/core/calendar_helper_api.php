@@ -18,6 +18,9 @@
 # user has created, whoever their members are; ALL_USERS (0) and a real
 # user id are the other two modes
 define( 'CALENDAR_FILTER_AUTHOR', -1 );
+# for_user value that keeps the events waiting for a reply of the current
+# user, see calendar_rsvp_pending_event_ids()
+define( 'CALENDAR_FILTER_PENDING', -2 );
 
 # Where the calendar of the issue view page is placed, see bug_calendar_block_position.
 # A row of the issue details table, the way it has always been.
