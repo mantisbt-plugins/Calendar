@@ -407,14 +407,12 @@ $s_plugin_Calendar_rsvp_summary = '是: %1$d，可能: %2$d，否: %3$d，未答
 $s_plugin_Calendar_rsvp_recorded = '您对事件“%1$s”的答复已记录: %2$s。';
 $s_plugin_Calendar_rsvp_link_invalid = '此链接已失效: 已过期，或您已不再参与该事件。';
 $s_plugin_Calendar_rsvp_link_other_account = '此链接发送给了 %1$s：请使用该账户登录后再回复。';
+$s_plugin_Calendar_rsvp_page_series_hint = '该事件会重复；回复适用于其所有重复。';
 $s_plugin_Calendar_rsvp_open_event = '打开事件';
 $s_plugin_Calendar_event_history_rsvp = '%1$s 的答复';
 $s_plugin_Calendar_event_history_rsvp_reset = '答复已清除，事件时间已变更';
 $s_plugin_Calendar_notify_config_row_rsvp = '参与者答复了是否参加';
-$s_plugin_Calendar_notify_rsvp_links = '您会参加吗？
-是: %1$s
-可能: %2$s
-否: %3$s';
+$s_plugin_Calendar_notify_rsvp_links = '您会参加吗？在此回复：%1$s';
 $s_plugin_Calendar_notify_rsvp_email_subject = '事件答复: %1$s';
 $s_plugin_Calendar_notify_rsvp_email_body = '%7$s 答复了事件: %8$s。
 

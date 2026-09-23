@@ -25,12 +25,12 @@
  * dropped and asked for again, since they were given for another time.
  *
  * A member replies on the page of the event, or straight from a notification
- * mail or an .ics file through a link that carries the reply and a signed
- * token. The link works for its recipient logged in only - a forwarded mail
- * or a shared calendar must not answer for them -, and the token keeps a
- * crafted link from making a member answer what they never meant to. It is
- * an HMAC over the event, the user, the reply and an expiry date, keyed by
- * the master salt of the instance; nothing is stored for it, and a link
+ * mail or an .ics file through a personal link to a page with the reply
+ * buttons. The page opens for the recipient of the link logged in only - a
+ * forwarded mail or a shared calendar must not answer for them -, and the
+ * reply is given there, by a button under the form security token. The link
+ * is signed with an HMAC over the event, the user and an expiry date, keyed
+ * by the master salt of the instance; nothing is stored for it, and a link
  * stops working once the event is over or the user is no longer a member.
  */
 
@@ -298,14 +298,13 @@ function event_member_reset_statuses( $p_event_id, $p_keep_user_id = null, $p_ac
  * by the master salt of the instance
  * @param integer $p_event_id Integer representing event identifier.
  * @param integer $p_user_id  The member the link is for.
- * @param integer $p_status   The reply the link gives.
  * @param integer $p_expires  Timestamp the link stops working at.
  * @return string
  * @access private
  */
-function calendar_rsvp_token( $p_event_id, $p_user_id, $p_status, $p_expires ) {
+function calendar_rsvp_token( $p_event_id, $p_user_id, $p_expires ) {
 
-    $t_data = 'rsvp|' . (int)$p_event_id . '|' . (int)$p_user_id . '|' . (int)$p_status . '|' . (int)$p_expires;
+    $t_data = 'rsvp|' . (int)$p_event_id . '|' . (int)$p_user_id . '|' . (int)$p_expires;
 
     return hash_hmac( 'sha256', $t_data, config_get_global( 'crypto_master_salt' ) );
 }
@@ -314,47 +313,44 @@ function calendar_rsvp_token( $p_event_id, $p_user_id, $p_status, $p_expires ) {
  * Whether a reply link is genuine and still current
  * @param integer $p_event_id Integer representing event identifier.
  * @param integer $p_user_id  The member the link is for.
- * @param integer $p_status   The reply the link gives.
  * @param integer $p_expires  Timestamp the link stops working at.
  * @param string  $p_token    Signature carried by the link.
  * @return boolean
  * @access public
  */
-function calendar_rsvp_token_valid( $p_event_id, $p_user_id, $p_status, $p_expires, $p_token ) {
+function calendar_rsvp_token_valid( $p_event_id, $p_user_id, $p_expires, $p_token ) {
 
     if( (int)$p_expires < time() ) {
         return false;
     }
 
-    return hash_equals( calendar_rsvp_token( $p_event_id, $p_user_id, $p_status, $p_expires ), (string)$p_token );
+    return hash_equals( calendar_rsvp_token( $p_event_id, $p_user_id, $p_expires ), (string)$p_token );
 }
 
 /**
- * Link a member follows to reply to an event in one tap, once logged in.
+ * Link a member follows to the page they reply to an event on.
  *
  * The link lives until the event is over - the end of the last occurrence for
  * a series - and for a day at the least, so that a mail about an event that
  * is about to start can still be answered.
  * @param integer $p_event_id Integer representing event identifier.
  * @param integer $p_user_id  The member the link is for.
- * @param integer $p_status   The reply the link gives.
  * @return string absolute URL
  * @access public
  */
-function calendar_rsvp_url( $p_event_id, $p_user_id, $p_status ) {
+function calendar_rsvp_url( $p_event_id, $p_user_id ) {
 
     $t_expires = max( (int)event_get_field( $p_event_id, 'date_to' ), time() + 86400 );
 
     return config_get_global( 'path' ) . plugin_page( 'event_rsvp', true )
             . '&event_id=' . (int)$p_event_id
             . '&user_id=' . (int)$p_user_id
-            . '&status=' . (int)$p_status
             . '&expires=' . $t_expires
-            . '&token=' . calendar_rsvp_token( $p_event_id, $p_user_id, $p_status, $t_expires );
+            . '&token=' . calendar_rsvp_token( $p_event_id, $p_user_id, $t_expires );
 }
 
 /**
- * The reply links of one recipient of a mail, as the paragraph the mail
+ * The reply link of one recipient of a mail, as the paragraph the mail
  * bodies embed; empty when there is nothing to reply to - the feature is off
  * or the recipient is not a member of the event. Meant to be called in the
  * language of the recipient.
@@ -369,8 +365,5 @@ function calendar_rsvp_mail_block( $p_event_id, $p_user_id ) {
         return '';
     }
 
-    return sprintf( plugin_lang_get( 'notify_rsvp_links' ),
-                    calendar_rsvp_url( $p_event_id, $p_user_id, CALENDAR_RSVP_ACCEPTED ),
-                    calendar_rsvp_url( $p_event_id, $p_user_id, CALENDAR_RSVP_TENTATIVE ),
-                    calendar_rsvp_url( $p_event_id, $p_user_id, CALENDAR_RSVP_DECLINED ) );
+    return sprintf( plugin_lang_get( 'notify_rsvp_links' ), calendar_rsvp_url( $p_event_id, $p_user_id ) );
 }

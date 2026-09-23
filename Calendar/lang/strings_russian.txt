@@ -407,14 +407,12 @@ $s_plugin_Calendar_rsvp_summary = 'да: %1$d, возможно: %2$d, нет: %
 $s_plugin_Calendar_rsvp_recorded = 'Ваш ответ на событие «%1$s» записан: %2$s.';
 $s_plugin_Calendar_rsvp_link_invalid = 'Эта ссылка больше не действует: срок её истёк, либо вы больше не участвуете в событии.';
 $s_plugin_Calendar_rsvp_link_other_account = 'Эта ссылка отправлена пользователю %1$s: чтобы ответить, войдите под его учётной записью.';
+$s_plugin_Calendar_rsvp_page_series_hint = 'Событие повторяется; ответ даётся сразу на все его повторения.';
 $s_plugin_Calendar_rsvp_open_event = 'Открыть событие';
 $s_plugin_Calendar_event_history_rsvp = 'Ответ участника %1$s';
 $s_plugin_Calendar_event_history_rsvp_reset = 'Ответы сброшены, время события изменилось';
 $s_plugin_Calendar_notify_config_row_rsvp = 'Участник ответил, будет ли он участвовать';
-$s_plugin_Calendar_notify_rsvp_links = 'Будете участвовать?
-Да: %1$s
-Возможно: %2$s
-Нет: %3$s';
+$s_plugin_Calendar_notify_rsvp_links = 'Будете участвовать? Ответить: %1$s';
 $s_plugin_Calendar_notify_rsvp_email_subject = 'Ответ на событие: %1$s';
 $s_plugin_Calendar_notify_rsvp_email_body = '%7$s ответил(а) на событие: %8$s.
 
