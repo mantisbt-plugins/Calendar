@@ -181,6 +181,7 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                 <tr>
                                     <td class="category">
                                         <?php echo plugin_lang_get( 'rsvp_pref_enabled' ) ?>
+                                        <br /><span class="small"><?php echo plugin_lang_get( 'rsvp_pref_hint' ) ?></span>
                                     </td>
 
                                     <td>
@@ -188,7 +189,6 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                         echo '<label><input type="checkbox" name="rsvp_enabled" value="1"'
                                                 . ( calendar_rsvp_user_enabled( $t_current_user_id ) ? ' checked="checked"' : '' ) . '></input></label>';
                                         ?>
-                                        <p class="small"><?php echo plugin_lang_get( 'rsvp_pref_hint' ) ?></p>
                                     </td>
                                 </tr>
 
@@ -234,6 +234,7 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                 <tr>
                                     <td class="category">
                                         <?php echo plugin_lang_get( 'reminders_pref_no_reply' ) ?>
+                                        <br /><span class="small"><?php echo plugin_lang_get( 'reminders_pref_no_reply_hint' ) ?></span>
                                     </td>
 
                                     <td>
@@ -241,7 +242,6 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                         echo '<label><input type="checkbox" name="reminders_no_reply" value="1"'
                                                 . ( calendar_reminder_user_no_reply( $t_current_user_id ) ? ' checked="checked"' : '' ) . '></input></label>';
                                         ?>
-                                        <p class="small"><?php echo plugin_lang_get( 'reminders_pref_no_reply_hint' ) ?></p>
                                     </td>
                                 </tr>
                                 <?php } ?>
@@ -249,11 +249,11 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                 <tr>
                                     <td class="category">
                                         <?php echo plugin_lang_get( 'reminders_pref_default' ) ?>
+                                        <br /><span class="small"><?php echo plugin_lang_get( 'reminders_pref_hint' ) ?></span>
                                     </td>
 
                                     <td>
                                         <?php print_event_reminder_rows( calendar_reminder_user_offsets( $t_current_user_id ), FALSE ) ?>
-                                        <p class="small"><?php echo plugin_lang_get( 'reminders_pref_hint' ) ?></p>
                                     </td>
                                 </tr>
 

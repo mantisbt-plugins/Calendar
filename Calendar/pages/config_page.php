@@ -163,6 +163,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                 <tr>
                                     <td class="category" width="50%">
                                         <?php echo plugin_lang_get( 'config_rsvp_feature_enabled' ) ?>
+                                        <br /><span class="small"><?php echo plugin_lang_get( 'config_rsvp_feature_hint' ) ?></span>
 
                                     </td>
 
@@ -182,7 +183,6 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                                     . plugin_lang_get( $t_lang_key ) . '</option>';
                                         }
                                         echo '</select>';
-                                        echo '<p class="small">' . plugin_lang_get( 'config_rsvp_feature_hint' ) . '</p>';
                                         ?>
                                     </td>
                                 </tr>
