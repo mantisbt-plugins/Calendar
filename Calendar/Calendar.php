@@ -561,7 +561,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'member_add_others_event_threshold'                   => DEVELOPER,
                                   'member_delete_others_event_threshold'                => DEVELOPER, //Access level needed to delete other users from the list of users member a event.
                                   //Replies of the members: whether they will take part.
-                                  'rsvp_feature_enabled'                                => ON, //Master switch of the whole feature, changed by the administrator only.
+                                  'rsvp_feature_enabled'                                => OFF, //Master switch of the whole feature, changed by the administrator only. Replies, their mails and links, the pending list, its filter and the fading of unanswered events.
                                   //Reminders about upcoming events.
                                   'reminders_feature_enabled'                           => OFF, //Master switch of the whole feature, changed by the administrator only.
                                   'reminders_enabled'                                   => ON, //Per user opt-out.

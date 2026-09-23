@@ -170,6 +170,7 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                         <?php
                                         echo '<label><input type="checkbox" name="rsvp_feature_enabled" value="1"'
                                                 . ( plugin_config_get( 'rsvp_feature_enabled' ) == ON ? ' checked="checked"' : '' ) . '></input></label>';
+                                        echo '<p class="small">' . plugin_lang_get( 'config_rsvp_feature_hint' ) . '</p>';
                                         ?>
                                     </td>
                                 </tr>

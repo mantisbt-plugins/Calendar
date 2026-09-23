@@ -395,6 +395,7 @@ Comienza: %3$s
 Archivo de calendario (.ics): %5$s';
 
 $s_plugin_Calendar_config_rsvp_feature_enabled = 'Los participantes responden si van a participar';
+$s_plugin_Calendar_config_rsvp_feature_hint = 'Activa las respuestas de los participantes: los botones de respuesta de la página del evento, el enlace de respuesta en los correos y en el archivo .ics, el correo al autor sobre una respuesta, la lista de invitaciones pendientes con su botón y su filtro, y el aspecto atenuado de los eventos sin respuesta.';
 $s_plugin_Calendar_rsvp_status_none = 'Sin respuesta';
 $s_plugin_Calendar_rsvp_status_accepted = 'Participará';
 $s_plugin_Calendar_rsvp_status_tentative = 'Quizás';

@@ -396,6 +396,7 @@ $s_plugin_Calendar_notify_member_removed_others_email_body = 'Из событи�
 Файл для календаря (.ics): %5$s';
 
 $s_plugin_Calendar_config_rsvp_feature_enabled = 'Участники отвечают, будут ли они участвовать';
+$s_plugin_Calendar_config_rsvp_feature_hint = 'Включает ответы участников: кнопки ответа на странице события, ссылку на ответ в письмах и в файле .ics, письмо автору об ответе, список приглашений без ответа с его кнопкой и фильтром, а также полупрозрачный вид событий без ответа.';
 $s_plugin_Calendar_rsvp_status_none = 'Нет ответа';
 $s_plugin_Calendar_rsvp_status_accepted = 'Будет участвовать';
 $s_plugin_Calendar_rsvp_status_tentative = 'Возможно';
