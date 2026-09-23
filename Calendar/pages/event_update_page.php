@@ -238,8 +238,9 @@ layout_page_begin();
                                         <label for="event_is_repeated"><?php echo plugin_lang_get( 'ending_repetition' ) ?></label>
 
                                         <?php
-                                        if( array_key_exists( 'UNTIL', $t_rule ) ) {
-                                            $t_time_until = ( clone $t_rule['UNTIL'] )->setTimezone( $t_form_timezone )->format( plugin_config_get( 'short_date_format' ) );
+                                        $t_rule_end = isset( $t_rrules[0] ) ? calendar_rrule_end( $t_rrules[0] ) : NULL;
+                                        if( $t_rule_end !== NULL ) {
+                                            $t_time_until = $t_rule_end->setTimezone( $t_form_timezone )->format( plugin_config_get( 'short_date_format' ) );
                                         } else {
                                             $t_time_until = plugin_lang_get( 'never_ending_repetition' );
                                         }

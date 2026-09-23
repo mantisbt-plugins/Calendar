@@ -212,7 +212,10 @@ if( count( $t_rrules ) > 0 ) {
         echo plugin_lang_get( 'repeat_to' );
         echo " ";
         # UNTIL is serialized in UTC per RFC 5545; show it in the event timezone
-        echo $t_rule['UNTIL']->setTimezone( new DateTimeZone( $t_event_timezone_name ) )->format( config_get( 'normal_date_format' ) );
+        $t_rule_end = calendar_rrule_end( $t_rrule );
+        echo $t_rule_end === NULL
+                ? plugin_lang_get( 'never_ending_repetition' )
+                : $t_rule_end->setTimezone( new DateTimeZone( $t_event_timezone_name ) )->format( config_get( 'normal_date_format' ) );
     }
 } else {
     echo plugin_lang_get( 'not_repeat' );

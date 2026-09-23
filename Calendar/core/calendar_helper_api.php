@@ -85,6 +85,31 @@ function calendar_rrule_datetime( $p_timestamp, ?DateTimeZone $p_timezone = NULL
 }
 
 /**
+ * Where a recurrence rule ends: its UNTIL, else the start of its last
+ * occurrence for a rule bounded by COUNT, else nothing for an endless one.
+ * The event forms always write UNTIL, but a rule may come from elsewhere -
+ * the public API, an import - and RFC 5545 allows either.
+ *
+ * @param \RRule\RRule $p_rrule
+ * @return DateTime|null a copy, free to be moved to another timezone
+ */
+function calendar_rrule_end( \RRule\RRule $p_rrule ) {
+    $t_until = $p_rrule->getRule()['UNTIL'] ?? NULL;
+
+    if( $t_until instanceof DateTimeInterface ) {
+        return DateTime::createFromInterface( $t_until );
+    }
+
+    if( !$p_rrule->isFinite() ) {
+        return NULL;
+    }
+
+    $t_occurrences = $p_rrule->getOccurrences();
+
+    return count( $t_occurrences ) > 0 ? DateTime::createFromInterface( end( $t_occurrences ) ) : NULL;
+}
+
+/**
  * Timezone object for a user-supplied timezone name; falls back to the
  * current user's timezone on a blank or invalid name.
  *
