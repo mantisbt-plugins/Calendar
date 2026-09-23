@@ -120,7 +120,7 @@ abstract class WeekCalendar {
 
     /**
      * Inline style that tells the state of an event in the grid. A grid about
-     * one event fades every other one out; any other grid darkens the events
+     * one event fades every other one out; any other grid fades out the events
      * the logged in user has yet to answer.
      * @param integer $p_event_id Event drawn.
      * @return string

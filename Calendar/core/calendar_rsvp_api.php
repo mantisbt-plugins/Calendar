@@ -494,7 +494,7 @@ function calendar_rsvp_pending_event_ids( $p_user_id ) {
 
 /**
  * Whether the logged in user has yet to answer the given event, the test
- * the calendar grids darken an event by; always false while the replies
+ * the calendar grids fade an event out by; always false while the replies
  * are switched off
  * @param integer $p_event_id Integer representing event identifier.
  * @return boolean
@@ -510,11 +510,11 @@ function calendar_rsvp_is_pending_for_current_user( $p_event_id ) {
 }
 
 /**
- * Inline style that darkens an event the logged in user has yet to answer
+ * Inline style that fades out an event the logged in user has yet to answer
  * @param integer $p_event_id Integer representing event identifier.
  * @return string
  * @access public
  */
 function calendar_rsvp_pending_style( $p_event_id ) {
-    return calendar_rsvp_is_pending_for_current_user( $p_event_id ) ? 'filter:brightness(0.8) saturate(0.6);' : '';
+    return calendar_rsvp_is_pending_for_current_user( $p_event_id ) ? 'opacity:0.5;' : '';
 }

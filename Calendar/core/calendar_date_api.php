@@ -421,7 +421,7 @@ function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS,
             $t_result = db_query( $p_query, array( auth_get_current_user_id(), $t_range_finish, $t_range_start ) );
         } else if( $p_user_id == CALENDAR_FILTER_PENDING ) {
             # the events waiting for a reply of the current user, the same
-            # circle calendar_rsvp_pending_event_ids() draws darkened
+            # circle the grids draw faded, see calendar_rsvp_pending_event_ids()
             $t_user_id = auth_get_current_user_id();
             $p_query = "SELECT et.id,et.project_id,et.date_from,et.date_to,et.duration,et.name,et.recurrence_pattern FROM " . $t_table_calendar_events . " AS et" .
                     " INNER JOIN " . $t_table_calendar_members . " AS mt" .
