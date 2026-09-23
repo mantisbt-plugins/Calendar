@@ -565,6 +565,7 @@ class CalendarPlugin extends MantisPlugin {
                                   //Reminders about upcoming events.
                                   'reminders_feature_enabled'                           => OFF, //Master switch of the whole feature, changed by the administrator only.
                                   'reminders_enabled'                                   => ON, //Per user opt-out.
+                                  'reminders_no_reply'                                  => OFF, //Per user: remind about events the user has not replied to yet (RSVP).
                                   'reminders_default'                                   => array( 900 ), //Per user default offsets in seconds, used by events without their own reminders.
                                   'reminder_max_per_event'                              => 5,
                                   'reminder_max_offset'                                 => 2678400, //31 days; the same value is the look ahead of the dispatcher.

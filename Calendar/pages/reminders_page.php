@@ -78,6 +78,22 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                     </td>
                                 </tr>
 
+                                <?php if( calendar_rsvp_feature_enabled() ) { ?>
+                                <tr>
+                                    <td class="category">
+                                        <?php echo plugin_lang_get( 'reminders_pref_no_reply' ) ?>
+                                    </td>
+
+                                    <td>
+                                        <?php
+                                        echo '<label><input type="checkbox" name="reminders_no_reply" value="1"'
+                                                . ( calendar_reminder_user_no_reply( $t_current_user_id ) ? ' checked="checked"' : '' ) . '></input></label>';
+                                        ?>
+                                        <p class="small"><?php echo plugin_lang_get( 'reminders_pref_no_reply_hint' ) ?></p>
+                                    </td>
+                                </tr>
+                                <?php } ?>
+
                                 <tr>
                                     <td class="category">
                                         <?php echo plugin_lang_get( 'reminders_pref_default' ) ?>

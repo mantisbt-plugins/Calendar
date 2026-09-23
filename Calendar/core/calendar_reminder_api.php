@@ -336,13 +336,19 @@ function event_reminder_get_all( $p_event_id ) {
  * from: the personal set of the recipient for this event, else the offsets of
  * the event, else the personal defaults of the recipient. A set that is
  * switched off yields no offsets.
+ *
+ * The reply of a member may hold the reminders back, see
+ * calendar_reminder_rsvp_hold(); held reminders yield no offsets either, and
+ * 'held' tells why.
  * @param integer    $p_event_id Integer representing event identifier.
  * @param integer    $p_user_id  Integer representing user identifier.
  * @param array|null $p_sets     Sets as returned by event_reminder_get_all(), read here when omitted.
- * @return array 'source' => 'personal' | 'event' | 'defaults', 'offsets' => offsets in seconds, ascending
+ * @param array|null $p_statuses Replies as returned by event_member_get_statuses(), read here when omitted.
+ * @return array 'source' => 'personal' | 'event' | 'defaults', 'offsets' => offsets in seconds, ascending,
+ *               'held' => null | 'declined' | 'no_reply'
  * @access public
  */
-function calendar_reminder_effective( $p_event_id, $p_user_id, ?array $p_sets = null ) {
+function calendar_reminder_effective( $p_event_id, $p_user_id, ?array $p_sets = null, ?array $p_statuses = null ) {
 
     if( $p_sets === null ) {
         $p_sets = event_reminder_get_all( $p_event_id );
@@ -365,7 +371,63 @@ function calendar_reminder_effective( $p_event_id, $p_user_id, ?array $p_sets = 
         $t_offsets = array();
     }
 
-    return array( 'source' => $t_source, 'offsets' => $t_offsets );
+    $t_held = calendar_reminder_rsvp_hold( $p_event_id, $c_user_id, $t_source, $p_statuses );
+
+    if( $t_held !== null ) {
+        $t_offsets = array();
+    }
+
+    return array( 'source' => $t_source, 'offsets' => $t_offsets, 'held' => $t_held );
+}
+
+/**
+ * Whether the reply of a member holds their reminders back. A member who
+ * declined is not reminded at all. A member who has not replied yet is not
+ * reminded either, unless they asked for it in their settings
+ * ('reminders_no_reply') or set reminders of their own for this very event.
+ * The author is never held back, and nobody is while replies are switched off.
+ * @param integer    $p_event_id Integer representing event identifier.
+ * @param integer    $p_user_id  Integer representing user identifier.
+ * @param string     $p_source   Where the reminders of the user come from, see calendar_reminder_effective().
+ * @param array|null $p_statuses Replies as returned by event_member_get_statuses(), read here when omitted.
+ * @return string|null 'declined', 'no_reply' or null if nothing is held back
+ * @access public
+ */
+function calendar_reminder_rsvp_hold( $p_event_id, $p_user_id, $p_source, ?array $p_statuses = null ) {
+
+    $c_user_id = (int)$p_user_id;
+
+    if( $c_user_id <= 0 || !calendar_rsvp_feature_enabled()
+            || (int)event_get_field( $p_event_id, 'author_id' ) == $c_user_id ) {
+        return null;
+    }
+
+    if( $p_statuses === null ) {
+        $p_statuses = event_member_get_statuses( $p_event_id );
+    }
+
+    $t_status = isset( $p_statuses[$c_user_id] ) ? (int)$p_statuses[$c_user_id] : CALENDAR_RSVP_NONE;
+
+    if( $t_status == CALENDAR_RSVP_DECLINED ) {
+        return 'declined';
+    }
+
+    if( $t_status == CALENDAR_RSVP_NONE && $p_source != 'personal' && !calendar_reminder_user_no_reply( $c_user_id ) ) {
+        return 'no_reply';
+    }
+
+    return null;
+}
+
+/**
+ * Whether the given user wants to be reminded about events they have not
+ * replied to yet
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return boolean
+ * @access public
+ */
+function calendar_reminder_user_no_reply( $p_user_id ) {
+    return plugin_config_get( 'reminders_no_reply', OFF, FALSE, (int)$p_user_id ) == ON;
 }
 
 /**
@@ -650,7 +712,8 @@ function calendar_reminder_snooze_ensure_valid( $p_event_id, $p_occurrence, $p_u
 }
 
 /**
- * Users to be reminded about the given event: its author and its members.
+ * Users to be reminded about the given event: its author and its members,
+ * except the members who declined it.
  * The member list is read with event_get_member_ids(), because
  * event_get_members() checks the access level of the session user, which the
  * command line does not have.
@@ -663,11 +726,18 @@ function calendar_reminder_snooze_ensure_valid( $p_event_id, $p_occurrence, $p_u
 function event_reminder_recipients( $p_event_id, $p_author_id ) {
 
     $t_user_ids = array_merge( array( (int)$p_author_id ), event_get_member_ids( $p_event_id ) );
+    $t_statuses = calendar_rsvp_feature_enabled() ? event_member_get_statuses( $p_event_id ) : array();
 
     $t_recipients = array();
     foreach( array_unique( $t_user_ids ) as $t_user_id ) {
 
         if( $t_user_id <= 0 || !user_exists( $t_user_id ) || !user_is_enabled( $t_user_id ) ) {
+            continue;
+        }
+
+        # a member who will not come is not reminded, a put off reminder of
+        # theirs included; the author cannot decline their own event
+        if( $t_user_id != (int)$p_author_id && isset( $t_statuses[$t_user_id] ) && $t_statuses[$t_user_id] == CALENDAR_RSVP_DECLINED ) {
             continue;
         }
 
@@ -820,6 +890,7 @@ function calendar_reminder_process() {
         }
 
         $t_reminder_sets = event_reminder_get_all( $t_event_id );
+        $t_statuses      = event_member_get_statuses( $t_event_id );
 
         $t_recipients  = event_reminder_recipients( $t_event_id, (int)$t_event['author_id'] );
         $t_is_recurring = !is_blank( $t_event['recurrence_pattern'] );
@@ -834,7 +905,7 @@ function calendar_reminder_process() {
 
                 # the personal set of the recipient, else the reminders of the
                 # event, else the personal defaults of the recipient
-                $t_effective = calendar_reminder_effective( $t_event_id, $t_user_id, $t_reminder_sets );
+                $t_effective = calendar_reminder_effective( $t_event_id, $t_user_id, $t_reminder_sets, $t_statuses );
                 $t_offsets   = $t_effective['offsets'];
 
                 foreach( $t_offsets as $t_offset ) {

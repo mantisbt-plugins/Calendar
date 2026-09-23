@@ -44,6 +44,12 @@ if( $t_reminders_enabled ) {
                                                                 gpc_get_string_array( 'reminder_unit', array() ) );
 
     plugin_config_set( 'reminders_enabled', $f_reminders_enabled, $t_current_user_id );
+
+    # the checkbox is only on the page while replies are switched on; without
+    # it the stored choice is kept for the day they are switched on again
+    if( calendar_rsvp_feature_enabled() ) {
+        plugin_config_set( 'reminders_no_reply', gpc_get_bool( 'reminders_no_reply' ) ? ON : OFF, $t_current_user_id );
+    }
     plugin_config_set( 'reminders_default', $t_reminder_offsets, $t_current_user_id );
 }
 

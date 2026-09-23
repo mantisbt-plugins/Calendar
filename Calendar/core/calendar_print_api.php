@@ -248,7 +248,9 @@ function print_event_reminder_personal_row( $p_event_id, $p_date, $p_user_id, $p
     echo '<th class="category" width="15%">' . $t_source_label . '</th>';
     echo '<td>';
 
-    if( count( $t_effective['offsets'] ) == 0 ) {
+    if( $t_effective['held'] !== null ) {
+        echo plugin_lang_get( 'reminders_held_' . $t_effective['held'] );
+    } elseif( count( $t_effective['offsets'] ) == 0 ) {
         echo plugin_lang_get( 'reminder_offset_disabled' );
     }
 
@@ -285,7 +287,9 @@ function print_event_reminder_personal_row( $p_event_id, $p_date, $p_user_id, $p
             echo '<br /><span class="small">' . plugin_lang_get( 'reminders_opted_out' ) . '</span>';
         }
 
-        if( $t_max_rows <= 0 || count( $t_effective['offsets'] ) < $t_max_rows ) {
+        # a member who declined gets nothing whatever they set, so the form
+        # would only mislead
+        if( $t_effective['held'] != 'declined' && ( $t_max_rows <= 0 || count( $t_effective['offsets'] ) < $t_max_rows ) ) {
             echo '<br /><br />';
             echo '<form method="post" action="' . plugin_page( 'event_reminder_add' ) . '" class="form-inline noprint">';
             echo form_security_field( 'event_reminder_add' );

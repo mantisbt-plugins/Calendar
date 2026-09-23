@@ -243,6 +243,10 @@ $s_plugin_Calendar_reminders_opted_out = 'В настройках учётной
 $s_plugin_Calendar_reminders_pref_enabled = 'Получать напоминания о событиях';
 $s_plugin_Calendar_reminders_pref_default = 'Напоминания по умолчанию';
 $s_plugin_Calendar_reminders_pref_hint = 'Эти напоминания используются для событий, у которых нет своих собственных.';
+$s_plugin_Calendar_reminders_pref_no_reply = 'Напоминать о событиях, на которые я не ответил';
+$s_plugin_Calendar_reminders_pref_no_reply_hint = 'Если выключено, событие, которое вы не приняли и не отклонили, напомнит о себе, только если вы задали для него свои напоминания на странице события. События, от которых вы отказались, не напоминают никогда.';
+$s_plugin_Calendar_reminders_held_no_reply = 'Не отправляются, пока вы не ответите на приглашение. Ответьте, добавьте ниже своё напоминание или включите напоминания о событиях без ответа в настройках учётной записи.';
+$s_plugin_Calendar_reminders_held_declined = 'Не отправляются: вы отказались от участия.';
 $s_plugin_Calendar_reminder_email_subject = 'Напоминание: %1$s';
 $s_plugin_Calendar_reminder_email_body = 'Событие календаря начнётся через %4$s.
 

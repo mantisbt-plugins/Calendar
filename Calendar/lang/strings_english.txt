@@ -243,6 +243,10 @@ $s_plugin_Calendar_reminders_opted_out = 'You have switched reminders off in you
 $s_plugin_Calendar_reminders_pref_enabled = 'Receive reminders about events';
 $s_plugin_Calendar_reminders_pref_default = 'Default reminders';
 $s_plugin_Calendar_reminders_pref_hint = 'These reminders are used for the events that do not define their own ones.';
+$s_plugin_Calendar_reminders_pref_no_reply = 'Remind about events I have not replied to';
+$s_plugin_Calendar_reminders_pref_no_reply_hint = 'Without it, an event you have neither accepted nor declined reminds you only if you set reminders of your own for it on its page. Events you declined never remind you.';
+$s_plugin_Calendar_reminders_held_no_reply = 'Not sent until you reply to the invitation. Reply, add a reminder of your own below, or turn on reminders about events without a reply in your account settings.';
+$s_plugin_Calendar_reminders_held_declined = 'Not sent: you declined this event.';
 $s_plugin_Calendar_reminder_email_subject = 'Reminder: %1$s';
 $s_plugin_Calendar_reminder_email_body = 'The calendar event starts in %4$s.
 
