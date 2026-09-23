@@ -446,3 +446,26 @@ function print_rsvp_rows( $p_event_id, $p_date, $p_user_id ) {
     echo '</td>';
     echo '</tr>';
 }
+
+/**
+ * The button of a calendar header that leads to the invitations waiting for
+ * a reply of the logged in user, with their number; nothing while the
+ * replies are switched off or for the anonymous user
+ * @return void
+ * @access public
+ */
+function print_rsvp_pending_button() {
+
+    if( !calendar_rsvp_feature_enabled() || current_user_is_anonymous() ) {
+        return;
+    }
+
+    $t_count = count( calendar_rsvp_pending_events( auth_get_current_user_id() ) );
+
+    echo '<div class="widget-toolbar no-border">';
+    echo '<a class="btn btn-primary btn-white btn-round btn-xs" href="' . plugin_page( 'rsvp_pending_page' ) . '">';
+    echo '<i class="fa fa-envelope-o"></i> ' . plugin_lang_get( 'rsvp_pending_title' );
+    echo ' <span class="badge' . ( $t_count > 0 ? ' badge-warning' : '' ) . '">' . $t_count . '</span>';
+    echo '</a>';
+    echo '</div>';
+}

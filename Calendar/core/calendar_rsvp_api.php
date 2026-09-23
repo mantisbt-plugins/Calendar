@@ -367,3 +367,93 @@ function calendar_rsvp_mail_block( $p_event_id, $p_user_id ) {
 
     return sprintf( plugin_lang_get( 'notify_rsvp_links' ), calendar_rsvp_url( $p_event_id, $p_user_id ) );
 }
+
+/**
+ * The occurrence of an event a member is asked about: the only one of a
+ * single event, the next one of a series - a series is answered as a whole,
+ * and the time that matters is the one coming up
+ * @param array $p_event Event row.
+ * @return array|null array( start, duration ), null when a series has no occurrence left
+ * @access public
+ */
+function calendar_rsvp_occurrence( array $p_event ) {
+
+    $t_start    = (int)$p_event['date_from'];
+    $t_duration = (int)$p_event['duration'] > 0 ? (int)$p_event['duration'] : (int)$p_event['date_to'] - $t_start;
+
+    if( !is_blank( $p_event['recurrence_pattern'] ) ) {
+        $t_rset = new \RRule\RSet( $p_event['recurrence_pattern'] );
+        $t_next = $t_rset->getOccurrencesAfter( new DateTime(), true, 1 );
+
+        if( count( $t_next ) == 0 ) {
+            return null;
+        }
+
+        $t_start = $t_next[0]->getTimestamp();
+    }
+
+    return array( $t_start, $t_duration );
+}
+
+/**
+ * Time of an occurrence as the reply pages show it: the day and the times
+ * of one within a day, the days and times of a longer one
+ * @param integer $p_start    Start of the occurrence.
+ * @param integer $p_duration Length of the occurrence in seconds.
+ * @return string
+ * @access public
+ */
+function calendar_rsvp_when_label( $p_start, $p_duration ) {
+
+    $t_label = calendar_event_time_label( $p_start, $p_duration );
+
+    if( calendar_event_is_multiday( $p_start, $p_duration ) ) {
+        return $t_label;
+    }
+
+    return date( plugin_config_get( 'short_date_format' ), $p_start ) . ' ' . $t_label;
+}
+
+/**
+ * The events that wait for a reply of the given member: they are a member
+ * without a reply, they did not call the event themselves, it is not over
+ * and they may view it. Soonest first.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return array list of event rows, each with 'occurrence' => array( start, duration ) added
+ * @access public
+ * @uses database_api.php
+ */
+function calendar_rsvp_pending_events( $p_user_id ) {
+
+    $c_user_id            = (int)$p_user_id;
+    $t_events_table       = plugin_table( 'events' );
+    $t_event_member_table = plugin_table( 'event_member' );
+
+    db_param_push();
+    $t_query  = "SELECT e.id, e.project_id, e.author_id, e.name, e.date_from, e.date_to, e.duration, e.recurrence_pattern
+                   FROM $t_events_table e
+                   JOIN $t_event_member_table m ON m.event_id = e.id
+                  WHERE m.user_id=" . db_param() . " AND m.status=" . db_param() . "
+                    AND e.author_id<>" . db_param() . " AND e.activity='Y' AND e.date_to>" . db_param();
+    $t_result = db_query( $t_query, array( $c_user_id, CALENDAR_RSVP_NONE, $c_user_id, time() ) );
+
+    $t_events = array();
+    while( $t_row = db_fetch_array( $t_result ) ) {
+
+        if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), (int)$t_row['id'], $c_user_id ) ) {
+            continue;
+        }
+
+        $t_row['occurrence'] = calendar_rsvp_occurrence( $t_row );
+
+        if( $t_row['occurrence'] !== null ) {
+            $t_events[] = $t_row;
+        }
+    }
+
+    usort( $t_events, function( $p_a, $p_b ) {
+        return $p_a['occurrence'][0] - $p_b['occurrence'][0];
+    } );
+
+    return $t_events;
+}

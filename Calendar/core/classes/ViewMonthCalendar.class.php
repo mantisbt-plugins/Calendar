@@ -123,6 +123,8 @@ class ViewMonthCalendar {
     private function print_navigation() {
         echo '<div class="widget-toolbar">';
         echo '</div>';
+
+        print_rsvp_pending_button();
     }
 
     private function print_header() {

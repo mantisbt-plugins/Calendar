@@ -73,6 +73,8 @@ class ViewWeekCalendar extends WeekCalendar {
         echo "GMT " . date( "P" );
         echo '</h4>';
 
+        print_rsvp_pending_button();
+
         if( access_has_project_level( plugin_config_get( 'manage_calendar_threshold' ) ) ) {
             echo '<div class="widget-toolbar no-border">';
             echo '<div class="widget-menu">';
