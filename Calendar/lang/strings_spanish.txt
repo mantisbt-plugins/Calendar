@@ -407,6 +407,7 @@ $s_plugin_Calendar_rsvp_recorded = 'Su respuesta al evento «%1$s» ha sido regi
 $s_plugin_Calendar_rsvp_link_invalid = 'Este enlace ya no funciona: ha caducado, o usted ya no participa en el evento.';
 $s_plugin_Calendar_rsvp_link_other_account = 'Este enlace se envió a %1$s: inicie sesión con esa cuenta para responder.';
 $s_plugin_Calendar_rsvp_page_series_hint = 'El evento se repite; la respuesta vale para todas sus repeticiones.';
+$s_plugin_Calendar_rsvp_page_calendar_title = 'Sus eventos en estos días';
 $s_plugin_Calendar_rsvp_open_event = 'Abrir el evento';
 $s_plugin_Calendar_event_history_rsvp = 'Respuesta de %1$s';
 $s_plugin_Calendar_event_history_rsvp_reset = 'Respuestas descartadas, la hora del evento ha cambiado';

@@ -20,7 +20,9 @@
  *
  * The link opens the page, it records nothing by itself: the member reads
  * what the event is and presses a button, and the page shows the outcome in
- * place, with the buttons still there to change their mind. The page is for
+ * place, with the buttons still there to change their mind. Below, a week
+ * grid of the days the occurrence covers shows every event of the member on
+ * those days, so that a collision is seen before the answer. The page is for
  * its member logged in only - a guest is sent through the login page and
  * back, the way the core does it for any page, and a session of somebody
  * else, the anonymous one included, is told whom the link was sent to. So a
@@ -103,7 +105,8 @@ if( $t_own ) {
 
     # a series is answered as a whole, and the time that matters to the
     # member is that of its next occurrence
-    $t_start = (int)$t_event['date_from'];
+    $t_start    = (int)$t_event['date_from'];
+    $t_duration = (int)$t_event['duration'] > 0 ? (int)$t_event['duration'] : (int)$t_event['date_to'] - $t_start;
     if( $t_is_recurring ) {
         $t_rset = new \RRule\RSet( $t_event['recurrence_pattern'] );
         $t_next = $t_rset->getOccurrencesAfter( new DateTime(), true, 1 );
@@ -122,8 +125,15 @@ if( $t_own ) {
     echo '<tr><th class="category width-30">' . lang_get( 'email_project' ) . '</th>';
     echo '<td>' . string_display_line( project_get_name( (int)$t_event['project_id'] ) ) . '</td></tr>';
 
-    echo '<tr><th class="category">' . plugin_lang_get( 'date_from' ) . '</th>';
-    echo '<td>' . date( config_get( 'normal_date_format' ), $t_start );
+    # the day in front of the times of an occurrence within a day, the label
+    # of a longer one names its days itself
+    $t_when = calendar_event_time_label( $t_start, $t_duration );
+    if( !calendar_event_is_multiday( $t_start, $t_duration ) ) {
+        $t_when = date( plugin_config_get( 'short_date_format' ), $t_start ) . ' ' . $t_when;
+    }
+
+    echo '<tr><th class="category">' . plugin_lang_get( 'date_event' ) . '</th>';
+    echo '<td>' . string_display_line( $t_when );
     if( $t_is_recurring ) {
         echo '<br><small>' . plugin_lang_get( 'rsvp_page_series_hint' ) . '</small>';
     }
@@ -152,5 +162,11 @@ if( $t_own ) {
 
 print_small_button( $t_event_url, plugin_lang_get( 'rsvp_open_event' ) );
 echo '</div>';
+
+# what else the member has on the days of the occurrence
+if( $t_own ) {
+    $t_calendar = new ViewEventReply( $t_start, $t_duration, $t_user_id );
+    $t_calendar->print_html();
+}
 
 layout_page_end();

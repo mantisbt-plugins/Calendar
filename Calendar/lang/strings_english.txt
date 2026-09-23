@@ -408,6 +408,7 @@ $s_plugin_Calendar_rsvp_recorded = 'Your reply to the event "%1$s" has been reco
 $s_plugin_Calendar_rsvp_link_invalid = 'This link does not work any more: it has expired, or you no longer take part in the event.';
 $s_plugin_Calendar_rsvp_link_other_account = 'This link was sent to %1$s: log in under that account to reply.';
 $s_plugin_Calendar_rsvp_page_series_hint = 'The event repeats; the reply is given for all of its occurrences.';
+$s_plugin_Calendar_rsvp_page_calendar_title = 'Your events on these days';
 $s_plugin_Calendar_rsvp_open_event = 'Open the event';
 $s_plugin_Calendar_event_history_rsvp = 'Reply of %1$s';
 $s_plugin_Calendar_event_history_rsvp_reset = 'Replies dropped, the time of the event has changed';

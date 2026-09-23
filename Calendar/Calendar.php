@@ -621,6 +621,7 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/classes/WeekCalendar.class.php';
         require_once 'core/classes/ViewWeekCalendar.class.php';
         require_once 'core/classes/ViewIssue.class.php';
+        require_once 'core/classes/ViewEventReply.class.php';
         require_once 'core/classes/ViewWeekSelect.class.php';
         require_once 'core/classes/ColumnForm.class.php';
         require_once 'core/classes/TimeColumn.class.php';
