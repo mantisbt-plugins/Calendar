@@ -684,7 +684,11 @@ class CalendarPlugin extends MantisPlugin {
      * $p_offset_seconds ). It is raised for every allowed recipient even when
      * no mail is sent (empty address, notifications switched off globally), so
      * a subscriber can deliver the reminder through its own channel; a user who
-     * opted out of reminders gets neither the mail nor the signal. A reminder
+     * opted out of reminders gets neither the mail nor the signal, and neither
+     * does a member who declined the event or - unless they asked for it -
+     * one who has not replied yet (see calendar_reminder_rsvp_hold()). The
+     * reminders of a user can be read and changed on their behalf through
+     * calendar_api_event_reminders() and the calls next to it. A reminder
      * that a recipient has put off through calendar_api_event_reminder_snooze()
      * is signalled the same way when its moment comes; its offset is then the
      * distance between that moment and the start of the occurrence, zero or

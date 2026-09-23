@@ -495,6 +495,69 @@ function event_reminder_user_set_all( $p_event_id, $p_user_id, array $p_offsets 
 }
 
 /**
+ * Add one offset to the reminders of one recipient of an event, for them
+ * only. What applied to them so far - the reminders of the event or their
+ * personal defaults - is taken over as their personal set with the offset in
+ * it; reminders held back while the recipient has not replied are not taken
+ * over, the recipient asks for this one alone. An offset that applies
+ * already changes nothing. A recipient who declined the event gets nothing
+ * whatever they set, so the call is refused for them.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Integer representing user identifier.
+ * @param integer $p_offset   Offset in seconds, validated against the limits of the event form.
+ * @return boolean (always true)
+ * @access public
+ */
+function event_reminder_user_add( $p_event_id, $p_user_id, $p_offset ) {
+
+    $t_offset    = calendar_reminder_offsets_normalize( array( $p_offset ) );
+    $t_effective = calendar_reminder_effective( $p_event_id, $p_user_id );
+
+    if( $t_effective['held'] == 'declined' ) {
+        trigger_error( ERROR_ACCESS_DENIED, ERROR );
+    }
+
+    $t_offsets = array_values( array_unique( array_merge( $t_effective['offsets'], $t_offset ) ) );
+    sort( $t_offsets );
+
+    if( count( $t_offsets ) > (int)plugin_config_get( 'reminder_max_per_event' ) ) {
+        plugin_error( 'ERROR_REMINDER_INVALID', ERROR );
+    }
+
+    # an offset that is there already does not turn the reminders of the
+    # event into a personal copy
+    if( $t_offsets != $t_effective['offsets'] ) {
+        event_reminder_user_set_all( $p_event_id, $p_user_id, $t_offsets );
+    }
+
+    return true;
+}
+
+/**
+ * Drop one offset from the reminders of one recipient of an event, for them
+ * only: the reminders of the event stay as its author set them, the
+ * recipient gets a personal set without the offset - an empty one switches
+ * their reminders about the event off. An offset that does not apply to
+ * them changes nothing.
+ * @param integer $p_event_id Integer representing event identifier.
+ * @param integer $p_user_id  Integer representing user identifier.
+ * @param integer $p_offset   Offset in seconds.
+ * @return boolean (always true)
+ * @access public
+ */
+function event_reminder_user_remove( $p_event_id, $p_user_id, $p_offset ) {
+
+    $t_effective = calendar_reminder_effective( $p_event_id, $p_user_id );
+    $t_offsets   = array_values( array_diff( $t_effective['offsets'], array( (int)$p_offset ) ) );
+
+    if( $t_offsets != $t_effective['offsets'] ) {
+        event_reminder_user_set_all( $p_event_id, $p_user_id, $t_offsets );
+    }
+
+    return true;
+}
+
+/**
  * Drop the personal reminder set of one recipient of an event, so that the
  * offsets of the event (or their personal defaults) apply to them again
  * @param integer $p_event_id Integer representing event identifier.

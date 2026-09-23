@@ -49,19 +49,7 @@ if( count( $t_offsets_new ) == 0 ) {
     plugin_error( 'ERROR_REMINDER_INVALID', ERROR );
 }
 
-$t_effective = calendar_reminder_effective( $f_event_id, $t_user_id );
-$t_offsets   = array_values( array_unique( array_merge( $t_effective['offsets'], $t_offsets_new ) ) );
-sort( $t_offsets );
-
-if( count( $t_offsets ) > (int)plugin_config_get( 'reminder_max_per_event' ) ) {
-    plugin_error( 'ERROR_REMINDER_INVALID', ERROR );
-}
-
-# an offset that is there already changes nothing, and does not turn the
-# reminders of the event into a personal copy
-if( $t_offsets != $t_effective['offsets'] ) {
-    event_reminder_user_set_all( $f_event_id, $t_user_id, $t_offsets );
-}
+event_reminder_user_add( $f_event_id, $t_user_id, $t_offsets_new[0] );
 
 form_security_purge( 'event_reminder_add' );
 

@@ -649,6 +649,213 @@ function calendar_api_event_reminder_snooze( int $p_event_id, int $p_occurrence,
 }
 
 /**
+ * The reminders of the given user about the given event, as the event page
+ * shows them: what a plugin with a channel of its own needs to draw the
+ * buttons under a reminder or an invitation - "stop this reminder", "remind
+ * me N minutes before", "back to the reminders of the event".
+ *
+ * The answer holds:
+ * - 'enabled': whether the reminders are switched on for the instance
+ *   ('reminders_feature_enabled'); the calls that change reminders are
+ *   rejected while they are not;
+ * - 'is_recipient': whether the user is reminded about the event at all,
+ *   that is its author or one of its members; only such a user may change
+ *   their reminders;
+ * - 'opted_out': whether the user switched every reminder off in their
+ *   account settings - nothing is sent to them, whatever the offsets;
+ * - 'source': where the reminders of the user come from - 'personal' (a set
+ *   of their own for this event), 'event' (the set of the event) or
+ *   'defaults' (their personal defaults);
+ * - 'held': null, or why nothing is sent although offsets would apply -
+ *   'declined' (the user declined the event) or 'no_reply' (the user has not
+ *   replied and does not want reminders about such events; adding a
+ *   reminder of their own lifts it);
+ * - 'offsets': the offsets in seconds that apply to the user, ascending,
+ *   empty when held back or switched off; these are exactly the offsets
+ *   EVENT_CALENDAR_EVENT_REMINDER is going to carry for them;
+ * - 'labels': offset => its text ("10 min") in the language of the user;
+ * - 'event_offsets': the set of the event itself, empty when it has none or
+ *   has it switched off, for a "back to the reminders of the event" button;
+ * - 'max_per_event', 'max_offset': the limits an added offset has to keep.
+ *
+ * A user who is not a recipient gets the set of the event as 'offsets'.
+ *
+ * @param int $p_event_id Event the reminders are about.
+ * @param int $p_user_id  User the reminders are for.
+ * @return array as described above.
+ * @throws \Mantis\Exceptions\ClientException When the event or the user is unknown.
+ * @access public
+ */
+function calendar_api_event_reminders( int $p_event_id, int $p_user_id ) : array {
+
+    plugin_push_current( 'Calendar' );
+
+    set_error_handler( function( $p_severity, $p_message ) {
+        $t_code = is_numeric( $p_message ) ? (int)$p_message : ERROR_GENERIC;
+        throw new \Mantis\Exceptions\ClientException( error_string( $p_message ), $t_code );
+    }, E_USER_ERROR );
+
+    try {
+        event_ensure_exists( $p_event_id );
+        user_ensure_exists( $p_user_id );
+
+        $t_is_recipient = calendar_reminder_user_is_recipient( $p_event_id, $p_user_id );
+        $t_sets         = event_reminder_get_all( $p_event_id );
+        $t_effective    = calendar_reminder_effective( $p_event_id, $t_is_recipient ? $p_user_id : 0, $t_sets );
+
+        $t_event_offsets = isset( $t_sets[0] ) && !calendar_reminder_offsets_disabled( $t_sets[0] ) ? $t_sets[0] : array();
+
+        # the texts go to the user, so they are worded in the language of the
+        # user rather than in that of whoever triggered the call
+        lang_push( user_pref_get_language( $p_user_id ) );
+        $t_labels = array();
+        foreach( array_unique( array_merge( $t_effective['offsets'], $t_event_offsets ) ) as $t_offset ) {
+            $t_labels[$t_offset] = calendar_reminder_format_offset( $t_offset );
+        }
+        lang_pop();
+
+        return array(
+            'enabled'       => calendar_reminder_feature_enabled(),
+            'is_recipient'  => $t_is_recipient,
+            'opted_out'     => !calendar_reminder_user_enabled( $p_user_id ),
+            'source'        => $t_effective['source'],
+            'held'          => $t_effective['held'],
+            'offsets'       => $t_effective['offsets'],
+            'labels'        => $t_labels,
+            'event_offsets' => $t_event_offsets,
+            'max_per_event' => (int)plugin_config_get( 'reminder_max_per_event' ),
+            'max_offset'    => (int)plugin_config_get( 'reminder_max_offset' ),
+        );
+    } finally {
+        restore_error_handler();
+        plugin_pop_current();
+    }
+}
+
+/**
+ * Add one reminder for the given user about the given event, for them only:
+ * the "remind me N minutes before" of a plugin with a channel of its own.
+ *
+ * What applied to the user so far is taken over as a set of their own with
+ * the offset in it, the set of the event stays as its author made it - see
+ * calendar_api_event_reminders() for the sources. For a user who has not
+ * replied and whose reminders were held back for that, the added offset is
+ * their only reminder about the event and it goes out. An offset that
+ * applies already changes nothing. The change is not logged in the history
+ * of the event: it concerns the user alone.
+ *
+ * The call guarantees that the event and the user exist, that the user is
+ * the author or a member of the event, that the offset is one the event
+ * form accepts (at least a minute, at most 'reminder_max_offset', and no more
+ * than 'reminder_max_per_event' offsets in all) and that the user has not
+ * declined the event; it is rejected while 'reminders_feature_enabled' is off.
+ *
+ * @param int $p_event_id Event the reminder is about.
+ * @param int $p_user_id  User the reminder is for.
+ * @param int $p_offset   Seconds before the start of every occurrence.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event, the user or
+ *                                            the offset is rejected.
+ * @access public
+ */
+function calendar_api_event_reminder_add( int $p_event_id, int $p_user_id, int $p_offset ) : void {
+
+    calendar_api_event_reminder_change( $p_event_id, $p_user_id, function() use ( $p_event_id, $p_user_id, $p_offset ) {
+        event_reminder_user_add( $p_event_id, $p_user_id, $p_offset );
+    } );
+}
+
+/**
+ * Remove one reminder of the given user about the given event, for them
+ * only: the "stop this reminder" of a plugin with a channel of its own,
+ * pressed under the reminder it delivered on EVENT_CALENDAR_EVENT_REMINDER.
+ *
+ * The user gets a set of their own without the offset, for every occurrence
+ * of the event; the set of the event stays as its author made it. Removing
+ * the last offset leaves the user without reminders about the event, not
+ * with the set of the event again - that is calendar_api_event_reminder_reset().
+ * An offset that does not apply to the user changes nothing. The change is
+ * not logged in the history of the event.
+ *
+ * The call guarantees that the event and the user exist and that the user is
+ * the author or a member of the event; it is rejected while
+ * 'reminders_feature_enabled' is off.
+ *
+ * @param int $p_event_id Event the reminder is about.
+ * @param int $p_user_id  User the reminder is for.
+ * @param int $p_offset   Seconds before the start, as EVENT_CALENDAR_EVENT_REMINDER carried them.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event or the user is rejected.
+ * @access public
+ */
+function calendar_api_event_reminder_remove( int $p_event_id, int $p_user_id, int $p_offset ) : void {
+
+    calendar_api_event_reminder_change( $p_event_id, $p_user_id, function() use ( $p_event_id, $p_user_id, $p_offset ) {
+        event_reminder_user_remove( $p_event_id, $p_user_id, $p_offset );
+    } );
+}
+
+/**
+ * Drop the reminders of their own the given user keeps for the given event,
+ * so that the set of the event - or, if it has none, the personal defaults
+ * of the user - applies to them again.
+ *
+ * Guarantees and rejections as in calendar_api_event_reminder_remove().
+ *
+ * @param int $p_event_id Event the reminders are about.
+ * @param int $p_user_id  User the reminders are for.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event or the user is rejected.
+ * @access public
+ */
+function calendar_api_event_reminder_reset( int $p_event_id, int $p_user_id ) : void {
+
+    calendar_api_event_reminder_change( $p_event_id, $p_user_id, function() use ( $p_event_id, $p_user_id ) {
+        event_reminder_user_reset( $p_event_id, $p_user_id );
+    } );
+}
+
+/**
+ * The frame the calls changing the reminders of a user share: the calendar
+ * as the current plugin, every error as an exception, and the checks every
+ * one of them makes before its change is applied.
+ * @param int      $p_event_id Event the reminders are about.
+ * @param int      $p_user_id  User the reminders are for.
+ * @param callable $p_change   The change itself.
+ * @return void
+ * @throws \Mantis\Exceptions\ClientException When the event or the user is rejected.
+ * @access private
+ */
+function calendar_api_event_reminder_change( int $p_event_id, int $p_user_id, callable $p_change ) : void {
+
+    plugin_push_current( 'Calendar' );
+
+    set_error_handler( function( $p_severity, $p_message ) {
+        $t_code = is_numeric( $p_message ) ? (int)$p_message : ERROR_GENERIC;
+        throw new \Mantis\Exceptions\ClientException( error_string( $p_message ), $t_code );
+    }, E_USER_ERROR );
+
+    try {
+        event_ensure_exists( $p_event_id );
+        user_ensure_exists( $p_user_id );
+
+        if( !calendar_reminder_feature_enabled() ) {
+            trigger_error( ERROR_ACCESS_DENIED, ERROR );
+        }
+
+        if( !calendar_reminder_user_is_recipient( $p_event_id, $p_user_id ) ) {
+            error_parameters( $p_user_id );
+            trigger_error( ERROR_USER_BY_ID_NOT_FOUND, ERROR );
+        }
+
+        $p_change();
+    } finally {
+        restore_error_handler();
+        plugin_pop_current();
+    }
+}
+
+/**
  * Add a record of the calling plugin to the history of the given event.
  *
  * The counterpart of the core plugin_history_log() for the change log of a

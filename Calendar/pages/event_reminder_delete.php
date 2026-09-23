@@ -42,14 +42,7 @@ if( !calendar_reminder_feature_enabled() || !calendar_reminder_user_is_recipient
     access_denied();
 }
 
-$f_offset = gpc_get_int( 'offset' );
-
-$t_effective = calendar_reminder_effective( $f_event_id, $t_user_id );
-$t_offsets   = array_values( array_diff( $t_effective['offsets'], array( $f_offset ) ) );
-
-if( $t_offsets != $t_effective['offsets'] ) {
-    event_reminder_user_set_all( $f_event_id, $t_user_id, $t_offsets );
-}
+event_reminder_user_remove( $f_event_id, $t_user_id, gpc_get_int( 'offset' ) );
 
 form_security_purge( 'event_reminder_delete' );
 
