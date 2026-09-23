@@ -406,6 +406,7 @@ $s_plugin_Calendar_rsvp_replies = '答复';
 $s_plugin_Calendar_rsvp_summary = '是: %1$d，可能: %2$d，否: %3$d，未答复: %4$d';
 $s_plugin_Calendar_rsvp_recorded = '您对事件“%1$s”的答复已记录: %2$s。';
 $s_plugin_Calendar_rsvp_link_invalid = '此链接已失效: 已过期，或您已不再参与该事件。';
+$s_plugin_Calendar_rsvp_link_other_account = '此链接发送给了 %1$s：请使用该账户登录后再回复。';
 $s_plugin_Calendar_rsvp_open_event = '打开事件';
 $s_plugin_Calendar_event_history_rsvp = '%1$s 的答复';
 $s_plugin_Calendar_event_history_rsvp_reset = '答复已清除，事件时间已变更';

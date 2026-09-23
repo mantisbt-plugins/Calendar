@@ -25,11 +25,13 @@
  * dropped and asked for again, since they were given for another time.
  *
  * A member replies on the page of the event, or straight from a notification
- * mail through a link that carries a signed token: the mail is personal, so
- * the link acts for its recipient without a session. The token is an HMAC
- * over the event, the user, the reply and an expiry date, keyed by the master
- * salt of the instance; nothing is stored for it, and a link stops working
- * once the event is over or the user is no longer a member.
+ * mail or an .ics file through a link that carries the reply and a signed
+ * token. The link works for its recipient logged in only - a forwarded mail
+ * or a shared calendar must not answer for them -, and the token keeps a
+ * crafted link from making a member answer what they never meant to. It is
+ * an HMAC over the event, the user, the reply and an expiry date, keyed by
+ * the master salt of the instance; nothing is stored for it, and a link
+ * stops working once the event is over or the user is no longer a member.
  */
 
 # no reply given yet
@@ -328,7 +330,7 @@ function calendar_rsvp_token_valid( $p_event_id, $p_user_id, $p_status, $p_expir
 }
 
 /**
- * Link a member follows to reply to an event without logging in first.
+ * Link a member follows to reply to an event in one tap, once logged in.
  *
  * The link lives until the event is over - the end of the last occurrence for
  * a series - and for a day at the least, so that a mail about an event that

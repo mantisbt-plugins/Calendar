@@ -15,17 +15,26 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Record a reply given through the link of a notification mail.
+ * Record a reply given through the link of a notification mail or of the
+ * description of an .ics file.
  *
- * The link is personal and signed (see calendar_rsvp_url()), so it acts for
- * the member it was sent to without a session: no login, no form security
- * token - a mail could not carry one. A member who is logged in already is
- * taken to the event afterwards; anybody else is told that the reply has
- * been recorded on a page of its own, in the language of the member, and
- * offered the event page, which asks them to log in the usual way. A link
- * that is stale - expired, forged, or sent to somebody who has left the
- * event since - records nothing and says so.
+ * The link carries the reply and is signed for the member it was sent to
+ * (see calendar_rsvp_url()), but it acts only for that member logged in: a
+ * guest is sent through the login page and back, the way the core does it
+ * for any page, and a session of somebody else - the anonymous account
+ * included - records nothing. So a forwarded mail, a shared calendar or a
+ * mail scanner that follows the links cannot answer for the member, while
+ * the signature keeps a crafted link from making a logged in member answer
+ * what they never meant to. No form security token: the signature plays its
+ * part, and a mail could not carry one anyway.
+ *
+ * A link that is stale - expired, forged, or sent to somebody who has left
+ * the event since - records nothing and says so.
  */
+
+if( !auth_is_user_authenticated() || current_user_is_anonymous() ) {
+    access_denied();
+}
 
 $f_event_id = gpc_get_int( 'event_id' );
 $f_user_id  = gpc_get_int( 'user_id' );
@@ -41,55 +50,36 @@ $t_valid = calendar_rsvp_feature_enabled()
         && user_is_member_event( $f_user_id, $f_event_id )
         && access_has_event_level( plugin_config_get( 'view_event_threshold' ), $f_event_id, $f_user_id );
 
+$t_own = $t_valid && auth_get_current_user_id() == $f_user_id;
+
 if( $t_valid ) {
-
-    $t_event = event_get_row( $f_event_id );
-
+    $t_event            = event_get_row( $f_event_id );
     $g_project_override = (int)$t_event['project_id'];
-
-    event_member_set_status( $f_event_id, $f_user_id, $f_status, $f_user_id );
-
-    $t_event_url = plugin_page( 'view', true ) . '&event_id=' . $f_event_id . '&date=' . (int)$t_event['date_from'] . '#members';
-
-    if( auth_is_user_authenticated() && auth_get_current_user_id() == $f_user_id ) {
-        print_header_redirect( $t_event_url );
-    }
-
-    lang_push( user_pref_get_language( $f_user_id ) );
-
-    $t_message = sprintf( plugin_lang_get( 'rsvp_recorded' ), $t_event['name'], calendar_rsvp_status_label( $f_status ) );
+    $t_event_url        = plugin_page( 'view', true ) . '&event_id=' . $f_event_id . '&date=' . (int)$t_event['date_from'] . '#members';
 } else {
-
     $t_event_url = event_exists( $f_event_id )
             ? plugin_page( 'view', true ) . '&event_id=' . $f_event_id . '&date=' . (int)event_get_field( $f_event_id, 'date_from' )
             : plugin_page( 'calendar_user_page', true );
+}
 
+if( $t_own ) {
+    event_member_set_status( $f_event_id, $f_user_id, $f_status, $f_user_id );
+
+    $t_message = sprintf( plugin_lang_get( 'rsvp_recorded' ), $t_event['name'], calendar_rsvp_status_label( $f_status ) );
+} elseif( $t_valid ) {
+    # a genuine link, opened under another account: it is not theirs to use
+    $t_message = sprintf( plugin_lang_get( 'rsvp_link_other_account' ), user_get_name( $f_user_id ) );
+} else {
     $t_message = plugin_lang_get( 'rsvp_link_invalid' );
 }
 
-layout_login_page_begin();
+layout_page_header( plugin_lang_get( 'rsvp_your_reply' ), $t_own ? $t_event_url : null );
+layout_page_begin( plugin_page( 'calendar_user_page' ) );
 
-echo '<div class="col-md-offset-3 col-md-6 col-sm-10 col-sm-offset-1">';
-echo '<div class="login-container">';
-echo '<div class="space-12"></div>';
-layout_login_page_logo();
-echo '<div class="space-24"></div>';
-echo '<div class="position-relative">';
-echo '<div class="signup-box visible widget-box no-border" id="login-box">';
-echo '<div class="widget-body">';
-echo '<div class="widget-main">';
-echo '<div class="alert ' . ( $t_valid ? 'alert-success' : 'alert-warning' ) . '">' . string_display_line( $t_message ) . '</div>';
+echo '<div class="col-md-12 col-xs-12">';
 echo '<div class="space-10"></div>';
+echo '<div class="alert ' . ( $t_own ? 'alert-success' : 'alert-warning' ) . '">' . string_display_line( $t_message ) . '</div>';
 print_small_button( $t_event_url, plugin_lang_get( 'rsvp_open_event' ) );
 echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
 
-if( $t_valid ) {
-    lang_pop();
-}
-
-layout_login_page_end();
+layout_page_end();

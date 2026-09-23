@@ -33,7 +33,7 @@
  * invitation: a client does not answer it, and there are no attendees in it -
  * an iTIP reply would go by mail to the organizer, which nothing here reads.
  * A member replies through the personal links in the description instead,
- * the very links the mails carry, which act for them without a session.
+ * the very links the mails carry, which take them through the login.
  *
  * The UID is derived from the event identifier and the SEQUENCE from the
  * date of the last change, so a client that matches on UID replaces its copy
