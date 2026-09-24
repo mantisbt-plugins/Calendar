@@ -125,7 +125,7 @@ function event_history_log( $p_event_id, $p_type, $p_field_name = '', $p_old_val
                                                   " . db_param() . ')';
 
     db_query( $t_query, Array( (int)$p_event_id, (int)$p_user_id, $p_field_name,
-                              (string)$p_old_value, (string)$p_new_value, (int)$p_type,
+                              db_mysql_fix_utf8( $p_old_value ), db_mysql_fix_utf8( $p_new_value ), (int)$p_type,
                               $p_timestamp ) );
 
     return true;

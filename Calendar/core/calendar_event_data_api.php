@@ -47,13 +47,18 @@ class CalendarEventData {
                 break;
 
             case 'name':
+                # a MySQL table in utf8 rejects 4-byte chars such as emoji,
+                # the core replaces them the same way for its own fields
+                $value = db_mysql_fix_utf8( trim( $value ) );
+                break;
+
             case 'timezone':
                 $value = trim( $value );
                 break;
 
             case 'description':
                 # NULL from the database (nullable column) becomes ''
-                $value = trim( (string)$value );
+                $value = db_mysql_fix_utf8( trim( (string)$value ) );
                 break;
 
             case 'date_changed':
