@@ -181,6 +181,28 @@ a.event-band {
     max-width: 100%;
 }
 
+/* The field opening an event by its number stands left of the user filter,
+   as high as the filter */
+.calendar-toolbar-bottom #nav-button {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px 8px;
+}
+
+.calendar-event-jump input {
+    height: 30px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 13px;
+}
+
+.calendar-event-jump .input-icon > .ace-icon {
+    line-height: 28px;
+    font-size: 14px;
+}
+
 /* Project legend in the bottom toolbar: a swatch in the project colour per project */
 .calendar-project-legend {
     flex: 1 1 auto;

@@ -355,6 +355,8 @@ class ViewMonthCalendar {
 
         echo '<div id="nav-button" class="btn-group pull-right">';
 
+        print_event_jump_form();
+
         echo '<form id="filter-queries-form" class="btn-toolbar"  method="get" name="list_queries" action="' . plugin_page( 'calendar_user_page' ) . '">';
         echo '<input type="hidden" name="page" value="Calendar/calendar_user_page" />';
         echo '<input type="hidden" name="view" value="month" />';

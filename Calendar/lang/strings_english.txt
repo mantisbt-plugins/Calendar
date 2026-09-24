@@ -420,6 +420,7 @@ $s_plugin_Calendar_rsvp_page_invitation_title = 'Invitation to an event';
 $s_plugin_Calendar_rsvp_page_series_hint = 'The event repeats; the reply is given for all of its occurrences.';
 $s_plugin_Calendar_rsvp_page_calendar_title = 'Your events on these days';
 $s_plugin_Calendar_rsvp_pending_title = 'Awaiting your reply';
+$s_plugin_Calendar_event_jump = 'Event #';
 $s_plugin_Calendar_rsvp_pending_empty = 'No invitation is waiting for your reply.';
 $s_plugin_Calendar_rsvp_open_event = 'Open the event';
 $s_plugin_Calendar_event_history_rsvp = 'Reply of %1$s';

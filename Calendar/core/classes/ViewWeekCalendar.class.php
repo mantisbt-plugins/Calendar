@@ -161,6 +161,8 @@ class ViewWeekCalendar extends WeekCalendar {
 
         echo '<div id="nav-button" class="btn-group pull-right">';
 
+        print_event_jump_form();
+
         echo '<form id="filter-queries-form" class="btn-toolbar"  method="get" name="list_queries" action="' . plugin_page( 'calendar_user_page' ) . '">';
         # CSRF protection not required here - form does not result in modifications
         echo '<input type="hidden" name="page" value="Calendar/calendar_user_page" />';

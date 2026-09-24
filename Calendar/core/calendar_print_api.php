@@ -477,3 +477,22 @@ function print_rsvp_pending_button() {
     echo '</div>';
     echo '</div>';
 }
+
+/**
+ * The field of the bottom toolbar of a calendar that opens an event by its
+ * number, as the one of the MantisBT breadcrumbs opens an issue
+ * @return void
+ * @access public
+ */
+function print_event_jump_form() {
+
+    echo '<div class="calendar-event-jump">';
+    # CSRF protection not required here - form does not result in modifications
+    echo '<form method="post" action="' . plugin_page( 'event_jump' ) . '">';
+    echo '<span class="input-icon">';
+    echo '<input type="text" name="event_id" size="12" autocomplete="off" placeholder="' . plugin_lang_get( 'event_jump' ) . '" />';
+    print_icon( 'fa-search', 'ace-icon' );
+    echo '</span>';
+    echo '</form>';
+    echo '</div>';
+}
