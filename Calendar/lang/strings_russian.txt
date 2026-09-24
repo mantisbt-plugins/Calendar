@@ -65,6 +65,7 @@ $s_plugin_Calendar_config_google_api_file = 'JSON Файл с учётными �
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Получить доступ к Google API Calendar</a>)<br>
 В настройках в пункте "Разрешенные URI перенаправления" нужно будет указать сдедующий URL:<br>
 %1$s';
+$s_plugin_Calendar_config_google_title = 'Синхронизация с Google Calendar';
 $s_plugin_Calendar_config_page_google_api_settings = 'Текущий JSON файл с учётными данными для доступа к google api';
 $s_plugin_Calendar_config_page_google_client_id = 'Текущий id клиента';
 

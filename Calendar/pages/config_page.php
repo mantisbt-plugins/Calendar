@@ -212,6 +212,31 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                         ?>
                                     </td>
                                 </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-10"></div>
+
+            <div class="widget-box widget-color-blue2">
+                <div class="widget-header widget-header-small">
+                    <h4 class="widget-title lighter">
+                        <i class="ace-icon fa fa-google"></i>
+                        <?php echo plugin_lang_get( 'config_google_title' ) ?>
+                    </h4>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main no-padding">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-condensed table-hover">
+                                <colgroup>
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                </colgroup>
 
                                 <?php
                                 $t_google_client_id = json_decode( plugin_config_get( 'google_client_secret' ), TRUE );
@@ -257,53 +282,67 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td class="category" width="50%">
-                                        <?php echo plugin_lang_get( 'config_update_check' ) ?>
-                                    </td>
-
-                                    <td colspan="3" width="50%">
-                                        <?php
-                                        # the check is a link rather than a nested form, so it can sit
-                                        # inside the settings form and still carry its own security token
-                                        echo sprintf( plugin_lang_get( 'update_check_installed' ), plugin_get()->version );
-                                        echo '<div class="space-4"></div>';
-                                        echo '<a class="btn btn-primary btn-sm btn-white btn-round" href="'
-                                                . plugin_page( 'update_check' ) . form_security_param( 'update_check' ) . '">'
-                                                . plugin_lang_get( 'update_check_button' ) . '</a>';
-
-                                        $t_update = calendar_update_result_get();
-                                        if( !empty( $t_update ) ) {
-                                            $t_checked_at = date( config_get( 'normal_date_format' ), $t_update['checked_at'] );
-
-                                            if( isset( $t_update['error'] ) ) {
-                                                echo '<div class="alert alert-danger">' . sprintf( plugin_lang_get( 'update_check_failed' ), string_display_line( $t_update['error'] ) ) . '</div>';
-                                            } else if( calendar_update_is_available( $t_update ) ) {
-                                                $t_latest = '<a href="' . string_attribute( $t_update['url'] ) . '" target="_blank" rel="noopener">' . string_display_line( $t_update['latest'] ) . '</a>';
-                                                echo '<div class="alert alert-warning">' . sprintf( plugin_lang_get( 'update_check_available' ), $t_latest, date( config_get( 'normal_date_format' ), $t_update['published_at'] ) ) . '</div>';
-                                            } else {
-                                                echo '<div class="alert alert-success">' . plugin_lang_get( 'update_check_up_to_date' ) . '</div>';
-                                            }
-
-                                            echo '<div class="small">' . sprintf( plugin_lang_get( 'update_check_checked_at' ), $t_checked_at ) . '</div>';
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="center" colspan="3">
-                                        <input type="submit" class="button" value="<?php echo lang_get( 'change_configuration' ) ?>" />
-                                    </td>
-                                </tr>
-
                             </table>
-                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="space-10"></div>
+
+            <div class="center">
+                <input type="submit" class="btn btn-primary btn-white btn-round" value="<?php echo lang_get( 'change_configuration' ) ?>" />
+            </div>
         </form>
+
+        <div class="space-10"></div>
+
+        <?php
+        # the check is not a setting, so it lives outside the settings form
+        # and its link carries its own security token
+        $t_update = calendar_update_result_get();
+        ?>
+        <div id="update_check" class="widget-box widget-color-blue2">
+            <div class="widget-header widget-header-small">
+                <h4 class="widget-title lighter">
+                    <i class="ace-icon fa fa-refresh"></i>
+                    <?php echo plugin_lang_get( 'config_update_check' ) ?>
+                </h4>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p><?php echo sprintf( plugin_lang_get( 'update_check_installed' ), '<strong>' . string_display_line( plugin_get()->version ) . '</strong>' ) ?></p>
+                    <?php
+                    if( !empty( $t_update ) ) {
+                        if( isset( $t_update['error'] ) ) {
+                            $t_update_class = 'alert-danger';
+                            $t_update_icon  = 'fa-exclamation-triangle';
+                            $t_update_text  = sprintf( plugin_lang_get( 'update_check_failed' ), string_display_line( $t_update['error'] ) );
+                        } else if( calendar_update_is_available( $t_update ) ) {
+                            $t_update_class = 'alert-warning';
+                            $t_update_icon  = 'fa-arrow-circle-up';
+                            $t_latest       = '<a href="' . string_attribute( $t_update['url'] ) . '" target="_blank" rel="noopener">' . string_display_line( $t_update['latest'] ) . '</a>';
+                            $t_update_text  = sprintf( plugin_lang_get( 'update_check_available' ), $t_latest, date( config_get( 'normal_date_format' ), $t_update['published_at'] ) );
+                        } else {
+                            $t_update_class = 'alert-success';
+                            $t_update_icon  = 'fa-check';
+                            $t_update_text  = plugin_lang_get( 'update_check_up_to_date' );
+                        }
+
+                        echo '<div class="alert ' . $t_update_class . ' no-margin-bottom"><i class="ace-icon fa ' . $t_update_icon . '"></i> ' . $t_update_text
+                                . '<div class="small">' . sprintf( plugin_lang_get( 'update_check_checked_at' ), date( config_get( 'normal_date_format' ), $t_update['checked_at'] ) ) . '</div></div>';
+                    }
+                    ?>
+                </div>
+
+                <div class="widget-toolbox padding-8 clearfix">
+                    <a class="btn btn-primary btn-sm btn-white btn-round" href="<?php echo plugin_page( 'update_check' ) . form_security_param( 'update_check' ) ?>">
+                        <?php echo plugin_lang_get( 'update_check_button' ) ?>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

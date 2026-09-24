@@ -65,6 +65,7 @@ $s_plugin_Calendar_config_google_api_file = '用于访问google api凭证的JSON
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>获取Google 日历的API</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
 %1$s';
+$s_plugin_Calendar_config_google_title = 'Google 日历同步';
 $s_plugin_Calendar_config_page_google_api_settings = '当前用于连接google api的JSON文件';
 $s_plugin_Calendar_config_page_google_client_id = '当前客户端ID';
 

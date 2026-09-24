@@ -15,7 +15,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 # Triggered by the button on the configuration page; the outcome is
-# shown there, so this page only runs the check and goes back.
+# shown there, so this page only runs the check and goes straight back.
 auth_reauthenticate();
 access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
 form_security_validate( 'update_check' );
@@ -24,11 +24,4 @@ calendar_update_check();
 
 form_security_purge( 'update_check' );
 
-$t_redirect_url = plugin_page( 'config_page', TRUE );
-
-layout_page_header( null, $t_redirect_url );
-layout_page_begin( $t_redirect_url );
-
-html_operation_successful( $t_redirect_url );
-
-layout_page_end();
+print_header_redirect( plugin_page( 'config_page', TRUE ) . '#update_check' );

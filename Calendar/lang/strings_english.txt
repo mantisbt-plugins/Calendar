@@ -65,6 +65,7 @@ $s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for acce
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
 %1$s';
+$s_plugin_Calendar_config_google_title = 'Google Calendar sync';
 $s_plugin_Calendar_config_page_google_api_settings = 'Current JSON file with credentials for access to google api';
 $s_plugin_Calendar_config_page_google_client_id = 'Current client id';
 
