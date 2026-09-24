@@ -615,8 +615,9 @@ function calendar_api_event_member_status_set( int $p_event_id, int $p_user_id, 
  * the event, and that the moment lies ahead but before the occurrence is
  * over; it is rejected while 'reminders_feature_enabled' is off, when no
  * reminder would go out anyway. Whatever changes by the time the moment
- * comes - a cancelled occurrence, a member who left, a switched off feature -
- * drops the reminder silently.
+ * comes - a cancelled occurrence, a member who left, reminders switched off
+ * for the event or for the user, a switched off feature - drops the reminder
+ * silently: switching the reminders off is how a put off one is cancelled.
  *
  * @param int $p_event_id   Event the reminder is about.
  * @param int $p_occurrence Start of the occurrence, as EVENT_CALENDAR_EVENT_REMINDER carried it.

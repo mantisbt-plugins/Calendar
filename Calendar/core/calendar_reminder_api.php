@@ -1005,7 +1005,8 @@ function calendar_reminder_process() {
  * once, and forget them. One is dropped without a word when its world has
  * changed meanwhile - its event is gone or no longer active, its occurrence
  * was cancelled or moved, its recipient is no longer reminded about the event
- * - and when its moment fell before the window: a put off reminder is not
+ * or has the reminders about it switched off - and when its moment fell
+ * before the window: a put off reminder is not
  * replayed after a long downtime any more than a scheduled one.
  * @param integer $p_window_start Start of the window, exclusive.
  * @param integer $p_now          End of the window, inclusive.
@@ -1042,10 +1043,13 @@ function calendar_reminder_process_snoozes( $p_window_start, $p_now ) {
         $t_user_id    = (int)$t_row['user_id'];
         $t_fire_at    = (int)$t_row['fire_at'];
 
+        # a recipient who has switched off the reminders about the event
+        # since, or has them held back, is not reminded about it any more
         if( $t_fire_at > $p_window_start
                 && $t_row['activity'] == 'Y'
                 && event_occurrence_exists( $t_event_id, $t_occurrence )
-                && in_array( $t_user_id, event_reminder_recipients( $t_event_id, (int)$t_row['author_id'] ), true ) ) {
+                && in_array( $t_user_id, event_reminder_recipients( $t_event_id, (int)$t_row['author_id'] ), true )
+                && count( calendar_reminder_effective( $t_event_id, $t_user_id )['offsets'] ) > 0 ) {
 
             # the offset of a put off reminder is where it went out relative to
             # the start, zero or negative once the occurrence has begun
