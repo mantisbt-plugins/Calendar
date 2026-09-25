@@ -74,8 +74,8 @@ class ViewMonthCalendar {
 
         // Add the modal window used to view events
         echo '<div id="eventModal" class="modal" style="display: none;"
-              data-events-for-date-text="' . plugin_lang_get("events_for_date") . '"
-              data-add-event-text="' . plugin_lang_get("add_new_event") . '">
+              data-events-for-date-text="' . string_attribute( plugin_lang_get( "events_for_date" ) ) . '"
+              data-add-event-text="' . string_attribute( plugin_lang_get( "add_new_event" ) ) . '">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="close">&times;</span>
@@ -216,15 +216,16 @@ class ViewMonthCalendar {
             });
         }
 
-        // Every day header carries its event list (possibly empty) for the modal window
+        // Every day header carries its event list (possibly empty) for the modal window.
+        // Values stay raw: the script puts them into the DOM as text, never as markup.
         $t_modal_events = array();
         foreach ($t_day_events as $t_event) {
             $t_modal_event = array(
                 'time' => calendar_event_segment_time_label($t_event),
                 'duration' => calendar_event_duration_label($t_event['date_from'], $t_event['duration']),
-                'name' => string_html_specialchars($t_event['name']),
+                'name' => $t_event['name'],
                 'url' => $this->get_event_url($t_event),
-                'project_name' => string_html_specialchars(project_get_name($t_event['project_id'])),
+                'project_name' => project_get_name($t_event['project_id']),
                 'style' => calendar_project_color_style($t_event['project_id']) . calendar_rsvp_pending_style($t_event['id'])
             );
             // Show whose event it is unless the grid is already one user's
@@ -233,11 +234,15 @@ class ViewMonthCalendar {
                 foreach (event_get_members($t_event['id']) as $t_member_id) {
                     $t_member_names[] = user_get_name($t_member_id);
                 }
-                $t_modal_event['user_name'] = string_html_specialchars(implode(', ', $t_member_names));
+                $t_modal_event['user_name'] = implode(', ', $t_member_names);
             }
             $t_modal_events[] = $t_modal_event;
         }
-        $t_events_attr = ' data-events="' . string_attribute(json_encode($t_modal_events)) . '"';
+        // The JSON_HEX_* flags leave no HTML special characters in the JSON, so the
+        // single attribute escaping below is the only one the browser has to undo
+        $t_events_json = json_encode( $t_modal_events,
+                JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE );
+        $t_events_attr = ' data-events="' . string_attribute( $t_events_json ) . '"';
         // Empty slots open the same modal window, so they carry the event list as well
         $t_empty_slot = '<div class="calendar-event-empty clickable" data-date="' . $p_date . '"' . $t_events_attr . '></div>';
 

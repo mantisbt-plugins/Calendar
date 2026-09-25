@@ -41,6 +41,14 @@ document.addEventListener("DOMContentLoaded", function() {
         return m ? m[3] + "." + m[2] + "." + m[1] : date;
     }
 
+    // Append a <div> with the given class and plain text content
+    function appendTextDiv(parent, className, text) {
+        var div = document.createElement("div");
+        div.className = className;
+        div.textContent = text;
+        parent.appendChild(div);
+    }
+
     // Function that shows the events of a day
     function showDayEvents(date, events) {
         var modalTitle = document.getElementById("modalTitle");
@@ -48,24 +56,29 @@ document.addEventListener("DOMContentLoaded", function() {
         var span = document.getElementsByClassName("close")[0];
         
         var eventsForDateText = eventModal.getAttribute("data-events-for-date-text");
-        modalTitle.innerHTML = eventsForDateText.replace("%s", date);
+        modalTitle.textContent = eventsForDateText.replace("%s", date);
         
-        var eventHtml = "";
+        // Event data comes from users, so it goes into the DOM as text only
+        while (modalEventList.firstChild) {
+            modalEventList.removeChild(modalEventList.firstChild);
+        }
         if(events !== null){
             events.forEach(function(event) {
-                eventHtml += "<a href='" + event.url + "' class='modal-event' style='" + (event.style || "") + "'>";
-                eventHtml += "<div class='event-time'>" + event.time + "</div>";
-                eventHtml += "<div class='event-duration'>" + event.duration + "</div>";
-                eventHtml += "<div class='event-name'>" + event.name + "</div>";
+                var link = document.createElement("a");
+                link.setAttribute("href", event.url);
+                link.className = "modal-event";
+                link.setAttribute("style", event.style || "");
+                appendTextDiv(link, "event-time", event.time);
+                appendTextDiv(link, "event-duration", event.duration);
+                appendTextDiv(link, "event-name", event.name);
                 if (event.user_name) {
-                    eventHtml += "<div class='event-user'>" + event.user_name + "</div>";
+                    appendTextDiv(link, "event-user", event.user_name);
                 }
-                eventHtml += "<div class='event-project'>" + event.project_name + "</div>";
-                eventHtml += "</a>";
+                appendTextDiv(link, "event-project", event.project_name);
+                modalEventList.appendChild(link);
             });
         }
     
-        modalEventList.innerHTML = eventHtml;
         eventModal.style.display = "block";
         
         var createEventForm = document.getElementById("createEventForm");

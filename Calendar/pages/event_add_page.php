@@ -81,7 +81,12 @@ if( $f_bug_id == 0 ) {
 
     $t_project_id = bug_get_field( $f_bug_id, 'project_id' );
 
-    $g_project_override = bug_get_field( $f_bug_id, 'project_id' );
+    # The event is created in the project of the issue, so every check below
+    # has to run against that project
+    $g_project_override = $t_project_id;
+
+    access_ensure_bug_level( config_get( 'view_bug_threshold', null, null, $t_project_id ), $f_bug_id );
+    access_ensure_project_level( plugin_config_get( 'report_event_threshold', null, false, null, $t_project_id ), $t_project_id );
 }
 
 
