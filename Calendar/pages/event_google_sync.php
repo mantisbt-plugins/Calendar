@@ -21,6 +21,18 @@ $f_date     = gpc_get_int( 'date' );
 
 event_ensure_exists( $f_event_id );
 
+# the thresholds are read for the project of the event, the way the event
+# page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
+# the event page offers the sync to the author of the event only, whose
+# Google account the event lives in
+access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
+
+if( (int)event_get_field( $f_event_id, 'author_id' ) != auth_get_current_user_id() ) {
+    access_denied();
+}
+
 if( event_is_synchronized_with_google( $f_event_id ) || event_google_get_id( $f_event_id ) != NULL ) {
     event_google_update( event_get( $f_event_id ) );
 } else {

@@ -670,7 +670,8 @@ function event_get_member_ids( $p_event_id ) {
  * @return array
  */
 function event_get_members( $p_event_id, $p_user_id = null ) {
-    if( !access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $p_event_id, $p_user_id ) ) {
+    # read for the project of the event, the list is asked for outside of its page too
+    if( !access_has_event_level( plugin_config_get( 'show_member_list_threshold', null, false, $p_user_id, (int)event_get_field( $p_event_id, 'project_id' ) ), $p_event_id, $p_user_id ) ) {
         return array();
     }
 
@@ -781,6 +782,84 @@ function event_attach_issue( $p_event_id, array $p_bugs_id ) {
         bug_update_date( $t_bug_id );
     }
     return TRUE;
+}
+
+/**
+ * Keep the issues the given user may view, in the project each issue lives in;
+ * an issue that does not exist is dropped as well. Attaching an event to an
+ * issue, or listing the issues of an event, must never disclose an issue.
+ * @param array        $p_bug_ids List of issue identifiers.
+ * @param integer|null $p_user_id User the issues are checked for, defaults to the logged in one.
+ * @return array issue identifiers, in the given order
+ * @access public
+ */
+function event_bug_ids_filter_viewable( array $p_bug_ids, $p_user_id = null ) {
+
+    if( $p_user_id === null ) {
+        $p_user_id = auth_get_current_user_id();
+    }
+
+    $t_bug_ids = array();
+
+    foreach( $p_bug_ids as $t_bug_id ) {
+        $c_bug_id = (int)$t_bug_id;
+
+        if( !bug_exists( $c_bug_id ) ) {
+            continue;
+        }
+
+        $t_view_threshold = config_get( 'view_bug_threshold', null, $p_user_id, bug_get_field( $c_bug_id, 'project_id' ) );
+
+        if( access_has_bug_level( $t_view_threshold, $c_bug_id, $p_user_id ) ) {
+            $t_bug_ids[] = $c_bug_id;
+        }
+    }
+
+    return $t_bug_ids;
+}
+
+/**
+ * Check that the given users may become the members of an event of the given
+ * project, created by the given author, and halt with the usual error
+ * otherwise: every member exists, is not the anonymous account and reaches
+ * the project at the view_event_threshold level, and the author passes
+ * member_add_others_event_threshold as soon as the list names somebody else.
+ * @param integer $p_project_id Project the event belongs to.
+ * @param integer $p_author_id  User the event is created by.
+ * @param array   $p_member_ids List of user identifiers.
+ * @return void
+ * @access public
+ */
+function event_members_ensure_eligible( $p_project_id, $p_author_id, array $p_member_ids ) {
+
+    $t_adds_other_members = FALSE;
+
+    foreach( $p_member_ids as $t_member_id ) {
+        $c_member_id = (int)$t_member_id;
+
+        user_ensure_exists( $c_member_id );
+
+        $t_member_threshold = plugin_config_get( 'view_event_threshold', NULL, FALSE, $c_member_id, $p_project_id );
+
+        if( user_is_anonymous( $c_member_id )
+                || !access_has_project_level( $t_member_threshold, $p_project_id, $c_member_id ) ) {
+            error_parameters( 'members' );
+            trigger_error( ERROR_INVALID_FIELD_VALUE, ERROR );
+        }
+
+        if( $c_member_id != $p_author_id ) {
+            $t_adds_other_members = TRUE;
+        }
+    }
+
+    # signing somebody else up for an event is a separate permission
+    if( $t_adds_other_members ) {
+        $t_add_others_threshold = plugin_config_get( 'member_add_others_event_threshold', NULL, FALSE, $p_author_id, $p_project_id );
+
+        if( !access_has_project_level( $t_add_others_threshold, $p_project_id, $p_author_id ) ) {
+            access_denied();
+        }
+    }
 }
 
 /**

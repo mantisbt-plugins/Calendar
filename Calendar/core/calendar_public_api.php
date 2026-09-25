@@ -131,35 +131,9 @@ function calendar_api_event_create( \CalendarPluginApi\EventCreateRequest $p_req
         # the member selector of the event form is filled from
         # project_get_all_user_rows(), so only users who can reach the project of
         # the event are eligible; an ineligible member is a malformed request
-        # rather than a permission problem of the author, hence the field error
-        $t_adds_other_members = FALSE;
-
-        foreach( $t_members as $t_member_id ) {
-            $c_member_id = (int)$t_member_id;
-
-            user_ensure_exists( $c_member_id );
-
-            $t_member_threshold = plugin_config_get( 'view_event_threshold', NULL, FALSE, $c_member_id, $t_project_id );
-
-            if( user_is_anonymous( $c_member_id )
-                    || !access_has_project_level( $t_member_threshold, $t_project_id, $c_member_id ) ) {
-                error_parameters( 'members' );
-                trigger_error( ERROR_INVALID_FIELD_VALUE, ERROR );
-            }
-
-            if( $c_member_id != $t_user_id ) {
-                $t_adds_other_members = TRUE;
-            }
-        }
-
+        # rather than a permission problem of the author, hence the field error;
         # signing somebody else up for an event is a separate permission
-        if( $t_adds_other_members ) {
-            $t_add_others_threshold = plugin_config_get( 'member_add_others_event_threshold', NULL, FALSE, $t_user_id, $t_project_id );
-
-            if( !access_has_project_level( $t_add_others_threshold, $t_project_id, $t_user_id ) ) {
-                access_denied();
-            }
-        }
+        event_members_ensure_eligible( $t_project_id, $t_user_id, $t_members );
 
         $t_recurrence_pattern = trim( $p_request->recurrence_pattern );
         if( !is_blank( $t_recurrence_pattern ) ) {
@@ -546,7 +520,8 @@ function calendar_api_event_member_statuses( int $p_event_id ) : array {
  * of its own - a bot, a mobile client - lets the member answer there.
  *
  * The call guarantees that the event exists, that the user is one of its
- * members and that the reply is one a member may give, that is
+ * members, that they pass the view_event_threshold of the event and that the
+ * reply is one a member may give, that is
  * CALENDAR_RSVP_ACCEPTED, CALENDAR_RSVP_TENTATIVE or CALENDAR_RSVP_DECLINED;
  * it is rejected when the member does not take part in the replies - the
  * 'rsvp_mode' is off, or leaves the choice to the users and the member has
@@ -583,6 +558,10 @@ function calendar_api_event_member_status_set( int $p_event_id, int $p_user_id, 
             error_parameters( $p_user_id );
             trigger_error( ERROR_USER_BY_ID_NOT_FOUND, ERROR );
         }
+
+        # a member who can no longer view the event does not reply to it, the
+        # pages refuse them the same way
+        calendar_api_event_view_ensure( $p_event_id, $p_user_id );
 
         if( !in_array( $p_status, calendar_rsvp_replies(), true ) ) {
             error_parameters( 'status' );
@@ -751,7 +730,8 @@ function calendar_api_event_reminders( int $p_event_id, int $p_user_id ) : array
  * of the event: it concerns the user alone.
  *
  * The call guarantees that the event and the user exist, that the user is
- * the author or a member of the event, that the offset is one the event
+ * the author or a member of the event and passes its view_event_threshold,
+ * that the offset is one the event
  * form accepts (at least a minute, at most 'reminder_max_offset', and no more
  * than 'reminder_max_per_event' offsets in all) and that the user has not
  * declined the event; it is rejected while 'reminders_feature_enabled' is off.
@@ -784,7 +764,8 @@ function calendar_api_event_reminder_add( int $p_event_id, int $p_user_id, int $
  * not logged in the history of the event.
  *
  * The call guarantees that the event and the user exist and that the user is
- * the author or a member of the event; it is rejected while
+ * the author or a member of the event who passes its view_event_threshold;
+ * it is rejected while
  * 'reminders_feature_enabled' is off.
  *
  * @param int $p_event_id Event the reminder is about.
@@ -854,10 +835,31 @@ function calendar_api_event_reminder_change( int $p_event_id, int $p_user_id, ca
             trigger_error( ERROR_USER_BY_ID_NOT_FOUND, ERROR );
         }
 
+        calendar_api_event_view_ensure( $p_event_id, $p_user_id );
+
         $p_change();
     } finally {
         restore_error_handler();
         plugin_pop_current();
+    }
+}
+
+/**
+ * Halt with ERROR_ACCESS_DENIED unless the given user passes the
+ * view_event_threshold of the given event, read for that user and for the
+ * project of the event. Meant for the facades, whose error handler turns the
+ * error into an exception.
+ * @param int $p_event_id Event to check.
+ * @param int $p_user_id  User to check.
+ * @return void
+ * @access private
+ */
+function calendar_api_event_view_ensure( int $p_event_id, int $p_user_id ) : void {
+
+    $t_threshold = plugin_config_get( 'view_event_threshold', NULL, FALSE, $p_user_id, (int)event_get_field( $p_event_id, 'project_id' ) );
+
+    if( !access_has_event_level( $t_threshold, $p_event_id, $p_user_id ) ) {
+        trigger_error( ERROR_ACCESS_DENIED, ERROR );
     }
 }
 

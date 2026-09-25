@@ -234,7 +234,7 @@ echo '</tr>';
 echo '<tr>';
 echo '<th class="bug-reporter category">', plugin_lang_get( 'name_event' ), '</th>';
 echo '<td class="bug-reporter" >';
-echo $t_formatted_event_id . ": " . $t_event->name;
+echo $t_formatted_event_id . ": " . string_display_line( $t_event->name );
 echo '</td>';
 echo '</tr>';
 
@@ -317,7 +317,7 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                                     if( !in_array( $project_user['id'], $t_users ) && access_has_event_level( plugin_config_get( 'member_event_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
                                                         ?>
                                                         <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
-                                                            <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
+                                                            <option value="<?php echo (int)$project_user['id']; ?>"><?php echo string_display_line( $project_user['realname'] ); ?></option>
                                                             <?php
                                                         endif;
                                                     }
@@ -392,7 +392,7 @@ if( calendar_reminder_feature_enabled() ) {
                             $t_bug_summary = bug_get_field( $t_bug_id, "summary" );
                             $t_bug_project_id = bug_get_field($t_bug_id, 'project_id');
 
-                            echo "<li><a href=\"" . string_get_bug_view_url( $t_bug_id ) . "\" target=\"_self\" style=\"background-color:" . get_status_color( bug_get_field( $t_bug_id, "status" ) ) . ";\">" . "[" . project_get_name( $t_bug_project_id ) . "] " . $t_bug_id . ": " . $t_bug_summary . "</a></li>";
+                            echo "<li><a href=\"" . string_get_bug_view_url( $t_bug_id ) . "\" target=\"_self\" style=\"background-color:" . get_status_color( bug_get_field( $t_bug_id, "status" ) ) . ";\">" . "[" . string_display_line( project_get_name( $t_bug_project_id ) ) . "] " . $t_bug_id . ": " . string_display_line( $t_bug_summary ) . "</a></li>";
                         }
                     }
                     echo "</ul>";

@@ -55,12 +55,17 @@ if( $t_posted ) {
     $t_genuine = calendar_rsvp_token_valid( $f_event_id, $f_user_id, gpc_get_int( 'expires' ), gpc_get_string( 'token', '' ) );
 }
 
+# the thresholds are read for the project of the event; the project is not
+# made the current one before the event is known to be visible, since the
+# page header would name it
+$t_event_project_id = event_exists( $f_event_id ) ? (int)event_get_field( $f_event_id, 'project_id' ) : null;
+
 $t_valid = calendar_rsvp_user_enabled( $f_user_id )
         && $t_genuine
-        && event_exists( $f_event_id )
+        && $t_event_project_id !== null
         && user_exists( $f_user_id ) && user_is_enabled( $f_user_id )
         && user_is_member_event( $f_user_id, $f_event_id )
-        && access_has_event_level( plugin_config_get( 'view_event_threshold' ), $f_event_id, $f_user_id );
+        && access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $f_user_id, $t_event_project_id ), $f_event_id, $f_user_id );
 
 $t_own = $t_valid && $t_user_id == $f_user_id;
 
@@ -69,7 +74,9 @@ if( $t_valid ) {
     $g_project_override = (int)$t_event['project_id'];
     $t_event_url        = plugin_page( 'view' ) . '&event_id=' . $f_event_id . '&date=' . (int)$t_event['date_from'] . '#members';
 } else {
-    $t_event_url = event_exists( $f_event_id )
+    # nothing about an event the viewer may not see is disclosed, not even its time
+    $t_event_url = $t_event_project_id !== null
+            && access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $t_user_id, $t_event_project_id ), $f_event_id )
             ? plugin_page( 'view' ) . '&event_id=' . $f_event_id . '&date=' . (int)event_get_field( $f_event_id, 'date_from' )
             : plugin_page( 'calendar_user_page' );
 }

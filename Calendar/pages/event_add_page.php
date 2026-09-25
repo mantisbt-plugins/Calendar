@@ -316,7 +316,7 @@ $t_form_encoding   = '';
                                                         <select size="8" multiple name="user_ids[]">
                                                             <?php foreach( $t_project_users as $project_user ): ?>
                                                                 <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
-                                                                    <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
+                                                                    <option value="<?php echo (int)$project_user['id']; ?>"><?php echo string_display_line( $project_user['realname'] ); ?></option>
                                                                 <?php endif; ?>
                                                             <?php endforeach; ?>
                                                         </select>
@@ -429,11 +429,11 @@ $t_form_encoding   = '';
 							id="task_' . $bug_id . '"
 							value="' . $bug_id . '"
                                                         ' . $t_checked . '
-							data-title="' . $bug_name . '"
+							data-title="' . string_attribute( $bug_name ) . '"
 							data-options="{background-color:' . $bug_status_color . ';}"
 							>';
 
-                                            echo '<b>' . $bug_id . '</b>: ' . $bug_name;
+                                            echo '<b>' . $bug_id . '</b>: ' . string_display_line( $bug_name );
                                             echo '</label>';
                                             echo '</div>';
                                         }

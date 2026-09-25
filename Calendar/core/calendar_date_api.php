@@ -448,7 +448,8 @@ function get_days_object( $p_ar_all_days, $p_project_id, $p_user_id = ALL_USERS,
             if( isset( $t_events[$t_event_id] ) || in_array( $t_event_id, $p_excluded_events ) ) {
                 continue;
             }
-            if( access_has_event_level( plugin_config_get( 'view_event_threshold' ), $t_event_id ) != TRUE ) {
+            # read for the project of the event, the grid spans several
+            if( access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, null, (int)$t_row['project_id'] ), $t_event_id ) != TRUE ) {
                 continue;
             }
 

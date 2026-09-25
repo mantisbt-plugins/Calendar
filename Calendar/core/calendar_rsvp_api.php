@@ -493,7 +493,7 @@ function calendar_rsvp_pending_events( $p_user_id ) {
     $t_events = array();
     while( $t_row = db_fetch_array( $t_result ) ) {
 
-        if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), (int)$t_row['id'], $c_user_id ) ) {
+        if( !access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $c_user_id, (int)$t_row['project_id'] ), (int)$t_row['id'], $c_user_id ) ) {
             continue;
         }
 

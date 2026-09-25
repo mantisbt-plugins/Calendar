@@ -16,6 +16,10 @@
 
 form_security_validate( 'config' );
 
+auth_reauthenticate();
+
+access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
+
 $t_days_week_config = plugin_config_get( 'arWeekdaysName' );
 $f_days_week_cheked = gpc_get_string_array( 'days_week' );
 
@@ -90,7 +94,7 @@ if( !is_blank( $f_file['tmp_name'] ) ) {
     }
 }
 
-form_security_purge( plugin_page( 'config', true ) );
+form_security_purge( 'config' );
 
 $t_redirect_url = plugin_page( 'config_page', true );
 

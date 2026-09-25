@@ -41,7 +41,7 @@ if( gpc_isset( 'reply' ) ) {
 
     if( in_array( $f_status, calendar_rsvp_replies(), true ) && event_exists( $f_event_id )
             && user_is_member_event( $t_user_id, $f_event_id )
-            && access_has_event_level( plugin_config_get( 'view_event_threshold' ), $f_event_id, $t_user_id ) ) {
+            && access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $t_user_id, (int)event_get_field( $f_event_id, 'project_id' ) ), $f_event_id, $t_user_id ) ) {
 
         event_member_set_status( $f_event_id, $t_user_id, $f_status, $t_user_id );
 

@@ -19,6 +19,10 @@ $f_date     = gpc_get_int( 'date' );
 
 event_ensure_exists( $f_event_id );
 
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
 access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 $t_event_is_rerecurrences = event_is_recurrences( $f_event_id );
@@ -35,12 +39,6 @@ $t_event = event_get( $f_event_id );
 
 if( $t_event_is_rerecurrences ) {
     $t_event->date_from = $f_date;
-}
-
-if( $t_event->project_id != $t_current_project ) {
-    # in case the current project is not the same project of the bug we are viewing...
-    # ... override the current project. This to avoid problems with categories and handlers lists etc.
-    $g_project_override = $t_event->project_id;
 }
 
 $t_bugs_id = event_get_attached_bugs_id( $f_event_id );
@@ -99,7 +97,7 @@ layout_page_begin();
                                         <span class="required">*</span><label for="name_event"><?php echo plugin_lang_get( 'name_event' ); ?></label>
                                     </th>
                                     <td>
-                                        <input <?php echo helper_get_tab_index() ?> type="text" id="name_event" name="name_event" size="105" maxlength="128" value="<?php echo $t_event->name ?>"required autofocus/>
+                                        <input <?php echo helper_get_tab_index() ?> type="text" id="name_event" name="name_event" size="105" maxlength="128" value="<?php echo string_attribute( $t_event->name ) ?>" required autofocus/>
                                     </td>
                                 </tr>
 
@@ -353,11 +351,11 @@ layout_page_begin();
 							id="task_' . $bug_id . '"
 							value="' . $bug_id . '"
                                                         ' . $t_checked . '
-							data-title="' . $bug_name . '"
+							data-title="' . string_attribute( $bug_name ) . '"
 							data-options="{background-color:' . $bug_status_color . ';}"
 							>';
 
-                                                    echo '<b>' . $bug_id . '</b>: ' . $bug_name;
+                                                    echo '<b>' . $bug_id . '</b>: ' . string_display_line( $bug_name );
                                                     echo '</label>';
                                                     echo '</div>';
                                                 }

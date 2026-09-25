@@ -296,7 +296,9 @@ function calendar_notify_recipients( array $p_event, $p_action, $p_actor_id = nu
 
         # the author and the members have access implicitly, this only catches
         # users that were meanwhile removed from the project
-        if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), $t_event_id, $t_user_id ) ) {
+        # read for the recipient and the project of the event, so that the
+        # answer depends neither on the context of whoever acts nor on cron
+        if( !access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $t_user_id, (int)$p_event['project_id'] ), $t_event_id, $t_user_id ) ) {
             continue;
         }
 
@@ -612,7 +614,7 @@ function calendar_notify_member( $p_event_id, $p_user_id, $p_action, $p_actor_id
         return;
     }
 
-    if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), $p_event_id, $c_user_id ) ) {
+    if( !access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $c_user_id, (int)event_get_field( $p_event_id, 'project_id' ) ), $p_event_id, $c_user_id ) ) {
         return;
     }
 

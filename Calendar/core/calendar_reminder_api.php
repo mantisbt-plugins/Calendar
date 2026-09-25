@@ -810,7 +810,9 @@ function event_reminder_recipients( $p_event_id, $p_author_id ) {
 
         # the author and the members have access implicitly, this only catches
         # users that were meanwhile removed from the project
-        if( !access_has_event_level( plugin_config_get( 'view_event_threshold' ), $p_event_id, $t_user_id ) ) {
+        # read for the recipient and the project of the event: the dispatcher
+        # runs from cron and from the request of any user alike
+        if( !access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $t_user_id, (int)event_get_field( $p_event_id, 'project_id' ) ), $p_event_id, $t_user_id ) ) {
             continue;
         }
 

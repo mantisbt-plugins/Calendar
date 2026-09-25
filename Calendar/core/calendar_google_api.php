@@ -302,10 +302,12 @@ function string_get_google_description( $p_event_id ) {
         $t_description .= nl2br( string_html_specialchars( $t_event_description ) ) . '<br><br>';
     }
 
-    $t_bugs_id = event_get_attached_bugs_id( $p_event_id );
+    # the event lands in the Google calendar of its author, so only the issues
+    # the author may view are listed there
+    $t_bugs_id = event_bug_ids_filter_viewable( event_get_attached_bugs_id( $p_event_id ), (int)event_get_field( $p_event_id, 'author_id' ) );
 
     foreach( $t_bugs_id as $t_bug_id ) {
-        $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . bug_get_field( $t_bug_id, 'summary' ) . '</a><br><br>';
+        $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . string_html_specialchars( bug_get_field( $t_bug_id, 'summary' ) ) . '</a><br><br>';
     }
     return $t_description;
 }

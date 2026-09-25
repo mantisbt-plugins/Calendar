@@ -22,6 +22,10 @@ $f_from_bug_id   = gpc_get_int( 'from_bug_id', 0 );
 
 event_ensure_exists( $f_event_id );
 
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
 access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 if( event_is_recurrences( $f_event_id ) ) {

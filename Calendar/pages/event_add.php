@@ -16,11 +16,15 @@
 
 $f_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
 
-access_ensure_project_level( plugin_config_get( 'report_event_threshold' ), $f_project_id );
+# the threshold is read for the project the event is created in, which is
+# posted along with the form and need not be the current one
+access_ensure_project_level( plugin_config_get( 'report_event_threshold', null, false, null, $f_project_id ), $f_project_id );
 
 form_security_validate( 'event_add' );
 
-$f_bugs     = gpc_get_int_array( 'bugs_add', array() );
+# attaching an issue must not disclose one, so only the issues the user may
+# view are kept, the way the issue selector of the form lists them
+$f_bugs     = event_bug_ids_filter_viewable( gpc_get_int_array( 'bugs_add', array() ) );
 $f_from_bug = gpc_get_int( 'from_bug_id', 0 );
 
 if($f_from_bug != 0) {
@@ -70,17 +74,21 @@ switch( $f_selected_freq ) {
         $t_event_data->date_to = $t_period['date_to'];
 }
 
-$t_event_id = $t_event_data->create();
-
-if( count( $f_bugs ) > 0 ) {
-    event_attach_issue( $t_event_id, $f_bugs );
-}
-
 $f_owner_is_members = gpc_get_bool( 'owner_is_members' );
 $f_member_user_list = gpc_get_int_array( 'user_ids', array() );
 
 if( $f_owner_is_members || count( $f_member_user_list ) == 0 ) {
     $f_member_user_list[] = $t_event_data->author_id;
+}
+
+# the same member rules as calendar_api_event_create(), checked before the
+# event row is written so that a rejected request leaves no orphan behind
+event_members_ensure_eligible( $f_project_id, $t_event_data->author_id, $f_member_user_list );
+
+$t_event_id = $t_event_data->create();
+
+if( count( $f_bugs ) > 0 ) {
+    event_attach_issue( $t_event_id, $f_bugs );
 }
 
 foreach( $f_member_user_list as $t_member ) {

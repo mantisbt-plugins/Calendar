@@ -52,7 +52,7 @@ class EventArea {
         $t_name       = event_get_field( $this->event['id'], "name" );
         $t_time_label = calendar_event_time_label( $this->event['date_from'], $this->event['duration'] );
 
-        $t_text_area = $t_name . '</br>' . $t_time_label;
+        $t_text_area = string_display_line( $t_name ) . '</br>' . $t_time_label;
 
         # the project is told by the colour of the block (see the legend)
         # and named in the tooltip only

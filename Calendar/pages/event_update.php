@@ -23,7 +23,8 @@ $f_interval          = gpc_get_int( 'interval_value' );
 $t_event_timezone    = calendar_timezone_get( gpc_get_string( 'event_timezone', '' ) );
 $t_period            = calendar_event_form_period( $t_event_timezone );
 $f_until             = calendar_strtotime_in_timezone( gpc_get_string( 'date_ending_repetition', NULL ), $t_event_timezone );
-$f_bugs              = gpc_get_int_array( 'bugs_add', array( 0 ) );
+# only the issues the user may view are attached, see event_add.php
+$f_bugs              = event_bug_ids_filter_viewable( gpc_get_int_array( 'bugs_add', array() ) );
 
 # the rows survive the confirmation page of a recurring event, because
 # print_hidden_inputs() re-posts arrays as they were submitted
@@ -32,6 +33,10 @@ if( calendar_reminder_feature_enabled() ) {
 }
 
 event_ensure_exists( $f_event_id );
+
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
 
 access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
@@ -245,16 +250,19 @@ switch( $t_range ) {
             event_reminder_set_all( $t_event_child_data->id, $t_reminder_offsets );
         }
 
-        sort( $f_bugs );
-
         $t_current_bugs = event_get_attached_bugs_id( $t_event_child_data->id );
 
-        if( $f_bugs != $t_current_bugs ) {
-            
-            event_detach_issue( $t_event_child_data->id, array_diff( $t_current_bugs, $f_bugs ));
-            event_attach_issue( $t_event_child_data->id, array_diff( $f_bugs, $t_current_bugs ) );
+        # the form lists the issues the user may view, so an issue the user
+        # cannot see stays attached rather than being taken for unchecked
+        $t_bugs_detached = array_diff( event_bug_ids_filter_viewable( $t_current_bugs ), $f_bugs );
+        $t_bugs_attached = array_diff( $f_bugs, $t_current_bugs );
+        $t_bugs_changed  = count( $t_bugs_detached ) > 0 || count( $t_bugs_attached ) > 0;
+
+        if( $t_bugs_changed ) {
+            event_detach_issue( $t_event_child_data->id, $t_bugs_detached );
+            event_attach_issue( $t_event_child_data->id, $t_bugs_attached );
         }
-        if( $t_event_child_data != $t_event_parent_data || $f_bugs != $t_current_bugs ) {
+        if( $t_event_child_data != $t_event_parent_data || $t_bugs_changed ) {
             event_google_update( $t_event_child_data );
 
             # the row, the reminders and the issue links are all written now;
