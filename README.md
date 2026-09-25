@@ -93,14 +93,21 @@ Features
 - Event description (v. >= 3.0.0).
 - E-mail reminders about upcoming events: per-event reminders or personal defaults, with a per-user opt-out (v. >= 3.0.0).
 - E-mail notifications about created, changed and deleted events and about membership changes, with a per-project recipient matrix like the one of MantisBT itself (v. >= 3.0.0).
+- Replies to invitations: members answer whether they will take part on the event page or from a link in the mail, and a list in the calendar header shows the invitations awaiting a reply (v. >= 3.0.0).
+- Personal reminders: the author and every member can add or remove reminders of an event for themselves only (v. >= 3.0.0).
+- Export of an event as an iCalendar (.ics) file, from the event page and from the notification mails (v. >= 3.0.0).
+- Opening an event by its number from the calendar toolbar (v. >= 3.0.0).
+- Choice of where the calendar sits on the issue page: a row of the issue details, a block of its own, or per user (v. >= 3.0.0).
+- Manual check for a newer release on the settings page (v. >= 3.0.0).
 - Event history, with records written by other plugins shown next to the native ones (v. >= 3.0.0).
-- Public API for other plugins: create events from your own plugin, write to the history of an event, ask who would be notified and subscribe to calendar changes (v. >= 3.0.0).
+- Public API for other plugins: create events from your own plugin, write to the history of an event, ask who would be notified, record replies, manage the reminders of a user, get the .ics file of an event and subscribe to calendar changes (v. >= 3.0.0).
 - Telegram integration: creating and managing calendar events from Telegram and receiving Telegram notifications about created and changed events — with the [TelegramBot](https://github.com/mantisbt-plugins/TelegramBot) plugin 2.0 and newer (v. >= 3.0.0).
 
 Supported Versions
 ------------------
 - MantisBT 2.14 to 2.25.x - supported in release up to 2.6.x (fixes only)
 - MantisBT 2.26.0 and higher - supported in release 2.7.0 and higher
+- PHP 7.4 and higher
 
 Download
 --------
@@ -114,8 +121,8 @@ The instructions live in the [project wiki](https://github.com/mantisbt-plugins/
 
 - [Installation](https://github.com/mantisbt-plugins/Calendar/wiki/Installation) — requirements, installing and upgrading the plugin.
 - [Google Calendar Sync](https://github.com/mantisbt-plugins/Calendar/wiki/Google-Calendar-Sync) — enabling the one-way synchronization, step by step.
-- [Reminders and Notifications](https://github.com/mantisbt-plugins/Calendar/wiki/Reminders-and-Notifications) — e-mail reminders and notifications about changes (v. >= 3.0.0).
-- [Public API for other plugins](https://github.com/mantisbt-plugins/Calendar/wiki/Public-API-for-other-plugins) — creating events, writing event history and subscribing to calendar signals from your own plugin (v. >= 3.0.0).
+- [Reminders and Notifications](https://github.com/mantisbt-plugins/Calendar/wiki/Reminders-and-Notifications) — e-mail reminders, notifications about changes, replies to invitations and the .ics file (v. >= 3.0.0).
+- [Public API for other plugins](https://github.com/mantisbt-plugins/Calendar/wiki/Public-API-for-other-plugins) — creating events, writing event history, replies, reminders, the .ics file and calendar signals from your own plugin (v. >= 3.0.0).
 
 The upgrade notes of each version are part of its [release](https://github.com/mantisbt-plugins/Calendar/releases).
 
