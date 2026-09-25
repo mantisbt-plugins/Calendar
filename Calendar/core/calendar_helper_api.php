@@ -96,17 +96,21 @@ function calendar_rrule_datetime( $p_timestamp, ?DateTimeZone $p_timezone = NULL
 function calendar_rrule_end( \RRule\RRule $p_rrule ) {
     $t_until = $p_rrule->getRule()['UNTIL'] ?? NULL;
 
-    if( $t_until instanceof DateTimeInterface ) {
-        return DateTime::createFromInterface( $t_until );
+    if( !( $t_until instanceof DateTimeInterface ) ) {
+        if( !$p_rrule->isFinite() ) {
+            return NULL;
+        }
+
+        $t_occurrences = $p_rrule->getOccurrences();
+        if( count( $t_occurrences ) == 0 ) {
+            return NULL;
+        }
+
+        $t_until = end( $t_occurrences );
     }
 
-    if( !$p_rrule->isFinite() ) {
-        return NULL;
-    }
-
-    $t_occurrences = $p_rrule->getOccurrences();
-
-    return count( $t_occurrences ) > 0 ? DateTime::createFromInterface( end( $t_occurrences ) ) : NULL;
+    # the copy is built by hand, DateTime::createFromInterface() needs PHP 8
+    return calendar_rrule_datetime( $t_until->getTimestamp(), $t_until->getTimezone() );
 }
 
 /**
