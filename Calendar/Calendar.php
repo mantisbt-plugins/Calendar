@@ -795,11 +795,6 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     /**
-     * Fallback dispatcher for installations that do not run the core cron job.
-     * Throttled, silent and free of output, so that page loads stay unaffected.
-     * @return void
-     */
-    /**
      * Per-request work that has to happen before any output: remember the
      * time range chosen for the issue page block and dispatch web reminders.
      * @return void
@@ -809,6 +804,11 @@ class CalendarPlugin extends MantisPlugin {
         $this->process_reminders_web();
     }
 
+    /**
+     * Fallback dispatcher for installations that do not run the core cron job.
+     * Throttled, silent and free of output, so that page loads stay unaffected.
+     * @return void
+     */
     function process_reminders_web() {
 
         if( !calendar_reminder_feature_enabled() ) {

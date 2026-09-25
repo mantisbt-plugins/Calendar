@@ -1,5 +1,5 @@
 <?php
-# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
 # Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation,
@@ -30,8 +30,10 @@ array_walk( $t_revert_vars, 'trim' );
 
 if( '' != $f_revert ) {
 	# Confirm with the user
-	helper_ensure_confirmed( lang_get( 'config_delete_sure' ) . lang_get( 'word_separator' ) .
-		string_html_specialchars( implode( ', ', $t_revert_vars ) ) . lang_get( 'word_separator' ) . lang_get( 'in_project' ) . lang_get( 'word_separator' ) . project_get_name( $f_project_id ),
+	helper_ensure_confirmed(
+		sprintf( lang_get( 'config_delete_sure' ),
+			string_html_specialchars( implode( ', ', $t_revert_vars ) ),
+			string_attribute( project_get_name( $f_project_id ) ) ),
 		lang_get( 'delete_config_button' ) );
 
 	foreach ( $t_revert_vars as $t_revert ) {

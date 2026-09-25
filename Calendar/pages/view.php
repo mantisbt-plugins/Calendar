@@ -308,8 +308,8 @@ if( access_has_event_level( plugin_config_get( 'show_member_list_threshold' ), $
                                     <br /><br />
                                     <form method="post" action="<?php echo plugin_page( 'event_member_add' ) ?>" class="form-inline noprint">
                                         <?php echo form_security_field( 'event_member_add' ) ?>
-                                        <input type="hidden" name="event_id" value="<?php echo (integer) $f_event_id; ?>" />
-                                        <input type="hidden" name="date" value="<?php echo (integer) $t_event->date_from; ?>" />
+                                        <input type="hidden" name="event_id" value="<?php echo (int) $f_event_id; ?>" />
+                                        <input type="hidden" name="date" value="<?php echo (int) $t_event->date_from; ?>" />
                                         <?php if( is_array( $t_project_users ) && count( $t_project_users ) > 0 ): ?>			
                                             <select size="8" multiple name="user_ids[]">
                                                 <?php foreach( $t_project_users as $project_user ): ?>
