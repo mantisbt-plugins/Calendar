@@ -19,7 +19,9 @@ Plugins -> Calendar):
   (author, members, the acting user) that can be overridden per project, like
   the e-mail notification settings of MantisBT itself, and every user can turn
   off each kind of notification on the same "My Account" tab. The user who made
-  the change never gets a mail about it.
+  the change never gets a mail about it. A mail that names another member —
+  added, removed, or replying to an invitation — goes only to users allowed to
+  see the member list of the event (`show_member_list_threshold`).
 - **Replies to invitations** let the members say whether they will take part
   (see below).
 

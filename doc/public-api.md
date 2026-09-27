@@ -77,7 +77,9 @@ returns the user ids the calendar itself would notify about the given action —
 one of `created`, `updated`, `deleted`, `member_added`, `member_removed`,
 `rsvp` —
 after the recipient matrix, the personal settings and the access checks have
-been applied. Use it to deliver the same notification through your own channel;
+been applied; for `member_added`, `member_removed` and `rsvp`, which name a
+member, only users who pass `show_member_list_threshold` of the event's project
+are returned. Use it to deliver the same notification through your own channel;
 the master switch of the calendar mails is deliberately not consulted.
 
 `calendar_api_event_members( $p_event_id )` returns the user ids of the
