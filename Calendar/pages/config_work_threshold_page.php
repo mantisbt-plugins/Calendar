@@ -1,18 +1,17 @@
 <?php
-# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
-# 
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 auth_reauthenticate();
@@ -220,6 +219,7 @@ get_section_begin_mcwt( plugin_lang_get( 'all_event' ) );
 get_capability_row( plugin_lang_get( 'config_view_event_threshold' ), 'view_event_threshold' );
 get_capability_row( plugin_lang_get( 'config_report_event_threshold' ), 'report_event_threshold' );
 get_capability_row( plugin_lang_get( 'config_update_event_threshold' ), 'update_event_threshold' );
+get_capability_row( plugin_lang_get( 'config_view_event_history_threshold' ), 'view_event_history_threshold' );
 get_capability_row( plugin_lang_get( 'config_show_member_list_threshold' ), 'show_member_list_threshold' );
 get_capability_row( plugin_lang_get( 'config_member_event_threshold' ), 'member_event_threshold' );
 get_capability_row( plugin_lang_get( 'config_member_add_others_event_threshold' ), 'member_add_others_event_threshold' );

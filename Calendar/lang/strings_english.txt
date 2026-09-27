@@ -1,17 +1,17 @@
 <?php
-# Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 $s_plugin_Calendar_name_plugin_description_page = 'Calendar of Events';
@@ -40,11 +40,12 @@ $s_plugin_Calendar_this_and_future_event = 'This and following events';
 $s_plugin_Calendar_all_event = 'All events';
 
 $s_plugin_Calendar_repeat_to = "to";
-$s_plugin_Calendar_not_repeat = "Not";
+$s_plugin_Calendar_not_repeat = "No";
 
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
 $s_plugin_Calendar_config_time_day_range = 'The beginning and end of working hours range (User settings override the default settings)';
+$s_plugin_Calendar_config_time_format_12h = '12-hour time format, 1:30 PM instead of 13:30 (by default as in the MantisBT date format)';
 $s_plugin_Calendar_config_step_day_minutes_count = 'Number of intervals per hour';
 $s_plugin_Calendar_config_start_step_days = 'Shift in days relative to the selected week';
 $s_plugin_Calendar_config_count_step_days = 'Number of days to display';
@@ -65,9 +66,11 @@ $s_plugin_Calendar_config_google_api_file = 'JSON File with credentials for acce
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>Get access to the Google API Calendar</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
 %1$s';
+$s_plugin_Calendar_config_google_title = 'Google Calendar sync';
 $s_plugin_Calendar_config_page_google_api_settings = 'Current JSON file with credentials for access to google api';
 $s_plugin_Calendar_config_page_google_client_id = 'Current client id';
 
+$s_plugin_Calendar_user_config_view_title = 'Calendar view';
 $s_plugin_Calendar_user_config_enable_google_calendar = 'The status of one-way synchronization with Google Calendar';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = 'Enable sync with Google Calendar';
 $s_plugin_Calendar_user_config_google_calendar_list = 'Select a calendar...';
@@ -75,23 +78,45 @@ $s_plugin_Calendar_config_user_google_access_denie = 'The server denied the requ
 
 $s_plugin_Calendar_menu_main_front = 'Calendar';
 $s_plugin_Calendar_name_event = 'Event Name';
+$s_plugin_Calendar_description_event = 'Description';
 $s_plugin_Calendar_date_event = 'Date of the event';
 $s_plugin_Calendar_event = 'Calendar Event';
 $s_plugin_Calendar_members = 'Event Members';
 $s_plugin_Calendar_owner_is_members = 'A member of the event?';
 $s_plugin_Calendar_add_user_to_member = 'Make user a member of the event';
 $s_plugin_Calendar_select_all_users = 'All users';
+$s_plugin_Calendar_select_author_is_me = 'I am the author';
+$s_plugin_Calendar_select_pending_reply = 'Awaiting my reply';
 $s_plugin_Calendar_filter_text = 'Filter by:';
 
 $s_plugin_Calendar_event_hystory_bug_detach = 'Removed from event';
 $s_plugin_Calendar_event_hystory_create = 'Added to the event';
+
+$s_plugin_Calendar_event_history = 'Event History';
+$s_plugin_Calendar_config_view_event_history_threshold = 'View event history';
+$s_plugin_Calendar_event_history_created = 'Event created';
+$s_plugin_Calendar_event_history_created_from_series = 'Created from recurring event %1$s';
+$s_plugin_Calendar_event_history_occurrence_deleted = 'Occurrence deleted';
+$s_plugin_Calendar_event_history_member_added = 'Member added';
+$s_plugin_Calendar_event_history_member_removed = 'Member removed';
+$s_plugin_Calendar_event_history_bug_attached = 'Issue attached';
+$s_plugin_Calendar_event_history_bug_detached = 'Issue detached';
+$s_plugin_Calendar_event_history_reminder_added = 'Reminder added';
+$s_plugin_Calendar_event_history_reminder_removed = 'Reminder removed';
+$s_plugin_Calendar_event_history_reminder_sent = 'Reminder sent';
+$s_plugin_Calendar_event_history_reminder_sent_many = 'Reminder sent to %1$d recipients';
+$s_plugin_Calendar_event_history_plugin = '%1$s (plugin)';
+$s_plugin_Calendar_event_duration = 'Duration';
+$s_plugin_Calendar_event_recurrence = 'Recurrence rule';
+$s_plugin_Calendar_event_activity = 'Activity';
+$s_plugin_Calendar_event_parent = 'Parent event';
+
 $s_plugin_Calendar_add_new_event = 'Add new event';
 $s_plugin_Calendar_enter_report_details_title = 'Enter Event Data';
 $s_plugin_Calendar_insert_event = 'Add to an event';
 $s_plugin_Calendar_delete_event_sure_msg = 'Are you sure you want to delete this event?';
 $s_plugin_Calendar_delete_event_button = 'Delete';
 $s_plugin_Calendar_not_update = 'Not updated';
-$s_plugin_Calendar_last_update = 'Updated';
 $s_plugin_Calendar_author = 'Author';
 $s_plugin_Calendar_updater = 'Updated';
 $s_plugin_Calendar_in = 'in';
@@ -111,7 +136,7 @@ $s_plugin_Calendar_update_successful_button = 'Event changed';
 $s_plugin_Calendar_save_button = 'Save';
 $s_plugin_Calendar_close_button = 'Close';
 
-$s_plugin_Calendar_week = 'Current week';
+$s_plugin_Calendar_week = 'Week';
 $s_plugin_Calendar_day = 'Day';
 $s_plugin_Calendar_next_period = 'Next';
 $s_plugin_Calendar_current_period = 'Current period';
@@ -119,8 +144,14 @@ $s_plugin_Calendar_previous_period = 'Back';
 $s_plugin_Calendar_goto_date_button = 'Go to date:';
 
 $s_plugin_Calendar_assigned_event = 'Assigned Events';
+$s_plugin_Calendar_assigned_event_count = 'Assigned Events - %d pcs.';
+$s_plugin_Calendar_issue_block_settings = 'Calendar block settings';
+$s_plugin_Calendar_switch_time_range = 'Switch the time range';
 $s_plugin_Calendar_not_assigned_event = 'No events assigned';
 $s_plugin_Calendar_event_view_title = 'Event Viewer';
+$s_plugin_Calendar_event_ics_button = 'Download .ics';
+$s_plugin_Calendar_event_ics_page_title = 'Calendar file';
+$s_plugin_Calendar_event_ics_page_hint = 'Download the file and import it into the calendar of your choice; import a newer file to update the copy.';
 $s_plugin_Calendar_id = 'Number';
 $s_plugin_Calendar_last_update = 'Date edited';
 $s_plugin_Calendar_view_event_google_last_sync = 'Synced with google';
@@ -129,6 +160,8 @@ $s_plugin_Calendar_event_relationships_bugs = 'Related tasks';
 $s_plugin_Calendar_date_from = 'Event start date';
 $s_plugin_Calendar_date_to = 'Event end date';
 $s_plugin_Calendar_out_of_range = 'events out of range';
+$s_plugin_Calendar_out_of_range_above = 'events earlier';
+$s_plugin_Calendar_out_of_range_below = 'events later';
 
 $s_plugin_Calendar_view_submitted_event_link = 'View the created event %1$s';
 
@@ -139,5 +172,269 @@ $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = 'Event %1$d was not found.';
 $s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = 'EVENT SHOULD BE ONE MEMBER';
 $s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = 'EVENT #%1$s DOES NOT EXIST IN THE SPECIFIED PERIOD.';
+$s_plugin_Calendar_ERROR_REMINDER_INVALID = 'THE REMINDERS ARE NOT SET CORRECTLY.';
 $s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Required dependencies are missing in Calendar/api/vendor/';
 $s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = 'If you downloaded the development version, then run composer install to download the dependencies. Otherwise, download the Calendar-vX_X_X.zip file from https://github.com/mantisbt-plugins/Calendar/releases';
+$s_plugin_Calendar_recurrence_migration_confirm_msg = 'The upgrade will re-anchor the recurrence rules of %1$d event(s) to the timezones of their authors (daylight saving time fix).';
+$s_plugin_Calendar_recurrence_migration_confirm_button = 'Upgrade';
+$s_plugin_Calendar_recurrence_migration_timezone_col = 'Timezone';
+$s_plugin_Calendar_recurrence_migration_backup_warning = 'Back up the database before upgrading!';
+$s_plugin_Calendar_recurrence_migration_backup_checkbox = 'I have backed up the database';
+$s_plugin_Calendar_event_timezone = 'Timezone';
+$s_plugin_Calendar_recurrence_migration_column_msg = 'The upgrade will also add the timezone column to the events table to store the timezone of each event.';
+$s_plugin_Calendar_recurrence_migration_timezones_warning = 'Before upgrading, make sure the timezones in the profiles of the event authors are up to date (see the table below). Recurrence rules will be anchored to the current timezone of each author: if it is wrong, the events will recur by the wrong timezone, and the only way to fix them afterwards is to re-save each event.';
+$s_plugin_Calendar_recurrence_migration_timezones_checkbox = 'User timezones are up to date';
+$s_plugin_Calendar_view_event_timezone_created = 'Created in timezone %1$s';
+
+$s_plugin_Calendar_month_view = 'Month';
+$s_plugin_Calendar_more_events = '%d more events';
+$s_plugin_Calendar_hours_short = 'h';
+$s_plugin_Calendar_days_short = 'd';
+$s_plugin_Calendar_month_view_enter_event_name = 'Please enter the event name';
+$s_plugin_Calendar_month_view_enter_event_time = 'Please specify the start and end time of the event';
+
+$s_plugin_Calendar_events_for_date = 'Events for %s';
+
+$s_plugin_Calendar_week_view = 'Week';
+$s_plugin_Calendar_view_selector = 'Calendar View';
+
+$s_plugin_Calendar_january = 'January';
+$s_plugin_Calendar_february = 'February';
+$s_plugin_Calendar_march = 'March';
+$s_plugin_Calendar_april = 'April';
+$s_plugin_Calendar_may = 'May';
+$s_plugin_Calendar_june = 'June';
+$s_plugin_Calendar_july = 'July';
+$s_plugin_Calendar_august = 'August';
+$s_plugin_Calendar_september = 'September';
+$s_plugin_Calendar_october = 'October';
+$s_plugin_Calendar_november = 'November';
+$s_plugin_Calendar_december = 'December';
+
+$s_plugin_Calendar_month = 'Month';
+
+$s_plugin_Calendar_config_reminders_feature_enabled = 'Remind about upcoming events';
+$s_plugin_Calendar_reminder_warning_cron_never = 'The core cron job (scripts/cronjob.php) has never run: reminders are only processed when someone opens a MantisBT page, so how timely they are depends on the activity of the users. Schedule %1$s to run every minute: a reminder goes out on the first run after its moment, so the interval of the cron job is the delay of the reminder; see %2$s.';
+$s_plugin_Calendar_reminder_warning_cron_stale = 'The core cron job (scripts/cronjob.php) has not run since %1$s: reminders are currently processed on page loads only. Check the schedule of %2$s, it should run every minute; see %3$s.';
+$s_plugin_Calendar_reminder_cron_ok = 'The core cron job is running, last run %1$s. A reminder goes out on the first run after its moment, so the job should run every minute.';
+$s_plugin_Calendar_reminder_cron_doc_link = 'the MantisBT administration guide, section $g_email_send_using_cronjob';
+$s_plugin_Calendar_reminder_notice_send_emails_cron = 'Sending mail through a cron job is switched on, so the reminder mail is delivered by scripts/send_emails.php as well.';
+
+$s_plugin_Calendar_reminders_title = 'Reminders';
+$s_plugin_Calendar_reminders_account_tab = 'Event calendar';
+$s_plugin_Calendar_reminder_add_row = 'Add a reminder';
+$s_plugin_Calendar_reminder_remove_row = 'Remove the reminder';
+$s_plugin_Calendar_reminder_unit_minutes = 'minutes before';
+$s_plugin_Calendar_reminder_unit_hours = 'hours before';
+$s_plugin_Calendar_reminder_unit_days = 'days before';
+$s_plugin_Calendar_reminder_offset_minutes = '%1$d min';
+$s_plugin_Calendar_reminder_offset_hours = '%1$d h';
+$s_plugin_Calendar_reminder_offset_days = '%1$d d';
+$s_plugin_Calendar_reminder_disable_label = 'Do not remind about this event';
+$s_plugin_Calendar_reminder_offset_disabled = 'no reminders';
+$s_plugin_Calendar_reminder_offset_at_start = 'at the start';
+$s_plugin_Calendar_reminder_offset_after_start = '%1$s after the start';
+$s_plugin_Calendar_reminder_hint_defaults = 'Without reminders of its own, the event uses the default reminders of every participant.';
+$s_plugin_Calendar_view_event_reminders_defaults = 'Default reminders of every participant';
+$s_plugin_Calendar_reminders_source_event = 'Reminders of the event';
+$s_plugin_Calendar_reminders_source_event_for_you = 'Your reminders: those of the event';
+$s_plugin_Calendar_reminders_source_personal = 'Your reminders for this event';
+$s_plugin_Calendar_reminders_source_defaults = 'Your default reminders';
+$s_plugin_Calendar_reminders_event_set = 'Reminders of the event: %1$s';
+$s_plugin_Calendar_reminders_reset = 'Back to the reminders of the event';
+$s_plugin_Calendar_reminder_remove_for_me = 'Remove this reminder for me';
+$s_plugin_Calendar_reminders_personal_hint = 'Changes here apply to you only; the reminders of the event stay as its author set them.';
+$s_plugin_Calendar_reminders_opted_out = 'You have switched reminders off in your account settings, so none of these are sent to you.';
+$s_plugin_Calendar_reminders_pref_enabled = 'Receive reminders about events';
+$s_plugin_Calendar_reminders_pref_default = 'Default reminders';
+$s_plugin_Calendar_reminders_pref_hint = 'These reminders are used for the events that do not define their own ones.';
+$s_plugin_Calendar_reminders_pref_no_reply = 'Remind about events I have not replied to';
+$s_plugin_Calendar_reminders_pref_no_reply_hint = 'Without it, an event you have neither accepted nor declined reminds you only if you set reminders of your own for it on its page. Events you declined never remind you.';
+$s_plugin_Calendar_reminders_held_no_reply = 'Not sent until you reply to the invitation. Reply, add a reminder of your own below, or turn on reminders about events without a reply in your account settings.';
+$s_plugin_Calendar_reminders_held_declined = 'Not sent: you declined this event.';
+$s_plugin_Calendar_reminder_email_subject = 'Reminder: %1$s';
+$s_plugin_Calendar_reminder_email_body = 'The calendar event starts in %4$s.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%5$s';
+$s_plugin_Calendar_reminder_email_body_started = 'The calendar event has started.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%5$s';
+
+$s_plugin_Calendar_config_notifications_feature_enabled = 'Notify about the changes of events';
+
+$s_plugin_Calendar_config_bug_calendar_block_position = 'Calendar on the issue view page';
+$s_plugin_Calendar_config_bug_calendar_block_details = 'A row of the issue details';
+$s_plugin_Calendar_config_bug_calendar_block_extra = 'A block of its own below the notes';
+$s_plugin_Calendar_config_bug_calendar_block_user_choice = 'Every user chooses';
+$s_plugin_Calendar_user_config_bug_calendar_block_separate = 'Show the calendar as a block of its own below the notes';
+
+$s_plugin_Calendar_notifications_title = 'Notifications';
+$s_plugin_Calendar_notify_pref_created = 'Receive mail about new events';
+$s_plugin_Calendar_notify_pref_updated = 'Receive mail about changed events';
+$s_plugin_Calendar_notify_pref_deleted = 'Receive mail about cancelled events';
+$s_plugin_Calendar_notify_pref_hint = 'Mail is sent about the events you take part in. Your own changes are never mailed back to you.';
+
+$s_plugin_Calendar_notify_created_email_subject = 'New event: %1$s';
+$s_plugin_Calendar_notify_created_email_body = 'New calendar event.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s
+
+%6$s';
+$s_plugin_Calendar_notify_updated_email_subject = 'Event changed: %1$s';
+$s_plugin_Calendar_notify_updated_email_body = 'The calendar event has been changed.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s
+
+%6$s';
+$s_plugin_Calendar_notify_deleted_email_subject = 'Event cancelled: %1$s';
+$s_plugin_Calendar_notify_deleted_email_body = 'The calendar event has been cancelled.
+
+Event: %1$s
+Project: %2$s
+Was starting: %3$s';
+$s_plugin_Calendar_notify_occurrence_cancelled_email_subject = 'Occurrence cancelled: %1$s';
+$s_plugin_Calendar_notify_occurrence_cancelled_email_body = 'One occurrence of the event has been cancelled, the rest of the series is unchanged.
+
+Event: %1$s
+Project: %2$s
+Cancelled occurrence: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s';
+$s_plugin_Calendar_notify_from_date_cancelled_email_subject = 'Occurrences cancelled: %1$s';
+$s_plugin_Calendar_notify_from_date_cancelled_email_body = 'The event has been cancelled from the given date on, the earlier occurrences are unchanged.
+
+Event: %1$s
+Project: %2$s
+Cancelled from: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s';
+$s_plugin_Calendar_notify_member_added_email_subject = 'Added to the event: %1$s';
+$s_plugin_Calendar_notify_member_added_email_body = 'You have been added to an event.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s
+
+%6$s';
+$s_plugin_Calendar_notify_member_removed_email_subject = 'Removed from the event: %1$s';
+$s_plugin_Calendar_notify_member_removed_email_body = 'You have been removed from an event.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s';
+
+$s_plugin_Calendar_config_update_check = 'Plugin updates';
+$s_plugin_Calendar_update_check_button = 'Check for updates';
+$s_plugin_Calendar_update_check_installed = 'Installed version: %s';
+$s_plugin_Calendar_update_check_available = 'Version %1$s is available (released %2$s).';
+$s_plugin_Calendar_update_check_up_to_date = 'The installed version is the latest.';
+$s_plugin_Calendar_update_check_failed = 'The check failed: %s';
+$s_plugin_Calendar_update_check_checked_at = 'Last checked: %s';
+
+$s_plugin_Calendar_notify_config_title = 'Notification recipients';
+$s_plugin_Calendar_notify_config_link = 'Choose who is notified about which action';
+$s_plugin_Calendar_notify_config_feature_disabled = 'Notifications about the changes of events are switched off, so nothing is sent yet. The recipients can be chosen here all the same, and they apply as soon as the feature is switched on.';
+$s_plugin_Calendar_notify_config_hint = 'The personal settings of a recipient and the access level required to view an event apply on top of this table: a user who has switched the mails off, or who may not see the event, is never written to.';
+$s_plugin_Calendar_notify_config_action_column = 'Action on the event';
+$s_plugin_Calendar_notify_config_recipients_column = 'Recipients of the mail';
+$s_plugin_Calendar_notify_config_row_created = 'Event created';
+$s_plugin_Calendar_notify_config_row_updated = 'Event changed';
+$s_plugin_Calendar_notify_config_row_deleted = 'Event cancelled';
+$s_plugin_Calendar_notify_config_row_member_added = 'Member added to the event';
+$s_plugin_Calendar_notify_config_row_member_removed = 'Member removed from the event';
+$s_plugin_Calendar_notify_config_target_author = 'Author of the event';
+$s_plugin_Calendar_notify_config_target_members = 'Members of the event';
+$s_plugin_Calendar_notify_config_target_actor = 'User who acts';
+$s_plugin_Calendar_notify_config_save_button = 'Save';
+$s_plugin_Calendar_notify_config_revert_to_global = 'Revert to the global values';
+$s_plugin_Calendar_notify_config_revert_to_default = 'Revert to the built-in values';
+
+$s_plugin_Calendar_notify_member_added_others_email_subject = 'Member added: %1$s';
+$s_plugin_Calendar_notify_member_added_others_email_body = '%7$s has been added to an event you take part in.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s';
+$s_plugin_Calendar_notify_member_removed_others_email_subject = 'Member removed: %1$s';
+$s_plugin_Calendar_notify_member_removed_others_email_body = '%7$s no longer takes part in an event you take part in.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s
+
+Calendar file (.ics): %5$s';
+
+$s_plugin_Calendar_config_rsvp_feature_enabled = 'Members reply whether they will take part';
+$s_plugin_Calendar_config_rsvp_feature_hint = 'Switches on the replies of the members: the reply buttons of the event page, the reply link in the mails and in the .ics file, the mail to the author about a reply, the list of the invitations awaiting a reply with its button and filter, and the faded look of the events without a reply.';
+$s_plugin_Calendar_config_rsvp_mode_off = 'Off';
+$s_plugin_Calendar_config_rsvp_mode_on = 'On for everybody';
+$s_plugin_Calendar_config_rsvp_mode_user_choice = 'Every user chooses';
+$s_plugin_Calendar_rsvp_pref_title = 'Invitations to events';
+$s_plugin_Calendar_rsvp_pref_enabled = 'Reply to invitations';
+$s_plugin_Calendar_rsvp_pref_hint = 'The reply buttons and links, the list of the invitations awaiting your reply with its button and filter, the faded look of those invitations and the mails about the replies of others. Without them your reminders are not held back until you reply.';
+$s_plugin_Calendar_rsvp_status_none = 'No reply';
+$s_plugin_Calendar_rsvp_status_accepted = 'Will take part';
+$s_plugin_Calendar_rsvp_status_tentative = 'Maybe';
+$s_plugin_Calendar_rsvp_status_declined = 'Will not take part';
+$s_plugin_Calendar_rsvp_reply_accepted = 'Yes';
+$s_plugin_Calendar_rsvp_reply_tentative = 'Maybe';
+$s_plugin_Calendar_rsvp_reply_declined = 'No';
+$s_plugin_Calendar_rsvp_your_reply = 'Will you take part?';
+$s_plugin_Calendar_rsvp_replies = 'Replies';
+$s_plugin_Calendar_rsvp_summary = 'yes: %1$d, maybe: %2$d, no: %3$d, no reply: %4$d';
+$s_plugin_Calendar_rsvp_recorded = 'Your reply to the event "%1$s" has been recorded: %2$s.';
+$s_plugin_Calendar_rsvp_link_invalid = 'This link does not work any more: it has expired, or you no longer take part in the event.';
+$s_plugin_Calendar_rsvp_link_other_account = 'This link was sent to %1$s: log in under that account to reply.';
+$s_plugin_Calendar_rsvp_page_invitation_title = 'Invitation to an event';
+$s_plugin_Calendar_rsvp_page_series_hint = 'The event repeats; the reply is given for all of its occurrences.';
+$s_plugin_Calendar_rsvp_page_calendar_title = 'Your events on these days';
+$s_plugin_Calendar_rsvp_pending_title = 'Awaiting your reply';
+$s_plugin_Calendar_event_jump = 'Event #';
+$s_plugin_Calendar_rsvp_pending_empty = 'No invitation is waiting for your reply.';
+$s_plugin_Calendar_rsvp_open_event = 'Open the event';
+$s_plugin_Calendar_event_history_rsvp = 'Reply of %1$s';
+$s_plugin_Calendar_event_history_rsvp_reset = 'Replies dropped, the time of the event has changed';
+$s_plugin_Calendar_notify_config_row_rsvp = 'Member replied whether they will take part';
+$s_plugin_Calendar_notify_rsvp_links = 'Will you take part? Reply here: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_subject = 'Reply to the event: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_body = '%7$s replied to the event: %8$s.
+
+Event: %1$s
+Project: %2$s
+Starts: %3$s
+
+%4$s';

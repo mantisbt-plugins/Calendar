@@ -1,18 +1,31 @@
 <?php
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation,
+# either version 2 of the License, or (at your option) any later version.
+#
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Calendar plugin for MantisBT.
+# If not, see <http://www.gnu.org/licenses/>.
 
 abstract class ColumnForm {
     const HEIGHT_MULTIPLIER = 3;
     const HOUR              = 3600;
     const DAY_MIN_TIME      = 0;
     const DAY_MAX_TIME      = 86400;
+    const HEADER_HEIGHT     = 38;
+    const OUT_OF_RANGE_ROW_HEIGHT = 20;
+    const BAND_HEIGHT       = 22;
 
-    protected $title_text    = '';
-    protected $last_row_text = '';
+    protected $title_text     = '';
+    protected $first_row_text = '';
+    protected $last_row_text  = '';
     public static $time_period_list   = array();
     public static $intervals_per_hour = 0;
     public static $is_initialized    = false;
@@ -20,6 +33,9 @@ abstract class ColumnForm {
     public static $min_segment_time_in_hour;
     public static $ratio_height;
     public static $total_days_counter;
+    # rows of multi-day bands between the day title and the hours, the same
+    # in every column so that the hour rows stay aligned; set by WeekCalendar
+    public static $band_lanes = 0;
 
     function __construct() {
         if( !self::$is_initialized ) {
@@ -54,11 +70,37 @@ abstract class ColumnForm {
         return '';
     }
 
+    protected function html_hour_li_attr( $p_time ) {
+        return '';
+    }
+
+    /**
+     * Height of the band area, what the hour rows are pushed down by
+     */
+    public static function bands_height() {
+        return self::$band_lanes * self::BAND_HEIGHT;
+    }
+
+    /**
+     * The title cell of the column; HEADER_HEIGHT pixels high in every column
+     */
+    protected function html_header() {
+        return '<ul class="column-header-day"><span>' . $this->title_text . '</span></ul>';
+    }
+
     final public function html() {
         $t_result = '';
 
         $t_result .= $this->html_column_param();
-        $t_result .= '<ul class="column-header-day"><span>' . $this->title_text . '</span></ul>';
+        $t_result .= $this->html_header();
+
+        if( self::$band_lanes > 0 ) {
+            $t_result .= '<div class="event-bands" style="height: ' . self::bands_height() . 'px"></div>';
+        }
+
+        $t_result .= "<ul class=\"hour first-row\" id=\"area_hour_top\">";
+        $t_result .= "<li>" . $this->first_row_text . "</li>";
+        $t_result .= "</ul>";
 
         $t_result .= $this->html_body();
 
@@ -73,7 +115,7 @@ abstract class ColumnForm {
                 break;
             }
 
-            $t_result .= "<li>";
+            $t_result .= "<li" . $this->html_hour_li_attr( $t_time ) . ">";
             $t_result .= $this->html_hour_text( $t_time );
             $t_result .= "</li>";
 

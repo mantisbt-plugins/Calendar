@@ -8,12 +8,13 @@
         }
     ],
     "require": {
-        "google/apiclient": "* 2.14.0",
-        "rlanvin/php-rrule": "v1.6.1"
+        "google/apiclient": "^2.14",
+        "rlanvin/php-rrule": "v3.0.0"
     },
     "replace": {
         "guzzlehttp/guzzle": "*",
-        "guzzlehttp/psr7": "*"
+        "guzzlehttp/psr7": "*",
+        "psr/http-message": "*"
     },
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
@@ -24,6 +25,9 @@
         ]
     },
     "config": {
-        "vendor-dir": "Calendar/api/vendor"
+        "vendor-dir": "Calendar/api/vendor",
+        "platform": {
+            "php": "7.4.0"
+        }
     }
 }

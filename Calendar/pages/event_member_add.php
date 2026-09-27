@@ -1,18 +1,17 @@
 <?php
-
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 form_security_validate( 'event_member_add' );
@@ -23,9 +22,35 @@ $f_date      = gpc_get_int( 'date' );
 
 event_ensure_exists( $f_event_id );
 
+# the thresholds are read for the project of the event, the way the event
+# page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
+$t_actor_id = auth_get_current_user_id();
+
+access_ensure_event_level( plugin_config_get( 'view_event_threshold' ), $f_event_id );
+
 foreach( $f_usernames as $t_user_id ) {
-    access_ensure_event_level(plugin_config_get( 'member_event_threshold' ), $f_event_id, $t_user_id );
+    # joining an event is a right of its own, signing somebody else up another
+    if( $t_user_id == $t_actor_id ) {
+        access_ensure_event_level( plugin_config_get( 'member_event_threshold' ), $f_event_id );
+    } else {
+        access_ensure_event_level( plugin_config_get( 'member_add_others_event_threshold' ), $f_event_id );
+    }
+
+    access_ensure_event_level( plugin_config_get( 'member_event_threshold' ), $f_event_id, $t_user_id );
+
+    # a user who is a member already is told nothing, the request is a no-op
+    # for them - and nothing is signalled about them either
+    $t_member_is_new = !user_is_member_event( $t_user_id, $f_event_id );
+
     event_member_add( $f_event_id, $t_user_id );
+
+    if( $t_member_is_new ) {
+        calendar_notify_member_added( $f_event_id, $t_user_id, $t_actor_id );
+
+        event_signal( 'EVENT_CALENDAR_EVENT_MEMBER_ADDED', array( $f_event_id, (int)$t_user_id, $t_actor_id ) );
+    }
 }
 
 event_google_update( event_get( $f_event_id ) );

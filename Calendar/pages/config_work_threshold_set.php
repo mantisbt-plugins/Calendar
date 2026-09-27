@@ -1,18 +1,17 @@
 <?php
-# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
-# 
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -22,6 +21,9 @@
 form_security_validate( 'config_work_threshold_set' );
 
 auth_reauthenticate();
+
+# the same gate as config_work_threshold_page.php, which issues the token
+access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
 
 $t_redirect_url = plugin_page( 'config_work_threshold_page', TRUE );
 
@@ -39,9 +41,12 @@ $g_project = helper_get_current_project();
  * @return void
  */
 function set_capability_row( $p_threshold, $p_all_projects_only = false ) {
-	global $g_project;
+	global $g_access, $g_project;
 
-	if( ALL_PROJECTS == $g_project  || !$p_all_projects_only  ) {
+	# like the core manage_config_work_threshold_set.php: a row is only stored
+	# by a user who reaches the access level the option itself requires
+	if( ( $g_access >= config_get_access( 'plugin_' . plugin_get_current() . '_' . $p_threshold ) )
+			&& ( ALL_PROJECTS == $g_project || !$p_all_projects_only ) ) {
 		$f_threshold = gpc_get_int_array( 'flag_thres_' . $p_threshold, array() );
 		# @@debug @@ echo "<br />for $p_threshold "; var_dump($f_threshold, $f_access); echo '<br />';
 		$t_access_levels = MantisEnum::getAssocArrayIndexedByValues( config_get( 'access_levels_enum_string' ) );
@@ -81,6 +86,7 @@ function set_capability_row( $p_threshold, $p_all_projects_only = false ) {
 set_capability_row( 'view_event_threshold' );
 set_capability_row( 'report_event_threshold' );
 set_capability_row( 'update_event_threshold' );
+set_capability_row( 'view_event_history_threshold' );
 set_capability_row( 'show_member_list_threshold' );
 set_capability_row( 'member_event_threshold' );
 set_capability_row( 'member_add_others_event_threshold' );

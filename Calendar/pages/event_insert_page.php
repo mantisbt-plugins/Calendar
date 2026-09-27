@@ -1,17 +1,17 @@
 <?php
 # Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 auth_ensure_user_authenticated();
@@ -48,7 +48,7 @@ $t_current_year = date( "o" );
 $f_week        = gpc_get_int( "week", $t_current_week );
 $f_year        = gpc_get_int( "year", $t_current_year );
 $f_is_fulltime = gpc_get_bool( "full_time" );
-$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
+$f_for_user    = calendar_for_user_get();
 
 if( strtotime( $f_year . 'W' . str_pad( $f_week, 2, 0, STR_PAD_LEFT ) ) == false ) {
     error_parameters( plugin_lang_get( 'date_event' ) );

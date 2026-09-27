@@ -1,21 +1,21 @@
 <?php
-# Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 $s_plugin_Calendar_name_plugin_description_page = '事件日历';
-$s_plugin_Calendar_description = 'Adds the task scheduling function in MantisBT based on the calendar of events with the possibility of one-way synchronization with Google Calendar';
+$s_plugin_Calendar_description = '为 MantisBT 添加基于事件日历的任务计划功能，并支持与 Google 日历单向同步';
 
 $s_plugin_Calendar_Mon = '周一';
 $s_plugin_Calendar_Tue = '周二';
@@ -45,6 +45,7 @@ $s_plugin_Calendar_not_repeat = "无需重复";
 $s_plugin_Calendar_config_title = '设置';
 $s_plugin_Calendar_config_days_week_display = '设置一周需显示的天数 (用户设置将覆盖默认设置)';
 $s_plugin_Calendar_config_time_day_range = '设置工作开始与结束时间 (用户设置将覆盖默认设置)';
+$s_plugin_Calendar_config_time_format_12h = '12 小时制时间格式，1:30 PM 而非 13:30 (默认与 MantisBT 日期格式一致)';
 $s_plugin_Calendar_config_step_day_minutes_count = '每小时的间隔数';
 $s_plugin_Calendar_config_start_step_days = '相对于所选周的天数变化';
 $s_plugin_Calendar_config_count_step_days = '显示的天数';
@@ -65,9 +66,11 @@ $s_plugin_Calendar_config_google_api_file = '用于访问google api凭证的JSON
 (<a href=https://console.developers.google.com/projectselector/apis/library/calendar-json.googleapis.com/?supportedpurview=project target=_blank>获取Google 日历的API</a>)<br>
 In the settings in the "Permitted URI redirection" you will need to specify the following URL:<br>
 %1$s';
+$s_plugin_Calendar_config_google_title = 'Google 日历同步';
 $s_plugin_Calendar_config_page_google_api_settings = '当前用于连接google api的JSON文件';
 $s_plugin_Calendar_config_page_google_client_id = '当前客户端ID';
 
+$s_plugin_Calendar_user_config_view_title = '日历视图';
 $s_plugin_Calendar_user_config_enable_google_calendar = '与Google日历同步的状态';
 $s_plugin_Calendar_user_config_enable_google_calendar_button = '启用Google日历同步功能';
 $s_plugin_Calendar_user_config_google_calendar_list = '选择一个日历...';
@@ -75,31 +78,53 @@ $s_plugin_Calendar_config_user_google_access_denie = '服务器拒绝此请求. 
 
 $s_plugin_Calendar_menu_main_front = '日历';
 $s_plugin_Calendar_name_event = '事件名称';
+$s_plugin_Calendar_description_event = '描述';
 $s_plugin_Calendar_date_event = '创建日期';
 $s_plugin_Calendar_event = '事件日历';
 $s_plugin_Calendar_members = '事件成员';
 $s_plugin_Calendar_owner_is_members = '是否为此事件成员?';
 $s_plugin_Calendar_add_user_to_member = '添加该成员到事件中';
 $s_plugin_Calendar_select_all_users = '所有成员';
+$s_plugin_Calendar_select_author_is_me = '我是创建者';
+$s_plugin_Calendar_select_pending_reply = '等待我的回复';
 $s_plugin_Calendar_filter_text = '筛选方式:';
 
 $s_plugin_Calendar_event_hystory_bug_detach = '从事件中删除';
 $s_plugin_Calendar_event_hystory_create = '加入此事件中';
+
+$s_plugin_Calendar_event_history = '事件历史';
+$s_plugin_Calendar_config_view_event_history_threshold = '查看事件历史';
+$s_plugin_Calendar_event_history_created = '事件已创建';
+$s_plugin_Calendar_event_history_created_from_series = '从重复事件 %1$s 创建';
+$s_plugin_Calendar_event_history_occurrence_deleted = '已删除一次重复';
+$s_plugin_Calendar_event_history_member_added = '成员已添加';
+$s_plugin_Calendar_event_history_member_removed = '成员已移除';
+$s_plugin_Calendar_event_history_bug_attached = '任务已关联';
+$s_plugin_Calendar_event_history_bug_detached = '任务已取消关联';
+$s_plugin_Calendar_event_history_reminder_added = '提醒已添加';
+$s_plugin_Calendar_event_history_reminder_removed = '提醒已移除';
+$s_plugin_Calendar_event_history_reminder_sent = '提醒已发送';
+$s_plugin_Calendar_event_history_reminder_sent_many = '提醒已发送给 %1$d 位收件人';
+$s_plugin_Calendar_event_history_plugin = '%1$s（插件）';
+$s_plugin_Calendar_event_duration = '持续时间';
+$s_plugin_Calendar_event_recurrence = '重复规则';
+$s_plugin_Calendar_event_activity = '活动';
+$s_plugin_Calendar_event_parent = '父事件';
+
 $s_plugin_Calendar_add_new_event = '添加新事件';
 $s_plugin_Calendar_enter_report_details_title = '填写事件资料';
 $s_plugin_Calendar_insert_event = '添加到活动';
 $s_plugin_Calendar_delete_event_sure_msg = '是否确认删除此事件?';
 $s_plugin_Calendar_delete_event_button = '删除';
 $s_plugin_Calendar_not_update = '未更新';
-$s_plugin_Calendar_last_update = '已更新';
 $s_plugin_Calendar_author = '创建者';
 $s_plugin_Calendar_updater = '已更新';
-$s_plugin_Calendar_in = 'in';
+$s_plugin_Calendar_in = '在';
 $s_plugin_Calendar_from_time = '开始时间';
 $s_plugin_Calendar_to_time = '结束时间';
 $s_plugin_Calendar_time_event = '时间';
 $s_plugin_Calendar_pointer_to_calendar_key = '使用此按钮选择日期';
-$s_plugin_Calendar_quantity = 'pcs';
+$s_plugin_Calendar_quantity = '个';
 $s_plugin_Calendar_selected = '选中';
 $s_plugin_Calendar_add_button = '添加';
 $s_plugin_Calendar_cancel_button = '取消';
@@ -111,7 +136,7 @@ $s_plugin_Calendar_update_successful_button = '事件已变更';
 $s_plugin_Calendar_save_button = '保存';
 $s_plugin_Calendar_close_button = '关闭';
 
-$s_plugin_Calendar_week = '本周';
+$s_plugin_Calendar_week = '周';
 $s_plugin_Calendar_day = '天';
 $s_plugin_Calendar_next_period = '前进';
 $s_plugin_Calendar_current_period = '本期';
@@ -119,8 +144,14 @@ $s_plugin_Calendar_previous_period = '后退';
 $s_plugin_Calendar_goto_date_button = '转到日期:';
 
 $s_plugin_Calendar_assigned_event = '已分配事件';
+$s_plugin_Calendar_assigned_event_count = '已分配的事件 - %d 个';
+$s_plugin_Calendar_issue_block_settings = '日历区块设置';
+$s_plugin_Calendar_switch_time_range = '切换时间范围';
 $s_plugin_Calendar_not_assigned_event = '未分配事件';
 $s_plugin_Calendar_event_view_title = '事件查看';
+$s_plugin_Calendar_event_ics_button = '下载 .ics';
+$s_plugin_Calendar_event_ics_page_title = '日历文件';
+$s_plugin_Calendar_event_ics_page_hint = '下载文件并导入到您使用的日历中；导入较新的文件即可更新副本。';
 $s_plugin_Calendar_id = '序号';
 $s_plugin_Calendar_last_update = '编辑时间';
 $s_plugin_Calendar_view_event_google_last_sync = '与Google同步';
@@ -129,15 +160,281 @@ $s_plugin_Calendar_event_relationships_bugs = '关联任务';
 $s_plugin_Calendar_date_from = '事件开始时间';
 $s_plugin_Calendar_date_to = '事件结束时间';
 $s_plugin_Calendar_out_of_range = '超出范围的事件';
+$s_plugin_Calendar_out_of_range_above = '个更早的事件';
+$s_plugin_Calendar_out_of_range_below = '个更晚的事件';
 
 $s_plugin_Calendar_view_submitted_event_link = '查看已创建事件 %1$s';
 
 $s_plugin_Calendar_column_view_issue_page_title = '日历中的事件数';
 
-$s_plugin_Calendar_ERROR_DATE = 'The date/time of the beginning of the event must not be equal to or greater than the end date of the event.';
+$s_plugin_Calendar_ERROR_DATE = '事件的开始日期/时间不得等于或晚于事件的结束日期。';
 $s_plugin_Calendar_ERROR_EVENT_NOT_FOUND = '无法找到事件 %1$d .';
-$s_plugin_Calendar_ERROR_RANGE_TIME = 'TIME BEGINNING / ENDING A WORKING RANGE IS NOT ASSIGNED RIGHTLY.';
+$s_plugin_Calendar_ERROR_RANGE_TIME = '工作时间范围的开始/结束时间设置不正确。';
 $s_plugin_Calendar_ERROR_MIN_MEMBERS = '事件至少需要一位成员';
-$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = '事件 ＃％1$s 在指定期间内不存在。';
+$s_plugin_Calendar_ERROR_EVENT_TIME_PERIOD_NOT_FOUND = '事件 #%1$s 在指定期间内不存在。';
+$s_plugin_Calendar_ERROR_REMINDER_INVALID = '提醒设置不正确。';
 $s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_DESCRIPTION = 'Calendar/api/vendor/ 中缺少必需的依赖项';
 $s_plugin_Calendar_ERROR_PLUGIN_DEPENDENCY_INSTALL_STATUS_MESSAGE = '如果您下载的是开发版本，请运行 composer install 以下载依赖项。否则，请从 https://github.com/mantisbt-plugins/Calendar/releases 下载 Calendar-vX_X_X.zip 文件';
+$s_plugin_Calendar_recurrence_migration_confirm_msg = '升级将把 %1$d 个事件的重复规则重新锚定到其作者的时区（夏令时修复）。';
+$s_plugin_Calendar_recurrence_migration_confirm_button = '升级';
+$s_plugin_Calendar_recurrence_migration_timezone_col = '时区';
+$s_plugin_Calendar_recurrence_migration_backup_warning = '升级前请务必备份数据库！';
+$s_plugin_Calendar_recurrence_migration_backup_checkbox = '我已备份数据库';
+$s_plugin_Calendar_event_timezone = '时区';
+$s_plugin_Calendar_recurrence_migration_column_msg = '升级还将在事件表中添加 timezone 列，用于存储每个事件的时区。';
+$s_plugin_Calendar_recurrence_migration_timezones_warning = '升级前请确认事件作者个人资料中的时区已是最新（见下表）。重复规则将锚定到每位作者当前的时区：如果时区不正确，事件将按错误的时区重复，之后只能通过重新保存每个事件来修正。';
+$s_plugin_Calendar_recurrence_migration_timezones_checkbox = '用户时区已是最新';
+$s_plugin_Calendar_view_event_timezone_created = '创建时区为 %1$s';
+
+$s_plugin_Calendar_month_view = '月视图';
+$s_plugin_Calendar_more_events = '还有 %d 个事件';
+$s_plugin_Calendar_hours_short = '小时';
+$s_plugin_Calendar_days_short = '天';
+$s_plugin_Calendar_month_view_enter_event_name = '请输入事件名称';
+$s_plugin_Calendar_month_view_enter_event_time = '请指定事件的开始和结束时间';
+
+$s_plugin_Calendar_events_for_date = '%s的事件';
+
+$s_plugin_Calendar_week_view = '周视图';
+$s_plugin_Calendar_view_selector = '日历视图';
+
+$s_plugin_Calendar_january = '一月';
+$s_plugin_Calendar_february = '二月';
+$s_plugin_Calendar_march = '三月';
+$s_plugin_Calendar_april = '四月';
+$s_plugin_Calendar_may = '五月';
+$s_plugin_Calendar_june = '六月';
+$s_plugin_Calendar_july = '七月';
+$s_plugin_Calendar_august = '八月';
+$s_plugin_Calendar_september = '九月';
+$s_plugin_Calendar_october = '十月';
+$s_plugin_Calendar_november = '十一月';
+$s_plugin_Calendar_december = '十二月';
+
+$s_plugin_Calendar_month = '月';
+
+$s_plugin_Calendar_config_reminders_feature_enabled = '提醒即将开始的事件';
+$s_plugin_Calendar_reminder_warning_cron_never = '核心计划任务 (scripts/cronjob.php) 从未运行：提醒仅在有人打开 MantisBT 页面时处理，其及时性取决于用户的活跃程度。请设置 %1$s 每分钟运行一次：提醒在其时刻之后的首次运行时发出，因此计划任务的间隔就是提醒的延迟；参见 %2$s。';
+$s_plugin_Calendar_reminder_warning_cron_stale = '核心计划任务 (scripts/cronjob.php) 自 %1$s 起未运行：目前提醒仅在页面加载时处理。请检查 %2$s 的计划，应每分钟运行一次；参见 %3$s。';
+$s_plugin_Calendar_reminder_cron_ok = '核心计划任务正在运行，上次运行 %1$s。提醒在其时刻之后的首次运行时发出，因此计划任务应每分钟运行一次。';
+$s_plugin_Calendar_reminder_cron_doc_link = 'MantisBT 管理指南中的 $g_email_send_using_cronjob 一节';
+$s_plugin_Calendar_reminder_notice_send_emails_cron = '已启用通过计划任务发送邮件，因此提醒邮件同样由 scripts/send_emails.php 发送。';
+
+$s_plugin_Calendar_reminders_title = '提醒';
+$s_plugin_Calendar_reminders_account_tab = '事件日历';
+$s_plugin_Calendar_reminder_add_row = '添加提醒';
+$s_plugin_Calendar_reminder_remove_row = '移除提醒';
+$s_plugin_Calendar_reminder_unit_minutes = '分钟前';
+$s_plugin_Calendar_reminder_unit_hours = '小时前';
+$s_plugin_Calendar_reminder_unit_days = '天前';
+$s_plugin_Calendar_reminder_offset_minutes = '%1$d 分钟';
+$s_plugin_Calendar_reminder_offset_hours = '%1$d 小时';
+$s_plugin_Calendar_reminder_offset_days = '%1$d 天';
+$s_plugin_Calendar_reminder_disable_label = '不提醒此事件';
+$s_plugin_Calendar_reminder_offset_disabled = '无提醒';
+$s_plugin_Calendar_reminder_offset_at_start = '开始时';
+$s_plugin_Calendar_reminder_offset_after_start = '开始后 %1$s';
+$s_plugin_Calendar_reminder_hint_defaults = '如果事件没有自己的提醒，则使用每位参与者的默认提醒。';
+$s_plugin_Calendar_view_event_reminders_defaults = '每位参与者的默认提醒';
+$s_plugin_Calendar_reminders_source_event = '事件的提醒';
+$s_plugin_Calendar_reminders_source_event_for_you = '您的提醒：沿用事件的提醒';
+$s_plugin_Calendar_reminders_source_personal = '您对此事件的提醒';
+$s_plugin_Calendar_reminders_source_defaults = '您的默认提醒';
+$s_plugin_Calendar_reminders_event_set = '事件的提醒：%1$s';
+$s_plugin_Calendar_reminders_reset = '恢复为事件的提醒';
+$s_plugin_Calendar_reminder_remove_for_me = '仅为我移除此提醒';
+$s_plugin_Calendar_reminders_personal_hint = '此处的更改仅对您生效；事件本身的提醒仍保持作者的设置。';
+$s_plugin_Calendar_reminders_opted_out = '您已在账户设置中关闭提醒，因此这些提醒都不会发送给您。';
+$s_plugin_Calendar_reminders_pref_enabled = '接收事件提醒';
+$s_plugin_Calendar_reminders_pref_default = '默认提醒';
+$s_plugin_Calendar_reminders_pref_hint = '这些提醒用于未设置自己提醒的事件。';
+$s_plugin_Calendar_reminders_pref_no_reply = '提醒我尚未回复的事件';
+$s_plugin_Calendar_reminders_pref_no_reply_hint = '关闭此项时，您既未接受也未拒绝的事件，只有在您于其页面上为其设置了自己的提醒时才会提醒您。您已拒绝的事件从不提醒。';
+$s_plugin_Calendar_reminders_held_no_reply = '在您回复邀请之前不会发送。请回复、在下方添加您自己的提醒，或在账户设置中开启对未回复事件的提醒。';
+$s_plugin_Calendar_reminders_held_declined = '不发送：您已拒绝此事件。';
+$s_plugin_Calendar_reminder_email_subject = '提醒：%1$s';
+$s_plugin_Calendar_reminder_email_body = '日历事件将在 %4$s 后开始。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%5$s';
+$s_plugin_Calendar_reminder_email_body_started = '日历事件已经开始。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%5$s';
+
+$s_plugin_Calendar_config_notifications_feature_enabled = '通知事件的变更';
+
+$s_plugin_Calendar_config_bug_calendar_block_position = '问题页面上的日历';
+$s_plugin_Calendar_config_bug_calendar_block_details = '问题详情中的一行';
+$s_plugin_Calendar_config_bug_calendar_block_extra = '注释下方的独立区块';
+$s_plugin_Calendar_config_bug_calendar_block_user_choice = '由用户自行选择';
+$s_plugin_Calendar_user_config_bug_calendar_block_separate = '将日历显示为注释下方的独立区块';
+
+$s_plugin_Calendar_notifications_title = '通知';
+$s_plugin_Calendar_notify_pref_created = '接收关于新事件的邮件';
+$s_plugin_Calendar_notify_pref_updated = '接收关于事件变更的邮件';
+$s_plugin_Calendar_notify_pref_deleted = '接收关于事件取消的邮件';
+$s_plugin_Calendar_notify_pref_hint = '仅发送您参与的事件的邮件。您本人所做的变更不会向您发送邮件。';
+
+$s_plugin_Calendar_notify_created_email_subject = '新事件: %1$s';
+$s_plugin_Calendar_notify_created_email_body = '新的日历事件。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s
+
+%6$s';
+$s_plugin_Calendar_notify_updated_email_subject = '事件已变更: %1$s';
+$s_plugin_Calendar_notify_updated_email_body = '日历事件已变更。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s
+
+%6$s';
+$s_plugin_Calendar_notify_deleted_email_subject = '事件已取消: %1$s';
+$s_plugin_Calendar_notify_deleted_email_body = '日历事件已取消。
+
+事件: %1$s
+项目: %2$s
+原开始时间: %3$s';
+$s_plugin_Calendar_notify_occurrence_cancelled_email_subject = '重复项已取消: %1$s';
+$s_plugin_Calendar_notify_occurrence_cancelled_email_body = '事件的一次重复已取消，系列中的其余重复不变。
+
+事件: %1$s
+项目: %2$s
+已取消的重复: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s';
+$s_plugin_Calendar_notify_from_date_cancelled_email_subject = '多个重复项已取消: %1$s';
+$s_plugin_Calendar_notify_from_date_cancelled_email_body = '事件自指定日期起已取消，此前的重复不变。
+
+事件: %1$s
+项目: %2$s
+取消起始日期: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s';
+$s_plugin_Calendar_notify_member_added_email_subject = '已加入事件: %1$s';
+$s_plugin_Calendar_notify_member_added_email_body = '您已被加入一个事件。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s
+
+%6$s';
+$s_plugin_Calendar_notify_member_removed_email_subject = '已从事件中移除: %1$s';
+$s_plugin_Calendar_notify_member_removed_email_body = '您已从一个事件中被移除。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s';
+
+$s_plugin_Calendar_config_update_check = '插件更新';
+$s_plugin_Calendar_update_check_button = '检查更新';
+$s_plugin_Calendar_update_check_installed = '已安装版本：%s';
+$s_plugin_Calendar_update_check_available = '有新版本 %1$s（发布于 %2$s）。';
+$s_plugin_Calendar_update_check_up_to_date = '已安装的版本是最新的。';
+$s_plugin_Calendar_update_check_failed = '检查失败：%s';
+$s_plugin_Calendar_update_check_checked_at = '上次检查：%s';
+
+$s_plugin_Calendar_notify_config_title = '通知接收人';
+$s_plugin_Calendar_notify_config_link = '设置每种操作通知哪些人';
+$s_plugin_Calendar_notify_config_feature_disabled = '事件变更通知已关闭，目前不会发送任何邮件。您仍可在此选择接收人，一旦启用该功能即刻生效。';
+$s_plugin_Calendar_notify_config_hint = '本表之上还会应用接收人的个人设置以及查看事件所需的访问级别：已关闭邮件或无权查看该事件的用户不会收到邮件。';
+$s_plugin_Calendar_notify_config_action_column = '对事件的操作';
+$s_plugin_Calendar_notify_config_recipients_column = '邮件接收人';
+$s_plugin_Calendar_notify_config_row_created = '事件已创建';
+$s_plugin_Calendar_notify_config_row_updated = '事件已变更';
+$s_plugin_Calendar_notify_config_row_deleted = '事件已取消';
+$s_plugin_Calendar_notify_config_row_member_added = '事件中加入了参与者';
+$s_plugin_Calendar_notify_config_row_member_removed = '事件中移除了参与者';
+$s_plugin_Calendar_notify_config_target_author = '事件创建者';
+$s_plugin_Calendar_notify_config_target_members = '事件参与者';
+$s_plugin_Calendar_notify_config_target_actor = '执行操作的用户';
+$s_plugin_Calendar_notify_config_save_button = '保存';
+$s_plugin_Calendar_notify_config_revert_to_global = '恢复为全局设置';
+$s_plugin_Calendar_notify_config_revert_to_default = '恢复为默认设置';
+
+$s_plugin_Calendar_notify_member_added_others_email_subject = '已加入参与者: %1$s';
+$s_plugin_Calendar_notify_member_added_others_email_body = '%7$s 已被加入您参与的事件。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s';
+$s_plugin_Calendar_notify_member_removed_others_email_subject = '已移除参与者: %1$s';
+$s_plugin_Calendar_notify_member_removed_others_email_body = '%7$s 已不再参与您参与的事件。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s
+
+日历文件 (.ics)：%5$s';
+
+$s_plugin_Calendar_config_rsvp_feature_enabled = '参与者答复是否参加';
+$s_plugin_Calendar_config_rsvp_feature_hint = '启用参与者回复：事件页面上的回复按钮、邮件和 .ics 文件中的回复链接、给作者的回复通知邮件、等待回复的邀请列表及其按钮和筛选，以及未回复事件的半透明显示。';
+$s_plugin_Calendar_config_rsvp_mode_off = '关闭';
+$s_plugin_Calendar_config_rsvp_mode_on = '对所有人开启';
+$s_plugin_Calendar_config_rsvp_mode_user_choice = '由用户选择';
+$s_plugin_Calendar_rsvp_pref_title = '事件邀请';
+$s_plugin_Calendar_rsvp_pref_enabled = '回复邀请';
+$s_plugin_Calendar_rsvp_pref_hint = '回复按钮和链接、等待您回复的邀请列表及其按钮和筛选、这些邀请的半透明显示，以及其他参与者回复的邮件。关闭后，您的提醒不会在回复前被暂缓。';
+$s_plugin_Calendar_rsvp_status_none = '未答复';
+$s_plugin_Calendar_rsvp_status_accepted = '将参加';
+$s_plugin_Calendar_rsvp_status_tentative = '可能';
+$s_plugin_Calendar_rsvp_status_declined = '不参加';
+$s_plugin_Calendar_rsvp_reply_accepted = '是';
+$s_plugin_Calendar_rsvp_reply_tentative = '可能';
+$s_plugin_Calendar_rsvp_reply_declined = '否';
+$s_plugin_Calendar_rsvp_your_reply = '您会参加吗？';
+$s_plugin_Calendar_rsvp_replies = '答复';
+$s_plugin_Calendar_rsvp_summary = '是: %1$d，可能: %2$d，否: %3$d，未答复: %4$d';
+$s_plugin_Calendar_rsvp_recorded = '您对事件“%1$s”的答复已记录: %2$s。';
+$s_plugin_Calendar_rsvp_link_invalid = '此链接已失效: 已过期，或您已不再参与该事件。';
+$s_plugin_Calendar_rsvp_link_other_account = '此链接发送给了 %1$s：请使用该账户登录后再回复。';
+$s_plugin_Calendar_rsvp_page_invitation_title = '事件邀请';
+$s_plugin_Calendar_rsvp_page_series_hint = '该事件会重复；回复适用于其所有重复。';
+$s_plugin_Calendar_rsvp_page_calendar_title = '您在这些天的事件';
+$s_plugin_Calendar_rsvp_pending_title = '等待您的回复';
+$s_plugin_Calendar_event_jump = '事件 #';
+$s_plugin_Calendar_rsvp_pending_empty = '没有等待您回复的邀请。';
+$s_plugin_Calendar_rsvp_open_event = '打开事件';
+$s_plugin_Calendar_event_history_rsvp = '%1$s 的答复';
+$s_plugin_Calendar_event_history_rsvp_reset = '答复已清除，事件时间已变更';
+$s_plugin_Calendar_notify_config_row_rsvp = '参与者答复了是否参加';
+$s_plugin_Calendar_notify_rsvp_links = '您会参加吗？在此回复：%1$s';
+$s_plugin_Calendar_notify_rsvp_email_subject = '事件答复: %1$s';
+$s_plugin_Calendar_notify_rsvp_email_body = '%7$s 答复了事件: %8$s。
+
+事件: %1$s
+项目: %2$s
+开始时间: %3$s
+
+%4$s';

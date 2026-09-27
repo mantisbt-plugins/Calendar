@@ -1,17 +1,17 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 auth_reauthenticate();
@@ -95,9 +95,152 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_reminders_feature_enabled' ) ?>
+
+                                    </td>
+
+                                    <td colspan="3" width="50%">
+                                        <?php
+                                        $t_reminders_feature_enabled = plugin_config_get( 'reminders_feature_enabled' ) == ON;
+
+                                        echo '<label><input type="checkbox" name="reminders_feature_enabled" value="1"'
+                                                . ( $t_reminders_feature_enabled ? ' checked="checked"' : '' ) . '></input></label>';
+
+                                        # how timely a reminder is depends entirely on the core cron job,
+                                        # so its state is reported right where the feature is switched on
+                                        if( $t_reminders_feature_enabled ) {
+
+                                            $t_reminder_last_cron_run = (int)plugin_config_get( 'reminder_last_cron_run' );
+
+                                            # the command of this very installation is spelled out next to the
+                                            # documentation link, so that scheduling it needs no path guessing
+                                            $t_reminder_cron_command = '<code>php ' . string_display_line( config_get_global( 'absolute_path' ) ) . 'scripts/cronjob.php</code>';
+                                            $t_reminder_cron_doc     = '<a href="https://mantisbt.org/docs/master/en-US/Admin_Guide/html-desktop/#admin.config.email" target="_blank" rel="noopener">'
+                                                    . plugin_lang_get( 'reminder_cron_doc_link' ) . '</a>';
+
+                                            if( $t_reminder_last_cron_run == 0 ) {
+                                                echo '<div class="alert alert-warning">' . sprintf( plugin_lang_get( 'reminder_warning_cron_never' ), $t_reminder_cron_command, $t_reminder_cron_doc ) . '</div>';
+                                            } else {
+                                                $t_reminder_last_cron_run_text = date( config_get( 'normal_date_format' ), $t_reminder_last_cron_run );
+
+                                                if( time() - $t_reminder_last_cron_run > 3600 ) {
+                                                    echo '<div class="alert alert-warning">' . sprintf( plugin_lang_get( 'reminder_warning_cron_stale' ), $t_reminder_last_cron_run_text, $t_reminder_cron_command, $t_reminder_cron_doc ) . '</div>';
+                                                } else {
+                                                    echo '<div class="alert alert-success">' . sprintf( plugin_lang_get( 'reminder_cron_ok' ), $t_reminder_last_cron_run_text ) . '</div>';
+                                                }
+                                            }
+
+                                            if( config_get( 'email_send_using_cronjob' ) == ON ) {
+                                                echo '<div class="alert alert-info">' . plugin_lang_get( 'reminder_notice_send_emails_cron' ) . '</div>';
+                                            }
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_notifications_feature_enabled' ) ?>
+
+                                    </td>
+
+                                    <td colspan="3" width="50%">
+                                        <?php
+                                        echo '<label><input type="checkbox" name="notifications_feature_enabled" value="1"'
+                                                . ( plugin_config_get( 'notifications_feature_enabled' ) == ON ? ' checked="checked"' : '' ) . '></input></label>';
+
+                                        # who is mailed about what is a matrix of its own, and it can be
+                                        # filled in before the feature is switched on
+                                        echo '<div class="space-4"></div>';
+                                        echo '<a href="' . plugin_page( 'notify_config_page' ) . '">'
+                                                . plugin_lang_get( 'notify_config_link' ) . '</a>';
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_rsvp_feature_enabled' ) ?>
+                                        <br /><span class="small"><?php echo plugin_lang_get( 'config_rsvp_feature_hint' ) ?></span>
+
+                                    </td>
+
+                                    <td colspan="3" width="50%">
+                                        <?php
+                                        $t_rsvp_mode = calendar_rsvp_mode();
+
+                                        $t_rsvp_mode_options = array(
+                                            CALENDAR_RSVP_MODE_OFF         => 'config_rsvp_mode_off',
+                                            CALENDAR_RSVP_MODE_ON          => 'config_rsvp_mode_on',
+                                            CALENDAR_RSVP_MODE_USER_CHOICE => 'config_rsvp_mode_user_choice',
+                                        );
+
+                                        echo '<select name="rsvp_mode" class="input-sm">';
+                                        foreach( $t_rsvp_mode_options as $t_value => $t_lang_key ) {
+                                            echo '<option value="' . $t_value . '"' . ( $t_value == $t_rsvp_mode ? ' selected="selected"' : '' ) . '>'
+                                                    . plugin_lang_get( $t_lang_key ) . '</option>';
+                                        }
+                                        echo '</select>';
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category" width="50%">
+                                        <?php echo plugin_lang_get( 'config_bug_calendar_block_position' ) ?>
+
+                                    </td>
+
+                                    <td colspan="3" width="50%">
+                                        <?php
+                                        $t_bug_calendar_block_position = (int)plugin_config_get( 'bug_calendar_block_position' );
+
+                                        $t_bug_calendar_block_options = array(
+                                            CALENDAR_BUG_BLOCK_DETAILS     => 'config_bug_calendar_block_details',
+                                            CALENDAR_BUG_BLOCK_EXTRA       => 'config_bug_calendar_block_extra',
+                                            CALENDAR_BUG_BLOCK_USER_CHOICE => 'config_bug_calendar_block_user_choice',
+                                        );
+
+                                        echo '<select name="bug_calendar_block_position" class="input-sm">';
+                                        foreach( $t_bug_calendar_block_options as $t_value => $t_lang_key ) {
+                                            echo '<option value="' . $t_value . '"' . ( $t_value == $t_bug_calendar_block_position ? ' selected="selected"' : '' ) . '>'
+                                                    . plugin_lang_get( $t_lang_key ) . '</option>';
+                                        }
+                                        echo '</select>';
+                                        ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-10"></div>
+
+            <div class="widget-box widget-color-blue2">
+                <div class="widget-header widget-header-small">
+                    <h4 class="widget-title lighter">
+                        <i class="ace-icon fa fa-google"></i>
+                        <?php echo plugin_lang_get( 'config_google_title' ) ?>
+                    </h4>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main no-padding">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-condensed table-hover">
+                                <colgroup>
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                </colgroup>
+
                                 <?php
                                 $t_google_client_id = json_decode( plugin_config_get( 'google_client_secret' ), TRUE );
-                                if( $t_google_client_id['web']['client_id'] ) {
+                                if( is_array( $t_google_client_id ) && !empty( $t_google_client_id['web']['client_id'] ) ) {
                                     ?>
 
                                     <tr>
@@ -139,19 +282,70 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td class="center" colspan="3">
-                                        <input type="submit" class="button" value="<?php echo lang_get( 'change_configuration' ) ?>" />
-                                    </td>
-                                </tr>
-
                             </table>
-                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="space-10"></div>
+
+            <div class="center">
+                <input type="submit" class="btn btn-primary btn-white btn-round" value="<?php echo lang_get( 'change_configuration' ) ?>" />
+            </div>
         </form>
+
+        <div class="space-10"></div>
+
+        <?php
+        # the check is not a setting, so it lives outside the settings form
+        # and its link carries its own security token
+        $t_update = calendar_update_result_get();
+        ?>
+        <div id="update_check" class="widget-box widget-color-blue2">
+            <div class="widget-header widget-header-small">
+                <h4 class="widget-title lighter">
+                    <i class="ace-icon fa fa-refresh"></i>
+                    <?php echo plugin_lang_get( 'config_update_check' ) ?>
+                </h4>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p><?php echo sprintf( plugin_lang_get( 'update_check_installed' ), '<strong>' . string_display_line( plugin_get()->version ) . '</strong>' ) ?></p>
+                    <?php
+                    if( !empty( $t_update ) ) {
+                        if( isset( $t_update['error'] ) ) {
+                            $t_update_class = 'alert-danger';
+                            $t_update_icon  = 'fa-exclamation-triangle';
+                            $t_update_text  = sprintf( plugin_lang_get( 'update_check_failed' ), string_display_line( $t_update['error'] ) );
+                        } else if( calendar_update_is_available( $t_update ) ) {
+                            $t_update_class = 'alert-warning';
+                            $t_update_icon  = 'fa-arrow-circle-up';
+                            $t_latest       = string_display_line( $t_update['latest'] );
+                            if( !is_blank( $t_update['url'] ) ) {
+                                $t_latest = '<a href="' . string_attribute( $t_update['url'] ) . '" target="_blank" rel="noopener">' . $t_latest . '</a>';
+                            }
+                            $t_update_text  = sprintf( plugin_lang_get( 'update_check_available' ), $t_latest, date( config_get( 'normal_date_format' ), $t_update['published_at'] ) );
+                        } else {
+                            $t_update_class = 'alert-success';
+                            $t_update_icon  = 'fa-check';
+                            $t_update_text  = plugin_lang_get( 'update_check_up_to_date' );
+                        }
+
+                        echo '<div class="alert ' . $t_update_class . ' no-margin-bottom"><i class="ace-icon fa ' . $t_update_icon . '"></i> ' . $t_update_text
+                                . '<div class="small">' . sprintf( plugin_lang_get( 'update_check_checked_at' ), date( config_get( 'normal_date_format' ), $t_update['checked_at'] ) ) . '</div></div>';
+                    }
+                    ?>
+                </div>
+
+                <div class="widget-toolbox padding-8 clearfix">
+                    <a class="btn btn-primary btn-sm btn-white btn-round" href="<?php echo plugin_page( 'update_check' ) . form_security_param( 'update_check' ) ?>">
+                        <?php echo plugin_lang_get( 'update_check_button' ) ?>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

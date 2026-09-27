@@ -1,23 +1,27 @@
 <?php
-# Copyright (c) 2024 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 $f_event_id = gpc_get_int( 'event_id' );
 $f_date     = gpc_get_int( 'date' );
 
 event_ensure_exists( $f_event_id );
+
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
 
 access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
@@ -37,13 +41,26 @@ if( $t_event_is_rerecurrences ) {
     $t_event->date_from = $f_date;
 }
 
-if( $t_event->project_id != $t_current_project ) {
-    # in case the current project is not the same project of the bug we are viewing...
-    # ... override the current project. This to avoid problems with categories and handlers lists etc.
-    $g_project_override = $t_event->project_id;
-}
-
 $t_bugs_id = event_get_attached_bugs_id( $f_event_id );
+
+# dates in this form are rendered and re-interpreted in the event's own
+# timezone, so that saving an untouched form keeps the event as is:
+# the stored timezone if any, else the recurrence anchor timezone,
+# else the viewer's
+$t_rrule_string = event_get_field( $f_event_id, 'recurrence_pattern' );
+$t_rule         = array();
+if( !is_blank( $t_rrule_string ) ) {
+    $t_rset   = new \RRule\RSet( $t_rrule_string );
+    $t_rrules = $t_rset->getRRules();
+    $t_rule   = $t_rrules[0]->getRule();
+}
+if( !is_blank( $t_event->timezone ) ) {
+    $t_form_timezone = calendar_timezone_get( $t_event->timezone );
+} elseif( isset( $t_rule['DTSTART'] ) && $t_rule['DTSTART'] instanceof DateTimeInterface ) {
+    $t_form_timezone = $t_rule['DTSTART']->getTimezone();
+} else {
+    $t_form_timezone = new DateTimeZone( date_default_timezone_get() );
+}
 
 layout_page_header();
 
@@ -80,14 +97,24 @@ layout_page_begin();
                                         <span class="required">*</span><label for="name_event"><?php echo plugin_lang_get( 'name_event' ); ?></label>
                                     </th>
                                     <td>
-                                        <input <?php echo helper_get_tab_index() ?> type="text" id="name_event" name="name_event" size="105" maxlength="128" value="<?php echo $t_event->name ?>"required autofocus/>
+                                        <input <?php echo helper_get_tab_index() ?> type="text" id="name_event" name="name_event" size="105" maxlength="128" value="<?php echo string_attribute( $t_event->name ) ?>" required autofocus/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="category">
+                                        <label for="description_event"><?php echo plugin_lang_get( 'description_event' ); ?></label>
+                                    </th>
+                                    <td>
+                                        <textarea <?php echo helper_get_tab_index() ?> id="description_event" name="description_event" class="form-control" cols="80" rows="5"><?php echo string_textarea( $t_event->description ) ?></textarea>
                                     </td>
                                 </tr>
 
                                 <!--#Date-->
 
                                 <?php
-                                $t_date_to_display = date( plugin_config_get( 'short_date_format' ), $t_event->date_from );
+                                $t_date_to_display     = ( new DateTime( '@' . $t_event->date_from ) )->setTimezone( $t_form_timezone )->format( plugin_config_get( 'short_date_format' ) );
+                                $t_date_end_to_display = ( new DateTime( '@' . ( $t_event->date_from + $t_event->duration ) ) )->setTimezone( $t_form_timezone )->format( plugin_config_get( 'short_date_format' ) );
                                 ?>
                                 <tr>
                                     <th class="category">
@@ -114,13 +141,30 @@ layout_page_begin();
                                         <span class="date-event time-event">
 
                                             <span class="event_time_start-area">
-                                                <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_from ) . " GMT", 0 ), TRUE ); ?></select>
+                                                <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( strtotime( ( new DateTime( '@' . $t_event->date_from ) )->setTimezone( $t_form_timezone )->format( 'H:i' ) . " GMT", 0 ), TRUE ); ?></select>
                                             </span>
 
                                         </span>
                                     </td>
                                 </tr>
 
+
+                                <!--#Date to-->
+
+                                <tr>
+                                    <th class="category">
+                                        <label for="date_event_to"><?php echo plugin_lang_get( 'date_to' ) ?></label>
+                                    </th>
+                                    <td>
+                                        <?php
+                                        echo '<input ' . helper_get_tab_index() . ' type="text" id="date_event_to" name="date_event_to" class="datetimepicker input-sm" ' .
+                                        'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                        '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                        'size="20" maxlength="16" value="' . $t_date_end_to_display . '" />'
+                                        ?>
+                                        <i class="fa fa-calendar fa-xlg datetimepicker"></i>
+                                    </td>
+                                </tr>
 
                                 <!--#event_time_finish-->
 
@@ -131,9 +175,25 @@ layout_page_begin();
                                     <td>
                                         <span class="date-event time-event">
                                             <span class="event_time_finish">
-                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( strtotime( date( "H:i", $t_event->date_from + $t_event->duration ) . " GMT", 0 ), TRUE ); ?></select>
+                                                <select tabindex=4 name="event_time_finish" id="event_time_finish"><?php print_time_select_option( strtotime( ( new DateTime( '@' . ( $t_event->date_from + $t_event->duration ) ) )->setTimezone( $t_form_timezone )->format( 'H:i' ) . " GMT", 0 ), TRUE ); ?></select>
                                             </span>	
                                         </span>
+                                    </td>
+                                </tr>
+
+                                <!--#event_timezone-->
+
+                                <tr>
+                                    <th class="category">
+                                        <label for="event_timezone"><?php echo plugin_lang_get( 'event_timezone' ) ?></label>
+                                    </th>
+                                    <td>
+                                        <select <?php helper_get_tab_index() ?> name="event_timezone" id="event_timezone">
+                                            <?php
+                                            # the same timezone the dates above are prefilled in
+                                            print_timezone_offset_option_list( $t_form_timezone->getName(), $t_event->date_from );
+                                            ?>
+                                        </select>
                                     </td>
                                 </tr>
 
@@ -145,14 +205,6 @@ layout_page_begin();
                                     </th>
                                     <td>
                                         <?php
-                                        $t_rrule_string    = event_get_field( $t_event->id, 'recurrence_pattern' );
-                                        $t_rule = array();
-                                        if( !is_blank( $t_rrule_string ) ) {
-                                            $t_rset   = new \RRule\RSet( $t_rrule_string );
-                                            $t_rrules = $t_rset->getRRules();
-                                            $t_rule   = $t_rrules[0]->getRule();
-                                        }
-
                                         if( array_key_exists('INTERVAL', $t_rule) ) {
                                             ?>
                                             <input style="width: 50px;" type="number" id="interval_value" name="interval_value" min="1" value="<?php echo $t_rule['INTERVAL'] ?>" step="1"/>
@@ -184,8 +236,9 @@ layout_page_begin();
                                         <label for="event_is_repeated"><?php echo plugin_lang_get( 'ending_repetition' ) ?></label>
 
                                         <?php
-                                        if( array_key_exists( 'UNTIL', $t_rule ) ) {
-                                            $t_time_until = $t_rule['UNTIL']->format( plugin_config_get( 'short_date_format' ) );
+                                        $t_rule_end = isset( $t_rrules[0] ) ? calendar_rrule_end( $t_rrules[0] ) : NULL;
+                                        if( $t_rule_end !== NULL ) {
+                                            $t_time_until = $t_rule_end->setTimezone( $t_form_timezone )->format( plugin_config_get( 'short_date_format' ) );
                                         } else {
                                             $t_time_until = plugin_lang_get( 'never_ending_repetition' );
                                         }
@@ -203,6 +256,33 @@ layout_page_begin();
 
                             </table>
                         </div>
+
+                        <?php if( calendar_reminder_feature_enabled() ) { ?>
+                            <?php #reminders_update   ?>
+                            <div class="col-md-12 col-xs-12">
+                                <div class="space-10"></div>
+
+                                <div id="reminders_update" class="widget-box widget-color-blue2">
+                                    <div class="widget-header widget-header-small">
+                                        <h4 class="widget-title lighter">
+                                            <i class="ace-icon fa fa-bell-o"></i>
+                                            <?php echo plugin_lang_get( 'reminders_title' ) ?>
+                                        </h4>
+                                        <div class="widget-toolbar">
+                                            <a data-action="collapse" href="#">
+                                                <i class="1 ace-icon fa fa-chevron-up bigger-125"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="widget-body">
+                                        <div class="widget-main">
+                                            <?php print_event_reminder_rows( event_reminder_get_offsets( $f_event_id ), TRUE, TRUE ) ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
 
 
                         <?php
@@ -271,11 +351,11 @@ layout_page_begin();
 							id="task_' . $bug_id . '"
 							value="' . $bug_id . '"
                                                         ' . $t_checked . '
-							data-title="' . $bug_name . '"
+							data-title="' . string_attribute( $bug_name ) . '"
 							data-options="{background-color:' . $bug_status_color . ';}"
 							>';
 
-                                                    echo '<b>' . $bug_id . '</b>: ' . $bug_name;
+                                                    echo '<b>' . $bug_id . '</b>: ' . string_display_line( $bug_name );
                                                     echo '</label>';
                                                     echo '</div>';
                                                 }

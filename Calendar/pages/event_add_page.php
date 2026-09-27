@@ -1,21 +1,36 @@
 <?php
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 $f_bug_id      = gpc_get_int( 'bug_id', 0 );
-$f_is_fulltime = gpc_get_bool( "full_time" );
+$f_is_fulltime = calendar_full_time_get();
+
+// Read the prefilled data from the URL
+$f_name = gpc_get_string('name', '');
+$f_date = gpc_get_string('date', '');
+$f_time_start = gpc_get_string( 'time_start', null ) === null ? null : (int)gpc_get_string( 'time_start', null );
+$f_time_end = gpc_get_string('time_end', null ) === null ? null : (int)gpc_get_string('time_end', null );
+
+// Format the date the way the picker expects it
+$t_date_to_display = '';
+if (!empty($f_date)) {
+    $t_timestamp = strtotime($f_date);
+    if ($t_timestamp !== false) {
+        $t_date_to_display = date( plugin_config_get( 'short_date_format' ), $t_timestamp );
+    }
+}
 
 if( $f_bug_id == 0 ) {
 
@@ -36,15 +51,29 @@ if( $f_bug_id == 0 ) {
         print_header_redirect( $_SERVER['REQUEST_URI'], true, false, true );
     }
 
+    # The project selector returns to "ref" as is, so the prefilled data from
+    # the calendar has to travel inside it; the whole URL is a single parameter
+    $t_ref_params = array();
+    foreach( array( 'name', 'date', 'time_start', 'time_end', 'full_time' ) as $t_key ) {
+        if( gpc_isset( $t_key ) ) {
+            $t_ref_params[$t_key] = gpc_get_string( $t_key );
+        }
+    }
+    $t_ref = plugin_page( 'event_add_page', TRUE );
+    if( !empty( $t_ref_params ) ) {
+        $t_ref .= '&' . http_build_query( $t_ref_params );
+    }
+    $t_select_project_url = 'login_select_proj_page.php?ref=' . string_url( $t_ref );
+
 # New issues cannot be reported for the 'All Project' selection
     if( ALL_PROJECTS == $t_current_project ) {
-        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
+        print_header_redirect( $t_select_project_url );
     }
 # Check for event report threshold
     if( !access_has_project_level( plugin_config_get( 'report_event_threshold' ) ) ) {
         # If can't report on current project, show project selector if there is any other allowed project
         access_ensure_any_project_level( plugin_config_get( 'report_event_threshold' ) );
-        print_header_redirect( 'login_select_proj_page.php?ref=' . plugin_page( 'event_add_page', TRUE ) );
+        print_header_redirect( $t_select_project_url );
     }
     access_ensure_project_level( plugin_config_get( 'report_event_threshold' ) );
 } else {
@@ -52,7 +81,12 @@ if( $f_bug_id == 0 ) {
 
     $t_project_id = bug_get_field( $f_bug_id, 'project_id' );
 
-    $g_project_override = bug_get_field( $f_bug_id, 'project_id' );
+    # The event is created in the project of the issue, so every check below
+    # has to run against that project
+    $g_project_override = $t_project_id;
+
+    access_ensure_bug_level( config_get( 'view_bug_threshold', null, null, $t_project_id ), $f_bug_id );
+    access_ensure_project_level( plugin_config_get( 'report_event_threshold', null, false, null, $t_project_id ), $t_project_id );
 }
 
 
@@ -90,15 +124,29 @@ $t_form_encoding   = '';
                                     <span class="required">*</span><label for="name_event"><?php echo plugin_lang_get( 'name_event' ); ?></label>
                                 </th>
                                 <td>
-                                    <input <?php echo helper_get_tab_index() ?> type="text" id="name_event" name="name_event" size="105" maxlength="128" required autofocus/>
+                                    <input <?php echo helper_get_tab_index() ?> 
+                                           type="text" 
+                                           id="name_event" 
+                                           name="name_event" 
+                                           size="105" 
+                                           maxlength="128" 
+                                           required 
+                                           autofocus
+                                           value="<?php echo string_attribute($f_name); ?>"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="category">
+                                    <label for="description_event"><?php echo plugin_lang_get( 'description_event' ); ?></label>
+                                </th>
+                                <td>
+                                    <textarea <?php echo helper_get_tab_index() ?> id="description_event" name="description_event" class="form-control" cols="80" rows="5"></textarea>
                                 </td>
                             </tr>
 
                             <!--#Date-->
 
-                            <?php
-                            $t_date_to_display = '';
-                            ?>
                             <tr>
                                 <th class="category">
                                     <span class="required">*</span><label for="date_event"><?php echo plugin_lang_get( 'date_event' ) ?></label>
@@ -108,7 +156,7 @@ $t_form_encoding   = '';
                                     echo '<input ' . helper_get_tab_index() . ' type="text" id="date_event" name="date_event" class="datetimepicker input-sm" ' .
                                     'data-picker-locale="' . lang_get_current_datetime_locale() .
                                     '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
-                                    'size="10" maxlength="10" required />'
+                                    'size="10" maxlength="10" required value="' . $t_date_to_display . '" />'
                                     ?>
                                     <i class="fa fa-calendar fa-xlg datetimepicker"></i>
                                 </td>
@@ -122,15 +170,30 @@ $t_form_encoding   = '';
                                 </th>
                                 <td>
                                     <span class="date-event time-event">
-
                                         <span class="event_time_start-area">
-                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( NULL, $f_is_fulltime ); ?></select>
+                                            <select tabindex=3 name="event_time_start" id="event_time_start"><?php print_time_select_option( $f_time_start, $f_is_fulltime ); ?></select>
                                         </span>
-
                                     </span>
                                 </td>
                             </tr>
 
+
+                            <!--#Date to: blank means the event ends on the day it starts-->
+
+                            <tr>
+                                <th class="category">
+                                    <label for="date_event_to"><?php echo plugin_lang_get( 'date_to' ) ?></label>
+                                </th>
+                                <td>
+                                    <?php
+                                    echo '<input ' . helper_get_tab_index() . ' type="text" id="date_event_to" name="date_event_to" class="datetimepicker input-sm" ' .
+                                    'data-picker-locale="' . lang_get_current_datetime_locale() .
+                                    '" data-picker-format="' . plugin_config_get( 'datetime_picker_format' ) . '" ' .
+                                    'size="10" maxlength="10" value="' . $t_date_to_display . '" />'
+                                    ?>
+                                    <i class="fa fa-calendar fa-xlg datetimepicker"></i>
+                                </td>
+                            </tr>
 
                             <!--#event_time_finish-->
 
@@ -141,9 +204,22 @@ $t_form_encoding   = '';
                                 <td>
                                     <span class="date-event time-event">
                                         <span class="event_time_finish">
-                                            <select  <?php helper_get_tab_index() ?> name="event_time_finish" id="event_time_finish"><?php print_time_select_option( NULL, $f_is_fulltime ); ?></select>
+                                            <select <?php helper_get_tab_index() ?> name="event_time_finish" id="event_time_finish"><?php print_time_select_option( $f_time_end, $f_is_fulltime ); ?></select>
                                         </span>	
                                     </span>
+                                </td>
+                            </tr>
+
+                            <!--#event_timezone-->
+
+                            <tr>
+                                <th class="category">
+                                    <label for="event_timezone"><?php echo plugin_lang_get( 'event_timezone' ) ?></label>
+                                </th>
+                                <td>
+                                    <select <?php helper_get_tab_index() ?> name="event_timezone" id="event_timezone">
+                                        <?php print_timezone_offset_option_list( date_default_timezone_get() ); ?>
+                                    </select>
                                 </td>
                             </tr>
 
@@ -245,7 +321,7 @@ $t_form_encoding   = '';
                                                         <select size="8" multiple name="user_ids[]">
                                                             <?php foreach( $t_project_users as $project_user ): ?>
                                                                 <?php if( !empty( $project_user['id'] ) && !empty( $project_user['realname'] ) ): ?>
-                                                                    <option value="<?php echo $project_user['id']; ?>"><?php echo $project_user['realname']; ?></option>
+                                                                    <option value="<?php echo (int)$project_user['id']; ?>"><?php echo string_display_line( $project_user['realname'] ); ?></option>
                                                                 <?php endif; ?>
                                                             <?php endforeach; ?>
                                                         </select>
@@ -258,6 +334,37 @@ $t_form_encoding   = '';
                             </div>
                         </div>
                     </div>
+
+                    <?php if( calendar_reminder_feature_enabled() ) { ?>
+                        <?php #reminders_add   ?>
+                        <div class="col-md-12 col-xs-12">
+                            <div class="space-10"></div>
+
+                            <div id="reminders_add" class="widget-box widget-color-blue2">
+                                <div class="widget-header widget-header-small">
+                                    <h4 class="widget-title lighter">
+                                        <i class="ace-icon fa fa-bell-o"></i>
+                                        <?php echo plugin_lang_get( 'reminders_title' ) ?>
+                                    </h4>
+                                    <div class="widget-toolbar">
+                                        <a data-action="collapse" href="#">
+                                            <i class="1 ace-icon fa fa-chevron-up bigger-125"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <?php
+                                        # a new event starts without reminders, so that the personal
+                                        # defaults of the participants apply unless one is added here
+                                        print_event_reminder_rows( array(), TRUE, TRUE );
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
 
 
@@ -327,11 +434,11 @@ $t_form_encoding   = '';
 							id="task_' . $bug_id . '"
 							value="' . $bug_id . '"
                                                         ' . $t_checked . '
-							data-title="' . $bug_name . '"
+							data-title="' . string_attribute( $bug_name ) . '"
 							data-options="{background-color:' . $bug_status_color . ';}"
 							>';
 
-                                            echo '<b>' . $bug_id . '</b>: ' . $bug_name;
+                                            echo '<b>' . $bug_id . '</b>: ' . string_display_line( $bug_name );
                                             echo '</label>';
                                             echo '</div>';
                                         }

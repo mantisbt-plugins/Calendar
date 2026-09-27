@@ -1,18 +1,17 @@
 <?php
-
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -44,13 +43,15 @@ function access_ensure_event_level( $p_access_level, $p_event_id, $p_user_id = n
  */
 function access_has_event_level( $p_access_level, $p_event_id, $p_user_id = null ) {
 	if( $p_user_id === null ) {
+		# Deal with not logged in silently: auth_get_current_user_id() would
+		# redirect to the login page instead, which kills a cron run
+		if( !auth_is_user_authenticated() ) {
+			return false;
+		}
 		$p_user_id = auth_get_current_user_id();
 	}
 
-	# Deal with not logged in silently in this case
-	# @@@ we may be able to remove this and just error
-	#     and once we default to anon login, we can remove it for sure
-	if( empty( $p_user_id ) && !auth_is_user_authenticated() ) {
+	if( empty( $p_user_id ) ) {
 		return false;
 	}
 
@@ -68,7 +69,7 @@ function access_has_event_level( $p_access_level, $p_event_id, $p_user_id = null
 		# build a static array holding that threshold for each project
 		static $s_thresholds = array();
 		if( !isset( $s_thresholds[$t_project_id] ) ) {
-			$t_report_event_threshold = plugin_config_get( 'report_event_threshold', null, $p_user_id, $t_project_id );
+			$t_report_event_threshold = plugin_config_get( 'report_event_threshold', null, false, $p_user_id, $t_project_id );
 			if( empty( $t_report_event_threshold ) ) {
 				$s_thresholds[$t_project_id] = NOBODY;
 			} else {

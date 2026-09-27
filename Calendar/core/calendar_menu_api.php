@@ -1,18 +1,17 @@
 <?php
-# Copyright (c) 2019 Grigoriy Ermolaev (igflocal@gmail.com)
-# 
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 function calendar_print_manage_config_menu( $p_page = '' ) {
@@ -25,8 +24,11 @@ function calendar_print_manage_config_menu( $p_page = '' ) {
 	$t_pages['config_page.php'] = array( 'url'   => plugin_page( 'config_page' ),
 	                                     'label' => 'config_title' );
 
-	$t_pages['config_work_threshold_page.php'] = array( 'url'   => plugin_page( 'config_work_threshold_page' ), 
+	$t_pages['config_work_threshold_page.php'] = array( 'url'   => plugin_page( 'config_work_threshold_page' ),
 	                                                    'label' => 'manage_threshold_config' );
+
+	$t_pages['notify_config_page.php'] = array( 'url'   => plugin_page( 'notify_config_page' ),
+	                                            'label' => 'notify_config_title' );
 
 	echo '<div class="space-10"></div>' . "\n";
 	echo '<div class="center">' . "\n";

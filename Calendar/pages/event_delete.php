@@ -1,18 +1,17 @@
 <?php
-
-# Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 form_security_validate( 'event_delete' );
@@ -22,6 +21,12 @@ $f_date_select = gpc_get_int( 'date' );
 $f_from_bug_id   = gpc_get_int( 'from_bug_id', 0 );
 
 event_ensure_exists( $f_event_id );
+
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
+access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 if( event_is_recurrences( $f_event_id ) ) {
 
@@ -34,43 +39,71 @@ if( event_is_recurrences( $f_event_id ) ) {
 $t_event_data    = event_get( $f_event_id );
 $t_bugs_attached = event_get_attached_bugs_id( $t_event_data->id );
 
+$t_actor_id = auth_get_current_user_id();
+
 switch( $t_range ) {
 
     case 'THIS':
         $t_rset_current = new CalendarPluginRRuleExt\RSetExt( $t_event_data->recurrence_pattern );
         if( $t_rset_current->count() == 1 ) {
+
+            # the only occurrence left goes with the event itself, so this is
+            # a full deletion as far as the recipients are concerned; the mail
+            # is sent while the members and the name can still be read
+            calendar_notify_event_deleted( $t_event_data, $t_actor_id );
+
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
+            event_reminder_delete_all( $t_event_data->id );
             event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
+        calendar_notify_event_deleted( $t_event_data, $t_actor_id, $f_date_select );
+
         $t_rset_current->addExDate( $f_date_select );
         $t_event_data->recurrence_pattern = $t_rset_current->rfcString();
 
+        # the excluded occurrence is what the user asked to delete, the change
+        # of the recurrence rule is only how it is stored
+        event_history_log( $t_event_data->id, CALENDAR_HISTORY_OCCURRENCE_DELETED, '', $f_date_select );
+
         $t_event_data->update();
         event_google_update( $t_event_data );
+
+        # to the subscribers the series is an event that changed: it lost an
+        # occurrence and goes on
+        event_signal_updated( $t_event_data->id );
         break;
 
     case 'THISANDFUTURE':
 
         if( $t_event_data->date_from == $f_date_select ) {
+
+            # cutting a series off at its very start leaves nothing behind
+            calendar_notify_event_deleted( $t_event_data, $t_actor_id );
+
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
+            event_reminder_delete_all( $t_event_data->id );
             event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
 
-        $t_rset_new            = new CalendarPluginRRuleExt\RSetExt();
-        $t_event_data->date_to = $f_date_select - 1;
+        $t_rset_new = new CalendarPluginRRuleExt\RSetExt();
+        $t_until    = $f_date_select - 1;
+
+        # the series is over when its last remaining occurrence ends, which
+        # for an occurrence spanning days is later than the UNTIL of the rule
+        $t_event_data->date_to = $t_until + $t_event_data->duration;
 
         $t_rset_current = new \RRule\RSet( $t_event_data->recurrence_pattern );
         $t_rrules       = $t_rset_current->getRRules();
 
         foreach( $t_rrules as $t_rrule ) {
             $t_rule          = $t_rrule->getRule();
-            $t_rule['UNTIL'] = $t_event_data->date_to;
+            $t_rule['UNTIL'] = $t_until;
             $t_rrules_new    = new RRule\RRule( $t_rule );
             $t_rset_new->addRRule( $t_rrules_new );
         }
@@ -81,12 +114,19 @@ switch( $t_range ) {
         }
 
         if( $t_rset_new->count() == 0 ) {
+
+            # nothing is left of the series once the tail is cut off
+            calendar_notify_event_deleted( $t_event_data, $t_actor_id );
+
             $t_event_data->delete();
             event_member_delete( $t_event_data->id );
+            event_reminder_delete_all( $t_event_data->id );
             event_detach_issue( $t_event_data->id, $t_bugs_attached );
             event_google_delete( $t_event_data );
             break;
         }
+
+        calendar_notify_event_deleted( $t_event_data, $t_actor_id, null, $f_date_select );
 
         $t_event_data->recurrence_pattern = $t_rset_new->rfcString();
         $t_event_data->update();
@@ -95,19 +135,30 @@ switch( $t_range ) {
 
         event_google_update( $t_event_data );
 
+        # to the subscribers the series is an event that changed: it was cut
+        # short and goes on
+        event_signal_updated( $t_event_data->id );
+
         break;
 
     case 'ALL':
     default:
         helper_ensure_confirmed( plugin_lang_get( 'delete_event_sure_msg' ), plugin_lang_get( 'delete_event_button' ) );
 
+        # the members are about to be dropped, so the mail goes out first
+        calendar_notify_event_deleted( $t_event_data, $t_actor_id );
+
+        # delete() raises the deletion signal, so it goes first: a subscriber
+        # must still find the members, like in the other branches
+        $t_event_data->delete();
+
         event_member_delete( $t_event_data->id );
+
+        event_reminder_delete_all( $t_event_data->id );
 
         event_detach_issue( $t_event_data->id, $t_bugs_attached );
 
         event_google_delete( $t_event_data );
-        
-        $t_event_data->delete();
 }
 
 form_security_purge( 'event_delete' );

@@ -1,18 +1,17 @@
 <?php
-
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 form_security_validate( 'event_member_delete' );
@@ -54,6 +53,17 @@ if( count( event_get_members( $f_event_id ) ) <= 1 ) {
 }
 
 event_member_delete( $f_event_id, $t_user_id );
+
+# the personal reminder set of the member is theirs for this event only
+if( calendar_reminder_feature_enabled() && $t_event->author_id != $t_user_id ) {
+    event_reminder_user_reset( $f_event_id, $t_user_id );
+}
+
+# a user who left the event on their own is not mailed about it
+calendar_notify_member_removed( $f_event_id, $t_user_id, $t_logged_in_user_id );
+
+# the subscribers are told in any case, whom to tell in turn is up to them
+event_signal( 'EVENT_CALENDAR_EVENT_MEMBER_REMOVED', array( $f_event_id, (int)$t_user_id, $t_logged_in_user_id ) );
 
 event_google_update( event_get( $f_event_id ) );
 

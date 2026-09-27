@@ -1,18 +1,17 @@
 <?php
-
-# Copyright (c) 2025 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Calendar plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 function print_google_calendar_list() {
@@ -23,11 +22,42 @@ function print_google_calendar_list() {
     echo '<option value="0">' . plugin_lang_get( 'user_config_google_calendar_list' ) . '</option>';
     foreach( $calendar_list as $calendar ) {
         if( $calendar['id'] === $t_config_list ) {
-            echo '<option selected value="' . $calendar['id'] . '">' . $calendar['summary'] . '</option>';
+            echo '<option selected value="' . string_attribute( $calendar['id'] ) . '">' . string_display_line( $calendar['summary'] ) . '</option>';
         } else {
-            echo '<option value="' . $calendar['id'] . '">' . $calendar['summary'] . '</option>';
+            echo '<option value="' . string_attribute( $calendar['id'] ) . '">' . string_display_line( $calendar['summary'] ) . '</option>';
         }
     }
+}
+
+/**
+ * Identifiers of the calendars of the Google account the given user has
+ * granted access to; empty while no grant is stored, so that nothing can be
+ * chosen without one. A grant that fails to refresh sends the browser through
+ * the consent of Google again, the way print_google_calendar_list() does.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return array calendar identifiers
+ * @access public
+ */
+function google_calendar_list_ids( $p_user_id ) {
+    $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, $p_user_id );
+
+    if( is_blank( plugin_config_get( 'google_client_secret' ) ) || !is_array( $t_oauth ) || !isset( $t_oauth['refresh_token'] ) ) {
+        return array();
+    }
+
+    $t_ids = array();
+
+    try {
+        $t_service = new Google_Service_Calendar( getClient( $p_user_id ) );
+
+        foreach( $t_service->calendarList->listCalendarList() as $t_calendar ) {
+            $t_ids[] = (string)$t_calendar['id'];
+        }
+    } catch( Exception $e ) {
+        return array();
+    }
+
+    return $t_ids;
 }
 
 function get_response_google_url() {
@@ -57,7 +87,7 @@ function getClient( $p_user_id = NULL, $p_state = NULL ) {
     }
 
     if( $p_state == NULL ) {
-        $p_state = $_REQUEST['page'];
+        $p_state = gpc_get_string( 'page', '' );
     }
 
     $t_oauth = plugin_config_get( 'oauth_key', NULL, FALSE, $t_user_id );
@@ -73,7 +103,14 @@ function getClient( $p_user_id = NULL, $p_state = NULL ) {
         $client->setApprovalPrompt( 'force' );
         $client->setIncludeGrantedScopes( true );
         $client->setState( json_encode( $p_state ) );
-        $client->refreshToken( $t_oauth["refresh_token"] );
+
+        # The sync stays enabled after the stored grant is gone (revoked by the user,
+        # or cleared below by an earlier failure), so the token may be missing here.
+        # Fall through to the consent flow instead of dereferencing a missing key.
+        if( !isset( $t_oauth['refresh_token'] ) ) {
+            throw new Exception( 'the stored OAuth grant has no refresh token' );
+        }
+        $client->refreshToken( $t_oauth['refresh_token'] );
 
         if( $client->isAccessTokenExpired() ) {
             $client->fetchAccessTokenWithRefreshToken( $client->getRefreshToken() );
@@ -290,10 +327,18 @@ function event_is_synchronized_with_google( $p_event_id ) {
 function string_get_google_description( $p_event_id ) {
     $t_description = '';
 
-    $t_bugs_id = event_get_attached_bugs_id( $p_event_id );
+    # the event's own description comes first, the linked issues follow
+    $t_event_description = event_get_field( $p_event_id, 'description' );
+    if( !is_blank( $t_event_description ) ) {
+        $t_description .= nl2br( string_html_specialchars( $t_event_description ) ) . '<br><br>';
+    }
+
+    # the event lands in the Google calendar of its author, so only the issues
+    # the author may view are listed there
+    $t_bugs_id = event_bug_ids_filter_viewable( event_get_attached_bugs_id( $p_event_id ), (int)event_get_field( $p_event_id, 'author_id' ) );
 
     foreach( $t_bugs_id as $t_bug_id ) {
-        $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . bug_get_field( $t_bug_id, 'summary' ) . '</a><br><br>';
+        $t_description .= '<a href="' . string_get_bug_view_url_with_fqdn( $t_bug_id ) . '" >' . $t_bug_id . ': ' . string_html_specialchars( bug_get_field( $t_bug_id, 'summary' ) ) . '</a><br><br>';
     }
     return $t_description;
 }

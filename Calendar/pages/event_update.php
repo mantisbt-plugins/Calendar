@@ -1,43 +1,55 @@
 <?php
-
-# Copyright (c) 2018 Grigoriy Ermolaev (igflocal@gmail.com)
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
-
-access_ensure_global_level( plugin_config_get( 'update_event_threshold' ) );
 
 form_security_validate( 'event_update' );
 
 $f_event_id          = gpc_get_int( 'event_id' );
-$f_event_time_start  = gpc_get_int( 'event_time_start' );
-$f_event_time_finish = gpc_get_int( 'event_time_finish' );
 $f_date              = gpc_get_int( 'date' );
 $f_freq              = gpc_get_string( 'selected_freq', 'NO_REPEAT' );
 $f_interval          = gpc_get_int( 'interval_value' );
-$f_until             = strtotime( gpc_get_string( 'date_ending_repetition', NULL ) );
-$f_bugs              = gpc_get_int_array( 'bugs_add', array( 0 ) );
+$t_event_timezone    = calendar_timezone_get( gpc_get_string( 'event_timezone', '' ) );
+$t_period            = calendar_event_form_period( $t_event_timezone );
+$f_until             = calendar_strtotime_in_timezone( gpc_get_string( 'date_ending_repetition', NULL ), $t_event_timezone );
+# only the issues the user may view are attached, see event_add.php
+$f_bugs              = event_bug_ids_filter_viewable( gpc_get_int_array( 'bugs_add', array() ) );
+
+# the rows survive the confirmation page of a recurring event, because
+# print_hidden_inputs() re-posts arrays as they were submitted
+if( calendar_reminder_feature_enabled() ) {
+    $t_reminder_offsets = calendar_reminder_offsets_from_event_form();
+}
 
 event_ensure_exists( $f_event_id );
+
+# the thresholds are read for the project of the event, not for the current
+# one, the way the event page does it
+$g_project_override = (int)event_get_field( $f_event_id, 'project_id' );
+
+access_ensure_event_level( plugin_config_get( 'update_event_threshold' ), $f_event_id );
 
 $t_event_parent_data = event_get( $f_event_id );
 $t_event_child_data  = clone $t_event_parent_data;
 
 $t_event_child_data->name            = gpc_get_string( 'name_event' );
+$t_event_child_data->description     = gpc_get_string( 'description_event', '' );
 $t_event_child_data->activity        = "Y";
 $t_event_child_data->changed_user_id = auth_get_current_user_id();
-$t_event_child_data->date_from       = strtotime( gpc_get_string( 'date_event' ), NULL ) + $f_event_time_start;
-$t_event_child_data->duration        = $f_event_time_finish - $f_event_time_start;
+$t_event_child_data->date_from       = $t_period['date_from'];
+$t_event_child_data->duration        = $t_period['duration'];
+$t_event_child_data->timezone        = $t_event_timezone->getName();
 
 if( event_is_recurrences( $f_event_id ) ) {
 
@@ -64,13 +76,35 @@ switch( $t_range ) {
         $t_event_parent_data->update();
         event_google_update( $t_event_parent_data );
 
+        # the series lost an occurrence, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         event_attach_issue( $t_event_child_id, $f_bugs );
 
         $t_event_members_current = event_get_members( $t_event_parent_data->id );
         foreach( $t_event_members_current as $t_event_member ) {
             event_member_add( $t_event_child_id, $t_event_member );
         }
+
+        # the split off event has a time of its own, so the replies given to
+        # the series do not carry over; its author is the one who moved it
+        event_member_accept_author( $t_event_child_id );
+
+        # like the members, the reminders are copied to the split off event
+        # instead of being inherited from the series at run time
+        if( calendar_reminder_feature_enabled() ) {
+            event_reminder_set_all( $t_event_child_id, $t_reminder_offsets );
+            event_reminder_user_copy_all( $t_event_parent_data->id, $t_event_child_id );
+        }
+
         event_google_add( $t_event_child_id, $t_event_child_data->author_id, $t_event_members_current );
+
+        # the split off event is fully assembled now
+        event_signal_created( $t_event_child_id );
+
+        # splitting an occurrence off is how the change is stored, what the
+        # user did is a change of the event - hence the mail about a change
+        calendar_notify_event_updated( $t_event_child_id, auth_get_current_user_id() );
 
         break;
 
@@ -85,13 +119,16 @@ switch( $t_range ) {
             case 'WEEKLY':
             case 'MONTHLY':
             case 'YEARLY':
-                $t_event_child_data->date_to = $f_until == NULL ? strtotime( '01-01-2038' ) + $f_event_time_finish : $f_until + $f_event_time_finish;
+                # see event_add.php: the rule stops on the last day, the series
+                # ends when the occurrence of that day does
+                $t_until_day                 = $f_until == NULL ? calendar_strtotime_in_timezone( '01-01-2038', $t_event_timezone ) : $f_until;
+                $t_event_child_data->date_to = $t_until_day + $t_period['end_offset'];
 
                 $t_rset_new = new CalendarPluginRRuleExt\RSetExt();
 
                 $t_rrule = new RRule\RRule( array(
-                                          'DTSTART'  => $t_event_child_data->date_from,
-                                          'UNTIL'    => $t_event_child_data->date_to,
+                                          'DTSTART'  => calendar_rrule_datetime( $t_event_child_data->date_from, $t_event_timezone ),
+                                          'UNTIL'    => calendar_rrule_datetime( $t_until_day + $t_period['time_finish'], $t_event_timezone ),
                                           'FREQ'     => $f_freq,
                                           'INTERVAL' => $f_interval
                         ) );
@@ -102,7 +139,7 @@ switch( $t_range ) {
                 break;
 
             default :
-                $t_event_child_data->date_to = $f_until == NULL ? strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish : $f_until + $f_event_time_finish;
+                $t_event_child_data->date_to = $t_period['date_to'];
         }
 
         $t_event_child_id = $t_event_child_data->create();
@@ -114,7 +151,21 @@ switch( $t_range ) {
             event_member_add( $t_event_child_id, $t_event_member );
         }
 
+        event_member_accept_author( $t_event_child_id );
+
+        if( calendar_reminder_feature_enabled() ) {
+            event_reminder_set_all( $t_event_child_id, $t_reminder_offsets );
+            event_reminder_user_copy_all( $t_event_parent_data->id, $t_event_child_id );
+        }
+
         event_google_add( $t_event_child_id, $t_event_child_data->author_id, $t_event_members_current );
+
+        # the split off event is fully assembled now
+        event_signal_created( $t_event_child_id );
+
+        # splitting an occurrence off is how the change is stored, what the
+        # user did is a change of the event - hence the mail about a change
+        calendar_notify_event_updated( $t_event_child_id, auth_get_current_user_id() );
 
         $t_rset_parent_old           = new \RRule\RSet( $t_event_parent_data->recurrence_pattern );
         $t_rrules_parent_old         = $t_rset_parent_old->getRRules();
@@ -135,6 +186,9 @@ switch( $t_range ) {
 
         event_google_update( $t_event_parent_data );
 
+        # the series was cut short, and that is all that changed in it
+        event_signal_updated( $t_event_parent_data->id );
+
         break;
 
     case 'ALL':
@@ -145,7 +199,10 @@ switch( $t_range ) {
             case 'WEEKLY':
             case 'MONTHLY':
             case 'YEARLY':
-                $t_event_child_data->date_to = $f_until == NULL ? strtotime( '01-01-2038' ) + $f_event_time_finish : $f_until + $f_event_time_finish;
+                # see event_add.php: the rule stops on the last day, the series
+                # ends when the occurrence of that day does
+                $t_until_day                 = $f_until == NULL ? calendar_strtotime_in_timezone( '01-01-2038', $t_event_timezone ) : $f_until;
+                $t_event_child_data->date_to = $t_until_day + $t_period['end_offset'];
 
                 $t_rset    = new \RRule\RSet( $t_event_child_data->recurrence_pattern );
                 $t_exdates = $t_rset->getExDates();
@@ -154,8 +211,8 @@ switch( $t_range ) {
 
 
                 $t_rrule = new RRule\RRule( array(
-                                          'DTSTART'  => $t_event_child_data->date_from,
-                                          'UNTIL'    => $t_event_child_data->date_to,
+                                          'DTSTART'  => calendar_rrule_datetime( $t_event_child_data->date_from, $t_event_timezone ),
+                                          'UNTIL'    => calendar_rrule_datetime( $t_until_day + $t_period['time_finish'], $t_event_timezone ),
                                           'FREQ'     => $f_freq,
                                           'INTERVAL' => $f_interval
                         ) );
@@ -167,26 +224,52 @@ switch( $t_range ) {
 
                 break;
             default :
-                $t_event_child_data->date_to = $f_until == NULL ? strtotime( gpc_get_string( 'date_event' ) ) + $f_event_time_finish : $f_until + $f_event_time_finish;
+                $t_event_child_data->date_to = $t_period['date_to'];
         }
 
         if( $t_event_child_data != $t_event_parent_data ) {
+
+            # a reply was given to a time: once that time is gone, so is the
+            # reply, except for the one of whoever moved the event. Dropped
+            # before the change is stored, so that a subscriber of
+            # EVENT_CALENDAR_EVENT_UPDATED already finds the replies asked anew
+            if( calendar_rsvp_feature_enabled()
+                    && ( $t_event_child_data->date_from != $t_event_parent_data->date_from
+                    || $t_event_child_data->duration != $t_event_parent_data->duration
+                    || $t_event_child_data->recurrence_pattern != $t_event_parent_data->recurrence_pattern ) ) {
+                event_member_reset_statuses( $t_event_child_data->id, auth_get_current_user_id() );
+            }
+
             $t_event_child_data->update();
         }
 
         $t_event_child_id = $t_event_child_data->id;
 
-        sort( $f_bugs );
+        # diff aware: an unchanged set of reminders leaves no history behind
+        if( calendar_reminder_feature_enabled() ) {
+            event_reminder_set_all( $t_event_child_data->id, $t_reminder_offsets );
+        }
 
         $t_current_bugs = event_get_attached_bugs_id( $t_event_child_data->id );
 
-        if( $f_bugs != $t_current_bugs ) {
-            
-            event_detach_issue( $t_event_child_data->id, array_diff( $t_current_bugs, $f_bugs ));
-            event_attach_issue( $t_event_child_data->id, array_diff( $f_bugs, $t_current_bugs ) );
+        # the form lists the issues the user may view, so an issue the user
+        # cannot see stays attached rather than being taken for unchecked
+        $t_bugs_detached = array_diff( event_bug_ids_filter_viewable( $t_current_bugs ), $f_bugs );
+        $t_bugs_attached = array_diff( $f_bugs, $t_current_bugs );
+        $t_bugs_changed  = count( $t_bugs_detached ) > 0 || count( $t_bugs_attached ) > 0;
+
+        if( $t_bugs_changed ) {
+            event_detach_issue( $t_event_child_data->id, $t_bugs_detached );
+            event_attach_issue( $t_event_child_data->id, $t_bugs_attached );
         }
-        if( $t_event_child_data != $t_event_parent_data || $f_bugs != $t_current_bugs ) {
+        if( $t_event_child_data != $t_event_parent_data || $t_bugs_changed ) {
             event_google_update( $t_event_child_data );
+
+            # the row, the reminders and the issue links are all written now;
+            # a form that was submitted without touching anything is not news
+            event_signal_updated( $t_event_child_data->id );
+
+            calendar_notify_event_updated( $t_event_child_data->id, auth_get_current_user_id() );
         }
 }
 

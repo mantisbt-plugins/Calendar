@@ -1,18 +1,17 @@
 <?php
-# Copyright (c) 2024 Grigoriy Ermolaev (igflocal@gmail.com)
-# 
-# Calendar for MantisBT is free software: 
+# Copyright (c) 2026 Grigoriy Ermolaev (igflocal@gmail.com)
+# Calendar plugin for MantisBT is free software:
 # you can redistribute it and/or modify it under the terms of the GNU
-# General Public License as published by the Free Software Foundation, 
+# General Public License as published by the Free Software Foundation,
 # either version 2 of the License, or (at your option) any later version.
 #
-# Calendar plugin for for MantisBT is distributed in the hope 
-# that it will be useful, but WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# Calendar plugin for MantisBT is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Customer management plugin for MantisBT.  
+# along with Calendar plugin for MantisBT.
 # If not, see <http://www.gnu.org/licenses/>.
 
 $f_oauth_key = gpc_get_string( 'code', NULL );
@@ -45,7 +44,7 @@ try {
         switch( $key ) {
 
             case 'user_config_google':
-                $t_redirect_url = plugin_page( 'user_config_page', true );
+                $t_redirect_url = plugin_page( 'reminders_page', true ) . '#calendar_view';
                 break;
 
             case 'event_add':
@@ -73,7 +72,7 @@ try {
     html_operation_successful( $t_redirect_url );
 } catch( Exception $ex ) {
 
-    $t_redirect_url = plugin_page( 'user_config_page', true );
+    $t_redirect_url = plugin_page( 'reminders_page', true ) . '#calendar_view';
     layout_page_header( null, $t_redirect_url );
     layout_page_begin( $t_redirect_url );
     html_operation_failure( $t_redirect_url, sprintf( plugin_lang_get( 'config_user_google_access_denie' ), $ex->getMessage() ) );
