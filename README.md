@@ -9,59 +9,27 @@ Adds the task scheduling function in MantisBT based on the calendar of events wi
 Screenshots
 -----------
 
-![alt text](doc/main_view_with_filter_list.png)
+![Week view with the user filter list opened](doc/main_view_with_filter_list.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): month view.
-     Calendar page with ?view=month, a month with events on several days,
-     including a day that shows the "+N more" indicator.
-     Save as doc/month_view.png and uncomment the line below.
-![alt text](doc/month_view.png)
--->
+![Month view with the +N more indicator](doc/month_view.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): day modal of the month view.
-     The modal opened from a day header, listing the events of that day.
-     Save as doc/month_view_day_modal.png and uncomment the line below.
-![alt text](doc/month_view_day_modal.png)
--->
+![Day modal of the month view listing the events of a day](doc/month_view_day_modal.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): time range selection in the week view.
-     A day column with a period selected by dragging, showing the chosen range.
-     Save as doc/week_view_time_range_selection.png and uncomment the line below.
-![alt text](doc/week_view_time_range_selection.png)
--->
+![Selecting a time range in the week view to create an event](doc/week_view_time_range_selection.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): multi-day events in the week view.
-     The week grid with two or three multi-day bands above the hourly rows,
-     one of them cut at the edge of the week; events of several projects in
-     their colours and the project legend in the bottom toolbar.
-     Save as doc/week_view_multiday_bands.png and uncomment the line below.
-![alt text](doc/week_view_multiday_bands.png)
--->
+![Multi-day events as bands above the hourly rows of the week view](doc/week_view_multiday_bands.png)
 
-![alt text](doc/view_event_layers_in_bug_view.png)
-![alt text](doc/add_event_view.png)
+![Calendar block with the events of an issue on the issue view page](doc/view_event_layers_in_bug_view.png)
+![New event form](doc/add_event_view.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): time zone selector on the event form.
-     The event create or edit page with the time zone select expanded.
-     Save as doc/add_event_timezone_select.png and uncomment the line below.
-![alt text](doc/add_event_timezone_select.png)
--->
+![Time zone selector on the event form](doc/add_event_timezone_select.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): event view page of a recurring event.
-     The view page showing the recurrence row and the "Created in timezone" row.
-     Save as doc/view_event_with_timezone.png and uncomment the line below.
-![alt text](doc/view_event_with_timezone.png)
--->
+![Event view page of a recurring event with its time zone](doc/view_event_with_timezone.png)
 
 ![alt text](doc/plugin_config_view.png)
 ![alt text](doc/workflow_thresholds_page.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): reminders and notifications of a user.
-     My Account -> "Event calendar" tab with the default reminders and the
-     notification switches.
-     Save as doc/account_event_calendar_tab.png and uncomment the line below.
-![alt text](doc/account_event_calendar_tab.png)
--->
+![Event calendar tab of My Account with reminders and notifications](doc/account_event_calendar_tab.png)
 
 <!-- SCREENSHOT PLACEHOLDER (3.0.0): notification recipient matrix.
      Manage -> Manage Plugins -> Calendar -> notification settings page with
@@ -70,11 +38,7 @@ Screenshots
 ![alt text](doc/notify_config_page.png)
 -->
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): event view page with description,
-     reminders and history.
-     Save as doc/view_event_page.png and uncomment the line below.
-![alt text](doc/view_event_page.png)
--->
+![Event view page with description, reminders and history](doc/view_event_page.png)
 
 Features
 --------
