@@ -26,17 +26,12 @@ Screenshots
 
 ![Event view page of a recurring event with its time zone](doc/view_event_with_timezone.png)
 
-![alt text](doc/plugin_config_view.png)
-![alt text](doc/workflow_thresholds_page.png)
+![Plugin settings page](doc/plugin_config_view.png)
+![Access thresholds of the plugin](doc/workflow_thresholds_page.png)
 
 ![Event calendar tab of My Account with reminders and notifications](doc/account_event_calendar_tab.png)
 
-<!-- SCREENSHOT PLACEHOLDER (3.0.0): notification recipient matrix.
-     Manage -> Manage Plugins -> Calendar -> notification settings page with
-     the per-project matrix.
-     Save as doc/notify_config_page.png and uncomment the line below.
-![alt text](doc/notify_config_page.png)
--->
+![Notification recipients matrix](doc/notify_config_page.png)
 
 ![Event view page with description, reminders and history](doc/view_event_page.png)
 
