@@ -163,7 +163,7 @@ echo '</tr>';
 
 # the start and the end of the occurrence, each with its own date - the
 # same two rows whether or not the occurrence runs past midnight
-$t_datetime_format = config_get( 'short_date_format' ) . ' H:i';
+$t_datetime_format = config_get( 'short_date_format' ) . ' ' . calendar_time_format();
 
 echo '<tr>';
 echo '<th class="bug-reporter category">', plugin_lang_get( 'date_from' ), '</th>';

@@ -52,7 +52,7 @@ class EventBand {
         # the bar itself shows which days the occurrence covers, so only the
         # times of its start and end are spelled out; the project is told by
         # the colour of the bar and named in the tooltip only
-        $t_text    = string_display_line( $t_name ) . ' | ' . date( 'H:i', $this->event['date_from'] ) . ' - ' . date( 'H:i', $this->event['date_from'] + $this->event['duration'] );
+        $t_text    = string_display_line( $t_name ) . ' | ' . date( calendar_time_format(), $this->event['date_from'] ) . ' - ' . date( calendar_time_format(), $this->event['date_from'] + $this->event['duration'] );
 
         # the tooltip carries the dates, the bar only marks where it is cut off
         $t_title = $t_name . ' | ' . calendar_event_time_label( $this->event['date_from'], $this->event['duration'] ) . ' [ ' . $t_project . ' ]';

@@ -520,6 +520,7 @@ class CalendarPlugin extends MantisPlugin {
                                   'datetime_picker_month_date_format'                   => 'MM-YYYY',
                                   'month_date_format'                                   => 'm-Y',
                                   'event_time_start_stop_picker_format'                 => 'HH:mm',
+                                  'time_format_12h'                                     => NULL, //Per user only: ON shows times as 1:30 PM instead of 13:30; unset follows the notation of the core normal_date_format, see calendar_time_12h().
                                   'startStepDays'                                       => 0,
 //                                  'startStepDays'                        => date( 'w' )-1,
                                   'countStepDays'                                       => 7,

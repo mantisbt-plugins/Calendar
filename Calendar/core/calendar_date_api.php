@@ -132,12 +132,46 @@ function calendar_event_is_in_past( $p_date_from, $p_duration ) {
 }
 
 /**
+ * Whether the core normal_date_format shows the hour in the 12-hour notation.
+ * @return boolean
+ */
+function calendar_time_12h_core() {
+    # g or h not escaped by a backslash
+    return preg_match( '/(?<!\x5C)[gh]/', config_get( 'normal_date_format' ) ) === 1;
+}
+
+/**
+ * Whether times are shown in the 12-hour notation: the choice of the current
+ * user, else the notation of the core date format.
+ * @return boolean
+ */
+function calendar_time_12h() {
+    return plugin_config_get( 'time_format_12h', calendar_time_12h_core() ? ON : OFF ) == ON;
+}
+
+/**
+ * The date() format of a time of day in the notation of calendar_time_12h().
+ * @return string
+ */
+function calendar_time_format() {
+    return calendar_time_12h() ? 'g:i A' : 'H:i';
+}
+
+/**
+ * The date() format of a whole hour in the notation of calendar_time_format().
+ * @return string
+ */
+function calendar_hour_format() {
+    return calendar_time_12h() ? 'gA' : 'H';
+}
+
+/**
  * "10:00 - 12:30" for an occurrence within a day, "2026-09-16 10:00 - 2026-09-18 18:00"
  * for one that spans several days.
  */
 function calendar_event_time_label( $p_date_from, $p_duration ) {
     $t_date_to = (int)$p_date_from + (int)$p_duration;
-    $t_format  = calendar_event_is_multiday( $p_date_from, $p_duration ) ? config_get( 'short_date_format' ) . ' H:i' : 'H:i';
+    $t_format  = calendar_event_is_multiday( $p_date_from, $p_duration ) ? config_get( 'short_date_format' ) . ' ' . calendar_time_format() : calendar_time_format();
 
     return date( $t_format, $p_date_from ) . ' - ' . date( $t_format, $t_date_to );
 }
@@ -155,13 +189,13 @@ function calendar_event_segment_time_label( array $p_event_row ) {
     $t_ends_here   = $p_event_row['segment_to'] == $p_event_row['date_from'] + $p_event_row['duration'];
 
     if( $t_starts_here && $t_ends_here ) {
-        return date( 'H:i', $p_event_row['date_from'] );
+        return date( calendar_time_format(), $p_event_row['date_from'] );
     }
     if( $t_starts_here ) {
-        return date( 'H:i', $p_event_row['segment_from'] ) . ' →';
+        return date( calendar_time_format(), $p_event_row['segment_from'] ) . ' →';
     }
     if( $t_ends_here ) {
-        return '→ ' . date( 'H:i', $p_event_row['segment_to'] );
+        return '→ ' . date( calendar_time_format(), $p_event_row['segment_to'] );
     }
     return '→';
 }

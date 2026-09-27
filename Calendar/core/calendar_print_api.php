@@ -95,13 +95,15 @@ function print_time_select_option( $p_selected_time = NULL, $p_full_range = FALS
     $t_time_count          = 3600 / plugin_config_get( 'stepDayMinutesCount' );
     $t_select_time_options = range( $t_time_day_start_timestamp, $t_time_day_finish_timestamp, $t_time_count );
 
+    $t_time_format = calendar_time_format();
+
     echo '<option value="--:--">--:--</option>';
     foreach( $t_select_time_options as $key => $t_current_time ) {
 
         if( $p_selected_time !== $t_current_time ) {
-            echo '<option value="' . $t_current_time . '">' . gmdate( "H:i", $t_current_time ) . '</option>';
+            echo '<option value="' . $t_current_time . '">' . gmdate( $t_time_format, $t_current_time ) . '</option>';
         } else {
-            echo '<option selected value="' . $t_current_time . '">' . gmdate( "H:i", $t_current_time ) . '</option>';
+            echo '<option selected value="' . $t_current_time . '">' . gmdate( $t_time_format, $t_current_time ) . '</option>';
         }
     }
 }

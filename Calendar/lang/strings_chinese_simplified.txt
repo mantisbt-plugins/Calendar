@@ -45,6 +45,7 @@ $s_plugin_Calendar_not_repeat = "无需重复";
 $s_plugin_Calendar_config_title = '设置';
 $s_plugin_Calendar_config_days_week_display = '设置一周需显示的天数 (用户设置将覆盖默认设置)';
 $s_plugin_Calendar_config_time_day_range = '设置工作开始与结束时间 (用户设置将覆盖默认设置)';
+$s_plugin_Calendar_config_time_format_12h = '12 小时制时间格式，1:30 PM 而非 13:30 (默认与 MantisBT 日期格式一致)';
 $s_plugin_Calendar_config_step_day_minutes_count = '每小时的间隔数';
 $s_plugin_Calendar_config_start_step_days = '相对于所选周的天数变化';
 $s_plugin_Calendar_config_count_step_days = '显示的天数';

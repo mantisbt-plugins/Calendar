@@ -97,6 +97,7 @@ Features
 - Personal reminders: the author and every member can add or remove reminders of an event for themselves only (v. >= 3.0.0).
 - Export of an event as an iCalendar (.ics) file, from the event page and from the notification mails (v. >= 3.0.0).
 - Opening an event by its number from the calendar toolbar (v. >= 3.0.0).
+- 12-hour (AM/PM) or 24-hour times, following the MantisBT date format by default, with a per-user choice in the account settings (v. >= 3.0.0).
 - Choice of where the calendar sits on the issue page: a row of the issue details, a block of its own, or per user (v. >= 3.0.0).
 - Manual check for a newer release on the settings page (v. >= 3.0.0).
 - Event history, with records written by other plugins shown next to the native ones (v. >= 3.0.0).

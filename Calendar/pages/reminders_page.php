@@ -104,6 +104,16 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
 
                                 <tr>
                                     <td class="category">
+                                        <?php echo plugin_lang_get( 'config_time_format_12h' ) ?>
+                                    </td>
+
+                                    <td colspan="2">
+                                        <label><input type="checkbox" name="time_format_12h" value="1"<?php echo calendar_time_12h() ? ' checked="checked"' : '' ?>></label>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="category">
                                         <?php echo plugin_lang_get( 'config_step_day_minutes_count' ) ?>
                                     </td>
 

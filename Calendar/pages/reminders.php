@@ -69,6 +69,14 @@ if( $t_view_settings ) {
     plugin_config_set( 'startStepDays', $f_start_step_days, $t_current_user_id );
     plugin_config_set( 'countStepDays', $f_count_step_days, $t_current_user_id );
 
+    # the notation of the core date format is not stored, so the user keeps following it
+    $f_time_format_12h = gpc_get_bool( 'time_format_12h' ) ? ON : OFF;
+    if( $f_time_format_12h == ( calendar_time_12h_core() ? ON : OFF ) ) {
+        plugin_config_delete( 'time_format_12h', $t_current_user_id );
+    } else {
+        plugin_config_set( 'time_format_12h', $f_time_format_12h, $t_current_user_id );
+    }
+
     # the list is only on the page once the user has granted access to Google;
     # "0" is its "do not sync" entry, anything else has to be one of the
     # calendars of that account - an unknown id keeps the stored choice

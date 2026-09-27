@@ -34,7 +34,7 @@ class TimeColumn extends ColumnForm {
         $this->range_url     = $p_range_url;
         $this->range_text    = $p_range_text;
         $t_date              = self::$time_period_list[count( self::$time_period_list ) - 1];
-        $this->last_row_text = gmdate( "H:i", $t_date );
+        $this->last_row_text = gmdate( calendar_time_format(), $t_date );
     }
 
     protected function html_column_param() {
@@ -65,10 +65,10 @@ class TimeColumn extends ColumnForm {
 //        }
         if( self::$intervals_per_hour % 2 == 0 ) {
             if( ( $p_time / self::$min_segment_time_in_hour ) % 2 == 0 ) {
-                $t_result .= gmdate( "H:i", $p_time );
+                $t_result .= gmdate( calendar_time_format(), $p_time );
             }
         } elseif( ( $p_time / self::$min_segment_time_in_hour ) % 2 != 0 ) {
-            $t_result .= gmdate( "H:i", $p_time );
+            $t_result .= gmdate( calendar_time_format(), $p_time );
         }
         return $t_result;
     }

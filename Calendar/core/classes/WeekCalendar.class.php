@@ -200,7 +200,7 @@ abstract class WeekCalendar {
         $t_start   = plugin_config_get( 'time_day_start', NULL, FALSE, $t_user_id );
         $t_finish  = plugin_config_get( 'time_day_finish', NULL, FALSE, $t_user_id );
 
-        return array( 'url' => $t_url, 'text' => gmdate( "H", $t_start ) . "-" . gmdate( "H", $t_finish ) );
+        return array( 'url' => $t_url, 'text' => gmdate( calendar_hour_format(), $t_start ) . "-" . gmdate( calendar_hour_format(), $t_finish ) );
     }
 
     /**
