@@ -236,6 +236,7 @@ $s_plugin_Calendar_reminder_offset_after_start = '%1$s después del inicio';
 $s_plugin_Calendar_reminder_hint_defaults = 'Si no tiene recordatorios propios, el evento usa los recordatorios predeterminados de cada participante.';
 $s_plugin_Calendar_view_event_reminders_defaults = 'Recordatorios predeterminados de cada participante';
 $s_plugin_Calendar_reminders_source_event = 'Recordatorios del evento';
+$s_plugin_Calendar_reminders_source_event_for_you = 'Sus recordatorios: los del evento';
 $s_plugin_Calendar_reminders_source_personal = 'Sus recordatorios para este evento';
 $s_plugin_Calendar_reminders_source_defaults = 'Sus recordatorios predeterminados';
 $s_plugin_Calendar_reminders_event_set = 'Recordatorios del evento: %1$s';

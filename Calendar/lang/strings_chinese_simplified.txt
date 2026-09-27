@@ -237,6 +237,7 @@ $s_plugin_Calendar_reminder_offset_after_start = '开始后 %1$s';
 $s_plugin_Calendar_reminder_hint_defaults = '如果事件没有自己的提醒，则使用每位参与者的默认提醒。';
 $s_plugin_Calendar_view_event_reminders_defaults = '每位参与者的默认提醒';
 $s_plugin_Calendar_reminders_source_event = '事件的提醒';
+$s_plugin_Calendar_reminders_source_event_for_you = '您的提醒：沿用事件的提醒';
 $s_plugin_Calendar_reminders_source_personal = '您对此事件的提醒';
 $s_plugin_Calendar_reminders_source_defaults = '您的默认提醒';
 $s_plugin_Calendar_reminders_event_set = '事件的提醒：%1$s';

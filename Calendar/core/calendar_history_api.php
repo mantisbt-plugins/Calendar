@@ -297,7 +297,10 @@ function event_history_localize_row( array $p_row ) {
             break;
 
         case CALENDAR_HISTORY_REMINDER_SENT_MANY:
-            $t_localized['note']      = sprintf( plugin_lang_get( 'event_history_reminder_sent_many' ), (int)$p_row['new_value'] );
+            # a single recipient reads better without the count
+            $t_localized['note']      = (int)$p_row['new_value'] == 1
+                    ? plugin_lang_get( 'event_history_reminder_sent' )
+                    : sprintf( plugin_lang_get( 'event_history_reminder_sent_many' ), (int)$p_row['new_value'] );
             $t_localized['new_value'] = calendar_reminder_format_distance( (int)$p_row['old_value'] );
             break;
 

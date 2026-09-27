@@ -184,7 +184,10 @@ function print_event_reminder_block( $p_event_id, $p_date, $p_user_id ) {
     $t_effective    = calendar_reminder_effective( $c_event_id, $t_is_recipient ? $p_user_id : 0, $t_sets );
     $t_max_rows     = (int)plugin_config_get( 'reminder_max_per_event' );
 
-    if( $t_is_recipient ) {
+    if( $t_is_recipient && $t_can_update && $t_effective['source'] == 'event' ) {
+        # the editor row above is headed "reminders of the event" already
+        $t_source_label = plugin_lang_get( 'reminders_source_event_for_you' );
+    } elseif( $t_is_recipient ) {
         $t_source_label = plugin_lang_get( 'reminders_source_' . $t_effective['source'] );
     } else {
         $t_source_label = $t_effective['source'] == 'event'

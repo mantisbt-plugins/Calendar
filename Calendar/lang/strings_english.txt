@@ -40,7 +40,7 @@ $s_plugin_Calendar_this_and_future_event = 'This and following events';
 $s_plugin_Calendar_all_event = 'All events';
 
 $s_plugin_Calendar_repeat_to = "to";
-$s_plugin_Calendar_not_repeat = "Not";
+$s_plugin_Calendar_not_repeat = "No";
 
 $s_plugin_Calendar_config_title = 'Settings';
 $s_plugin_Calendar_config_days_week_display = 'Days of the week for display (User settings override the default settings)';
@@ -237,6 +237,7 @@ $s_plugin_Calendar_reminder_offset_after_start = '%1$s after the start';
 $s_plugin_Calendar_reminder_hint_defaults = 'Without reminders of its own, the event uses the default reminders of every participant.';
 $s_plugin_Calendar_view_event_reminders_defaults = 'Default reminders of every participant';
 $s_plugin_Calendar_reminders_source_event = 'Reminders of the event';
+$s_plugin_Calendar_reminders_source_event_for_you = 'Your reminders: those of the event';
 $s_plugin_Calendar_reminders_source_personal = 'Your reminders for this event';
 $s_plugin_Calendar_reminders_source_defaults = 'Your default reminders';
 $s_plugin_Calendar_reminders_event_set = 'Reminders of the event: %1$s';

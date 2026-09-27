@@ -237,6 +237,7 @@ $s_plugin_Calendar_reminder_offset_after_start = '%1$s после начала';
 $s_plugin_Calendar_reminder_hint_defaults = 'Если у события нет своих напоминаний, используются напоминания по умолчанию каждого участника.';
 $s_plugin_Calendar_view_event_reminders_defaults = 'Напоминания по умолчанию каждого участника';
 $s_plugin_Calendar_reminders_source_event = 'Напоминания события';
+$s_plugin_Calendar_reminders_source_event_for_you = 'Ваши напоминания: напоминания события';
 $s_plugin_Calendar_reminders_source_personal = 'Ваши напоминания для этого события';
 $s_plugin_Calendar_reminders_source_defaults = 'Ваши напоминания по умолчанию';
 $s_plugin_Calendar_reminders_event_set = 'Напоминания события: %1$s';
