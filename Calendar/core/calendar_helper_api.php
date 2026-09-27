@@ -40,6 +40,35 @@ function calendar_bug_block_user_choice() {
 }
 
 /**
+ * Whether the logged in user may open the calendar of another user: it tells
+ * which events that user is a member of, so it takes the same level as the
+ * member list of an event, show_member_list_threshold, read for the current
+ * project the way the rest of the calendar page is
+ * @return boolean
+ */
+function calendar_other_user_calendar_allowed() {
+    return access_has_project_level( plugin_config_get( 'show_member_list_threshold' ) );
+}
+
+/**
+ * The for_user filter of the calendar views as requested: a user id,
+ * ALL_USERS, CALENDAR_FILTER_AUTHOR or CALENDAR_FILTER_PENDING. The calendar
+ * of another user falls back to the own one for whoever may not open it, see
+ * calendar_other_user_calendar_allowed().
+ * @return integer
+ */
+function calendar_for_user_get() {
+    $t_current_user_id = auth_get_current_user_id();
+    $f_for_user        = gpc_get_int( 'for_user', $t_current_user_id );
+
+    if( $f_for_user > 0 && $f_for_user != $t_current_user_id && !calendar_other_user_calendar_allowed() ) {
+        return $t_current_user_id;
+    }
+
+    return $f_for_user;
+}
+
+/**
  * Whether the logged in user may set up how their calendar grid looks - the
  * days, the hours and the step of the week grid, the Google calendar to sync
  * to - on the account tab; the same threshold the settings button of the

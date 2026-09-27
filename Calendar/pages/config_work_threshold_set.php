@@ -22,6 +22,9 @@ form_security_validate( 'config_work_threshold_set' );
 
 auth_reauthenticate();
 
+# the same gate as config_work_threshold_page.php, which issues the token
+access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
+
 $t_redirect_url = plugin_page( 'config_work_threshold_page', TRUE );
 
 layout_page_header( lang_get( 'manage_threshold_config' ), $t_redirect_url );
@@ -38,9 +41,12 @@ $g_project = helper_get_current_project();
  * @return void
  */
 function set_capability_row( $p_threshold, $p_all_projects_only = false ) {
-	global $g_project;
+	global $g_access, $g_project;
 
-	if( ALL_PROJECTS == $g_project  || !$p_all_projects_only  ) {
+	# like the core manage_config_work_threshold_set.php: a row is only stored
+	# by a user who reaches the access level the option itself requires
+	if( ( $g_access >= config_get_access( 'plugin_' . plugin_get_current() . '_' . $p_threshold ) )
+			&& ( ALL_PROJECTS == $g_project || !$p_all_projects_only ) ) {
 		$f_threshold = gpc_get_int_array( 'flag_thres_' . $p_threshold, array() );
 		# @@debug @@ echo "<br />for $p_threshold "; var_dump($f_threshold, $f_access); echo '<br />';
 		$t_access_levels = MantisEnum::getAssocArrayIndexedByValues( config_get( 'access_levels_enum_string' ) );

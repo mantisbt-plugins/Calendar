@@ -232,15 +232,41 @@ function get_dates_event_from_events_id( $p_events_id ) {
     return $t_dates;
 }
 
+/**
+ * Keep the events of an issue the logged in user may see in the calendar
+ * block of the issue page: the block itself is behind bug_calendar_view_threshold,
+ * and every event in it is behind the view_event_threshold of its own project
+ * as well, the same one the event page asks for.
+ * @param array $p_event_ids List of event identifiers.
+ * @return array event identifiers, in the given order
+ * @access public
+ */
+function calendar_issue_event_ids_visible( array $p_event_ids ) {
+
+    $t_event_ids = array();
+
+    foreach( $p_event_ids as $t_event_id ) {
+
+        if( !event_exists( $t_event_id ) ) {
+            continue;
+        }
+
+        $t_project_id = (int)event_get_field( $t_event_id, 'project_id' );
+
+        if( access_has_event_level( plugin_config_get( 'bug_calendar_view_threshold', NULL, FALSE, NULL, $t_project_id ), $t_event_id )
+                && access_has_event_level( plugin_config_get( 'view_event_threshold', NULL, FALSE, NULL, $t_project_id ), $t_event_id ) ) {
+            $t_event_ids[] = $t_event_id;
+        }
+    }
+
+    return $t_event_ids;
+}
+
 function calendar_column_objects_get_from_event_ids( $p_events_id ) {
 
     $t_dates = array();
 
-    foreach( $p_events_id as $t_event_id ) {
-        
-        if( !event_exists( $t_event_id ) || !access_has_event_level( plugin_config_get( 'bug_calendar_view_threshold', NULL, FALSE, NULL, event_get_field( $t_event_id, "project_id" ) ), $t_event_id )) {
-            continue;
-        }
+    foreach( calendar_issue_event_ids_visible( $p_events_id ) as $t_event_id ) {
 
         $t_duration = (int)event_get_field( $t_event_id, 'duration' );
 

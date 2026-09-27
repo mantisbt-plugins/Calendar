@@ -48,7 +48,7 @@ $t_current_year = date( "o" );
 $f_week        = gpc_get_int( "week", $t_current_week );
 $f_year        = gpc_get_int( "year", $t_current_year );
 $f_is_fulltime = gpc_get_bool( "full_time" );
-$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
+$f_for_user    = calendar_for_user_get();
 
 if( strtotime( $f_year . 'W' . str_pad( $f_week, 2, 0, STR_PAD_LEFT ) ) == false ) {
     error_parameters( plugin_lang_get( 'date_event' ) );

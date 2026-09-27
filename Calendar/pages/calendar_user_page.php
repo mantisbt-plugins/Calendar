@@ -51,7 +51,7 @@ $p_date_selected = $f_view_type === 'week' ? strtotime( $f_string_date_selected 
 $f_week        = gpc_get_int( "week", !$p_date_selected ? $t_current_week : date( "W", $p_date_selected ) );
 $f_month       = gpc_get_int( "month", !$p_date_selected ? $t_current_month : date( "n", $p_date_selected ) );
 $f_year        = gpc_get_int( "year", !$p_date_selected ? $t_current_year : date( "o", $p_date_selected ) );
-$f_for_user    = gpc_get_int( "for_user", auth_get_current_user_id() );
+$f_for_user    = calendar_for_user_get();
 //$t_access_level_current_user        = access_get_project_level();
 //$t_access_level_global_current_user = access_get_global_level();
 

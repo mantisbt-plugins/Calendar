@@ -47,9 +47,12 @@ if( $t_view_settings ) {
     $f_count_step_days        = gpc_get_int( 'count_step_days' );
     $f_google_calendar        = gpc_get_string( 'google_calendar_list', NULL );
 
-    if( $f_time_start >= $f_time_finish
+    # the ranges the form offers: a day of 0-24 hours, one to six rows an
+    # hour, a start within the week and a grid of at most a month
+    if( $f_time_start < 0 || $f_time_finish > 86400 || $f_time_start >= $f_time_finish
             || $f_step_day_minutes_count < 1 || $f_step_day_minutes_count > 6
-            || $f_start_step_days < 0 || $f_count_step_days < 1 ) {
+            || $f_start_step_days < 0 || $f_start_step_days > 6
+            || $f_count_step_days < 1 || $f_count_step_days > 31 ) {
         error_parameters( plugin_lang_get( 'date_event' ) );
         plugin_error( 'ERROR_RANGE_TIME', ERROR );
     }
@@ -67,7 +70,13 @@ if( $t_view_settings ) {
     plugin_config_set( 'countStepDays', $f_count_step_days, $t_current_user_id );
 
     # the list is only on the page once the user has granted access to Google;
-    # "0" is its "do not sync" entry
+    # "0" is its "do not sync" entry, anything else has to be one of the
+    # calendars of that account - an unknown id keeps the stored choice
+    if( $f_google_calendar !== NULL && $f_google_calendar !== '0'
+            && !in_array( $f_google_calendar, google_calendar_list_ids( $t_current_user_id ), true ) ) {
+        $f_google_calendar = NULL;
+    }
+
     if( $f_google_calendar !== NULL && plugin_config_get( 'google_calendar_sync_id', '0', FALSE, $t_current_user_id ) !== $f_google_calendar ) {
         if( $f_google_calendar === '0' ) {
             plugin_config_delete( 'google_calendar_sync_id', $t_current_user_id );

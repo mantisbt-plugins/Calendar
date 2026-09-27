@@ -322,7 +322,10 @@ $t_name_days_week = plugin_config_get( 'arWeekdaysName' );
                         } else if( calendar_update_is_available( $t_update ) ) {
                             $t_update_class = 'alert-warning';
                             $t_update_icon  = 'fa-arrow-circle-up';
-                            $t_latest       = '<a href="' . string_attribute( $t_update['url'] ) . '" target="_blank" rel="noopener">' . string_display_line( $t_update['latest'] ) . '</a>';
+                            $t_latest       = string_display_line( $t_update['latest'] );
+                            if( !is_blank( $t_update['url'] ) ) {
+                                $t_latest = '<a href="' . string_attribute( $t_update['url'] ) . '" target="_blank" rel="noopener">' . $t_latest . '</a>';
+                            }
                             $t_update_text  = sprintf( plugin_lang_get( 'update_check_available' ), $t_latest, date( config_get( 'normal_date_format' ), $t_update['published_at'] ) );
                         } else {
                             $t_update_class = 'alert-success';

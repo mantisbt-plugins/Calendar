@@ -359,7 +359,8 @@ function calendar_api_candidate_issues( int $p_project_id, int $p_user_id, int $
  *   with its own matrix is honoured;
  * - the personal notify_event_* settings of every candidate apply, as does the
  *   view_event_threshold of the event, which drops users who have meanwhile
- *   lost access to it;
+ *   lost access to it; for 'member_added', 'member_removed' and 'rsvp', whose
+ *   mails name a member, the show_member_list_threshold of the event as well;
  * - EVENT_CALENDAR_NOTIFY_USER_INCLUDE and EVENT_CALENDAR_NOTIFY_USER_EXCLUDE
  *   are raised on this path too, so a plugin that widens or narrows the circle
  *   of the mails narrows it here as well.

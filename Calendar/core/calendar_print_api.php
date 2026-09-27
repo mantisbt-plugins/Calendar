@@ -18,7 +18,8 @@
  * The <option> rows of the for_user filter of the calendar views: the reset
  * entry, all users, the events the current user has created, those waiting
  * for their reply while the replies are on, and then every user of the
- * project who can report events
+ * project who can report events - or the current user alone, for whoever
+ * may not open the calendar of another user
  * @param integer $p_for_user The selected value: a user id, ALL_USERS, CALENDAR_FILTER_AUTHOR or CALENDAR_FILTER_PENDING.
  * @return void
  */
@@ -31,6 +32,14 @@ function print_for_user_option_list( $p_for_user ) {
     foreach( $t_modes as $t_value => $t_lang_key ) {
         echo '<option value="' . $t_value . '"' . ( $p_for_user == $t_value ? ' selected="selected"' : '' ) . '>[' . plugin_lang_get( $t_lang_key ) . ']</option>';
     }
+    # the page falls back to the own calendar anyway, see calendar_for_user_get()
+    if( !calendar_other_user_calendar_allowed() ) {
+        $t_current_user_id = auth_get_current_user_id();
+        echo '<option value="' . $t_current_user_id . '"' . ( $p_for_user == $t_current_user_id ? ' selected="selected"' : '' ) . '>'
+                . string_display_line( user_get_name( $t_current_user_id ) ) . '</option>';
+        return;
+    }
+
     # The core appends a "deleted user" row for an id it cannot find and
     # marks it selected, so the sentinels of the modes must not reach it
     $t_selected_user = $p_for_user < 0 ? NO_USER : $p_for_user;

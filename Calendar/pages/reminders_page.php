@@ -118,7 +118,7 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                     </td>
 
                                     <td colspan="2">
-                                        <input style="width: 50px;" type="number" name="start_step_days" min="0" value="<?php echo plugin_config_get( 'startStepDays' ) ?>" step="1"/>
+                                        <input style="width: 50px;" type="number" name="start_step_days" min="0" max="6" value="<?php echo plugin_config_get( 'startStepDays' ) ?>" step="1"/>
                                     </td>
                                 </tr>
 
@@ -128,7 +128,7 @@ print_account_menu( plugin_page( 'reminders_page', TRUE ) );
                                     </td>
 
                                     <td colspan="2">
-                                        <input style="width: 50px;" type="number" name="count_step_days" min="1" value="<?php echo plugin_config_get( 'countStepDays' ) ?>" step="1"/>
+                                        <input style="width: 50px;" type="number" name="count_step_days" min="1" max="31" value="<?php echo plugin_config_get( 'countStepDays' ) ?>" step="1"/>
                                     </td>
                                 </tr>
 

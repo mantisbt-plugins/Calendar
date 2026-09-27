@@ -218,6 +218,12 @@ function calendar_notify_user_enabled( $p_user_id, $p_action ) {
  * survived all the checks, and a truthy answer of any plugin drops it.
  * Both are handed the raw action, not the row of the matrix it maps to, so
  * that a subscriber can tell a cancelled occurrence from a deleted event.
+ *
+ * The mails of the member_added, member_removed and rsvp rows name a member
+ * of the event and, for a reply, what they answered. They go only to the
+ * candidates who may see the member list of the event, that is who pass its
+ * show_member_list_threshold as well, so that a mail does not tell what the
+ * event page hides; calendar_api_event_notify_recipients() answers the same.
  * @param array        $p_event           Event fields as returned by calendar_notify_event_fields().
  * @param string       $p_action          One of the actions understood by calendar_notify_send().
  * @param integer|null $p_actor_id        User who acted, a recipient only where the matrix says so.
@@ -267,6 +273,9 @@ function calendar_notify_recipients( array $p_event, $p_action, $p_actor_id = nu
 
     $t_pref_action = calendar_notify_action_pref( $p_action );
 
+    # the rows whose mails name a member of the event
+    $t_names_member = in_array( calendar_notify_action_row( $p_action ), array( 'member_added', 'member_removed', 'rsvp' ), true );
+
     $t_recipients = array();
     foreach( array_unique( $t_user_ids ) as $t_user_id ) {
 
@@ -299,6 +308,12 @@ function calendar_notify_recipients( array $p_event, $p_action, $p_actor_id = nu
         # read for the recipient and the project of the event, so that the
         # answer depends neither on the context of whoever acts nor on cron
         if( !access_has_event_level( plugin_config_get( 'view_event_threshold', null, false, $t_user_id, (int)$p_event['project_id'] ), $t_event_id, $t_user_id ) ) {
+            continue;
+        }
+
+        # a mail that names a member is for those who may see the members
+        if( $t_names_member
+                && !access_has_event_level( plugin_config_get( 'show_member_list_threshold', null, false, $t_user_id, (int)$p_event['project_id'] ), $t_event_id, $t_user_id ) ) {
             continue;
         }
 

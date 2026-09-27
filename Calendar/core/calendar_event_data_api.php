@@ -486,6 +486,51 @@ function event_cache_row( $p_event_id, $p_trigger_errors = true ) {
 }
 
 /**
+ * Cache the rows of the given events with one query, for a list that is
+ * about to look them up one by one; an event that does not exist is cached
+ * as missing, the way event_cache_row() does it
+ * @param array $p_event_ids List of event identifiers.
+ * @return void
+ * @access public
+ * @uses database_api.php
+ */
+function event_cache_array_rows( array $p_event_ids ) {
+    global $g_cache_calendar_event;
+
+    $t_ids_to_fetch = array();
+    foreach( $p_event_ids as $t_event_id ) {
+        $c_event_id = (int)$t_event_id;
+        if( $c_event_id > 0 && !isset( $g_cache_calendar_event[$c_event_id] ) ) {
+            $t_ids_to_fetch[$c_event_id] = $c_event_id;
+        }
+    }
+
+    if( count( $t_ids_to_fetch ) == 0 ) {
+        return;
+    }
+
+    db_param_push();
+    $t_params    = array();
+    $t_in_values = array();
+    foreach( $t_ids_to_fetch as $c_event_id ) {
+        $t_params[]    = $c_event_id;
+        $t_in_values[] = db_param();
+    }
+
+    $t_query  = 'SELECT * FROM ' . plugin_table( 'events' ) . ' WHERE id IN (' . implode( ',', $t_in_values ) . ')';
+    $t_result = db_query( $t_query, $t_params );
+
+    while( $t_row = db_fetch_array( $t_result ) ) {
+        event_add_to_cache( $t_row );
+        unset( $t_ids_to_fetch[(int)$t_row['id']] );
+    }
+
+    foreach( $t_ids_to_fetch as $c_event_id ) {
+        $g_cache_calendar_event[$c_event_id] = false;
+    }
+}
+
+/**
  * Inject a event into the event cache
  * @param array p_event_row event row to cache
  * @param array p_stats bugnote stats to cache
@@ -732,6 +777,12 @@ function get_events_id_from_bug_id( $p_bug_id ) {
     }
 }
 
+/**
+ * The history of an issue is read by everybody who may view the issue, the
+ * event may be in a project they cannot see: the records written into it by
+ * event_detach_issue() and event_attach_issue() name the event by its number,
+ * never by its name.
+ */
 function event_detach_issue( $p_event_id, $p_bugs_id ) {
 
     $t_table_calendar_relationship = plugin_table( "relationship" );
@@ -746,7 +797,7 @@ function event_detach_issue( $p_event_id, $p_bugs_id ) {
         db_query( $query, array( $p_event_id, $t_bug_id ) );
 
         plugin_history_log(
-                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_bug_detach" ) . ": " . event_get_field( $p_event_id, 'name' )
+                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_bug_detach" ) . ": " . bug_format_id( $p_event_id )
         );
         bug_update_date( $t_bug_id );
 
@@ -777,7 +828,7 @@ function event_attach_issue( $p_event_id, array $p_bugs_id ) {
         event_history_log( $p_event_id, CALENDAR_HISTORY_BUG_ATTACHED, '', $t_bug_id );
 
         plugin_history_log(
-                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . event_get_field( $p_event_id, 'name' )
+                $t_bug_id, plugin_lang_get( "event" ), "", plugin_lang_get( "event_hystory_create" ) . ": " . bug_format_id( $p_event_id )
         );
         bug_update_date( $t_bug_id );
     }
@@ -879,7 +930,8 @@ function calendar_event_issue_attachment_count( $p_bug_id ) {
 }
 
 /**
- * Fills the cache with the attachment count from a list of bugs
+ * Fills the cache with the attachment count from a list of bugs, counting the
+ * events the logged in user may see only, see calendar_issue_event_ids_visible().
  * If the bug doesn't have attachments, cache its value as 0.
  * @global array $g_cache_calendar_event_count
  * @param array $p_bug_ids Array of bug ids
@@ -906,15 +958,34 @@ function calendar_event_issue_attachment_count_cache( array $p_bug_ids ) {
 		$t_in_values[] = db_param();
 	}
 
-	$t_query = 'SELECT E.bug_id AS bug_id, COUNT(E.event_id) AS attachments'
+	$t_query = 'SELECT E.bug_id AS bug_id, E.event_id AS event_id'
 			. ' FROM ' . plugin_table( 'relationship' ) . ' E'
-			. ' WHERE E.bug_id IN (' . implode( ',', $t_in_values ) . ')'
-			. ' GROUP BY E.bug_id';
+			. ' WHERE E.bug_id IN (' . implode( ',', $t_in_values ) . ')';
 
 	$t_result = db_query( $t_query, $t_params );
+	$t_bug_events = array();
 	while( $t_row = db_fetch_array( $t_result ) ) {
-		$c_bug_id = (int)$t_row['bug_id'];
-		$g_cache_calendar_event_count[$c_bug_id] = (int)$t_row['attachments'];
+		$t_bug_events[(int)$t_row['bug_id']][] = (int)$t_row['event_id'];
+	}
+
+	# only the events the user may see are counted, the way the calendar block
+	# of the issue page counts them; every event is checked once for the list
+	$t_all_event_ids = array();
+	foreach( $t_bug_events as $t_event_ids ) {
+		$t_all_event_ids = array_merge( $t_all_event_ids, $t_event_ids );
+	}
+	$t_all_event_ids = array_values( array_unique( $t_all_event_ids ) );
+	event_cache_array_rows( $t_all_event_ids );
+	$t_visible = array_flip( calendar_issue_event_ids_visible( $t_all_event_ids ) );
+
+	foreach( $t_bug_events as $c_bug_id => $t_event_ids ) {
+		$t_count = 0;
+		foreach( $t_event_ids as $t_event_id ) {
+			if( isset( $t_visible[$t_event_id] ) ) {
+				$t_count++;
+			}
+		}
+		$g_cache_calendar_event_count[$c_bug_id] = $t_count;
 		unset( $t_ids_to_search[$c_bug_id] );
 	}
 

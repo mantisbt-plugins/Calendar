@@ -36,6 +36,12 @@
 define( 'CALENDAR_UPDATE_RELEASES_LATEST_URL', 'https://api.github.com/repos/mantisbt-plugins/Calendar/releases/latest' );
 
 /**
+ * Prefix every release page link has to start with; anything else in the
+ * answer is not shown as a link.
+ */
+define( 'CALENDAR_UPDATE_RELEASE_PAGE_PREFIX', 'https://github.com/mantisbt-plugins/Calendar/' );
+
+/**
  * Query the latest release and remember the outcome.
  *
  * The stored array always holds 'checked_at'. On success it also holds
@@ -69,7 +75,10 @@ function calendar_update_check() {
         } else {
             # older tags read "v.2.7.3", hence the dot
             $t_result['latest']       = ltrim( $t_release['tag_name'], 'vV.' );
-            $t_result['url']          = isset( $t_release['html_url'] ) ? $t_release['html_url'] : '';
+            # the link is shown to the administrator, so it has to lead to the
+            # release pages of the plugin and nowhere else
+            $t_result['url']          = isset( $t_release['html_url'] ) && is_string( $t_release['html_url'] )
+                    && strpos( $t_release['html_url'], CALENDAR_UPDATE_RELEASE_PAGE_PREFIX ) === 0 ? $t_release['html_url'] : '';
             $t_result['published_at'] = isset( $t_release['published_at'] ) ? (int)strtotime( $t_release['published_at'] ) : 0;
         }
     } catch( \Exception $e ) {

@@ -22,11 +22,42 @@ function print_google_calendar_list() {
     echo '<option value="0">' . plugin_lang_get( 'user_config_google_calendar_list' ) . '</option>';
     foreach( $calendar_list as $calendar ) {
         if( $calendar['id'] === $t_config_list ) {
-            echo '<option selected value="' . $calendar['id'] . '">' . $calendar['summary'] . '</option>';
+            echo '<option selected value="' . string_attribute( $calendar['id'] ) . '">' . string_display_line( $calendar['summary'] ) . '</option>';
         } else {
-            echo '<option value="' . $calendar['id'] . '">' . $calendar['summary'] . '</option>';
+            echo '<option value="' . string_attribute( $calendar['id'] ) . '">' . string_display_line( $calendar['summary'] ) . '</option>';
         }
     }
+}
+
+/**
+ * Identifiers of the calendars of the Google account the given user has
+ * granted access to; empty while no grant is stored, so that nothing can be
+ * chosen without one. A grant that fails to refresh sends the browser through
+ * the consent of Google again, the way print_google_calendar_list() does.
+ * @param integer $p_user_id Integer representing user identifier.
+ * @return array calendar identifiers
+ * @access public
+ */
+function google_calendar_list_ids( $p_user_id ) {
+    $t_oauth = plugin_config_get( 'oauth_key', array(), FALSE, $p_user_id );
+
+    if( is_blank( plugin_config_get( 'google_client_secret' ) ) || !is_array( $t_oauth ) || !isset( $t_oauth['refresh_token'] ) ) {
+        return array();
+    }
+
+    $t_ids = array();
+
+    try {
+        $t_service = new Google_Service_Calendar( getClient( $p_user_id ) );
+
+        foreach( $t_service->calendarList->listCalendarList() as $t_calendar ) {
+            $t_ids[] = (string)$t_calendar['id'];
+        }
+    } catch( Exception $e ) {
+        return array();
+    }
+
+    return $t_ids;
 }
 
 function get_response_google_url() {

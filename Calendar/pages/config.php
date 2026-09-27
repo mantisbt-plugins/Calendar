@@ -42,7 +42,7 @@ foreach( $t_days_week_config as $t_name_day => $t_status ) {
     }
 }
 
-if( $f_time_start >= $f_time_finish ) {
+if( $f_time_start < 0 || $f_time_finish > 86400 || $f_time_start >= $f_time_finish ) {
     error_parameters( plugin_lang_get( 'date_event' ) );
     plugin_error( 'ERROR_RANGE_TIME', ERROR );
 }

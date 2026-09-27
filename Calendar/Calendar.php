@@ -612,7 +612,6 @@ class CalendarPlugin extends MantisPlugin {
         require_once 'core/calendar_access_api.php';
         require_once 'core/calendar_print_api.php';
         require_once 'core/calendar_helper_api.php';
-        require_once 'core/calendar_columns_api.php';
         require_once 'core/calendar_user_api.php';
         require_once 'core/calendar_form_api.php';
         require_once 'core/calendar_google_api.php';
@@ -880,7 +879,8 @@ class CalendarPlugin extends MantisPlugin {
     }
 
     private function print_issue_calendar( $p_bug_id ) {
-        $t_events_id = get_events_id_from_bug_id( $p_bug_id );
+        # the title counts the events the user may see, not every one attached
+        $t_events_id = calendar_issue_event_ids_visible( (array)get_events_id_from_bug_id( $p_bug_id ) );
         $t_dates     = calendar_column_objects_get_from_event_ids( $t_events_id );
 
         $t_calendar_issue_view = new ViewIssue( $t_dates, $p_bug_id, calendar_issue_full_time_get(), count( $t_events_id ) );
